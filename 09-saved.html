@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="תהילהון">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>תהילהון — פסוקים שמורים</title>
+<title>משניון — משניות שמורות</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--gold:#C07A00;--gold-light:#FFF8E5;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--gold:#E0A040;--gold-light:#2A2010;}
@@ -58,7 +58,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 .toast.show{opacity:1;}
 </style>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.84" defer></script>
+<script src="i18n.js?v=2.2.85" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -68,7 +68,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 
   <div class="topbar">
     <a href="01-dashboard.html" class="back-btn" data-i18n="read.back">← בית</a>
-    <div class="topbar-title" data-i18n="saved.title">🔖 פסוקים שמורים</div>
+    <div class="topbar-title" data-i18n="saved.title">🔖 משניות שמורות</div>
   </div>
 
   <div id="mainContent"></div>
@@ -130,15 +130,15 @@ function removeVerse(idx) {
   const saved = S.get(SAVED_KEY) || [];
   saved.splice(idx, 1);
   S.set(SAVED_KEY, saved);
-  showToast('🗑 הפסוק הוסר');
+  showToast('🗑 המשנה הוסרה');
   render();
 }
 
 /* Clear all */
 function clearAll() {
-  if (!confirm('למחוק את כל הפסוקים השמורים?')) return;
+  if (!confirm('למחוק את כל המשניות השמורות?')) return;
   S.set(SAVED_KEY, []);
-  showToast('🗑 כל הפסוקים נמחקו');
+  showToast('🗑 כל המשניות נמחקו');
   render();
 }
 
@@ -151,8 +151,8 @@ function render() {
     container.innerHTML = `
       <div class="hero">
         <span class="hero-icon">📜</span>
-        <div class="hero-title">אין פסוקים שמורים עדיין</div>
-        <div class="hero-sub">בזמן קריאת פרק, לחץ על 🔖<br>ליד כל פסוק שמוצא חן בעיניך — והוא ישמר כאן.</div>
+        <div class="hero-title">אין משניות שמורות עדיין</div>
+        <div class="hero-sub">בזמן לימוד פרק, לחץ על 🔖<br>ליד כל משנה שמוצאת חן בעיניך — והיא תישמר כאן.</div>
         <a href="03-reader.html" class="go-read-btn">פתח קורא ←</a>
       </div>`;
     return;
@@ -162,7 +162,7 @@ function render() {
     <div class="count-bar">
       <div>
         <span class="count-num">${saved.length}</span>
-        <span class="count-label"> פסוקים שמורים</span>
+        <span class="count-label"> משניות שמורות</span>
       </div>
       <button class="clear-all-btn" onclick="clearAll()">מחק הכל</button>
     </div>`;
@@ -188,7 +188,7 @@ function render() {
         <div class="verse-meta">
           <div class="verse-ref">
             <span class="verse-ref-dot"></span>
-            תהילים פרק ${chapRef}, פסוק ${verseRef}
+            ${chapRef}, משנה ${verseRef}
           </div>
           <div class="verse-actions">
             <a href="03-reader.html?chap=${sv.chap}" class="read-link">📖 פתח</a>

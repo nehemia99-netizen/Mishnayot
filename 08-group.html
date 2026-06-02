@@ -8,9 +8,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="תהילהון">
+  <meta name="apple-mobile-web-app-title" content="משניון">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>תהילהון — קבוצות</title>
+<title>משניון — קבוצות</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#7B2FF7;--purple-light:#F0EAFF;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#A87BF7;--purple-light:#1E1030;}
@@ -142,7 +142,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 .toast.show{opacity:1;}
 </style>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.84" defer></script>
+<script src="i18n.js?v=2.2.85" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -167,7 +167,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
   <div class="view" id="viewList">
     <div class="list-header">
       <div class="list-title" data-i18n="group.list_title">👥 הקבוצות שלי</div>
-      <div class="list-sub" data-i18n="group.list_sub">קרא תהילים יחד עם משפחה, חברים וחברותא</div>
+      <div class="list-sub" data-i18n="group.list_sub">למד משניות יחד עם משפחה, חברים וחברותא</div>
     </div>
     <div id="groupsListContainer"></div>
     <button class="add-group-btn" onclick="showCreate()" data-i18n="group.create_btn">➕ צור קבוצה חדשה</button>
@@ -265,7 +265,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
         <select class="form-input" id="challType" onchange="onChallTypeChange()">
           <option value="book" data-i18n="group.type_book">ספר שלם מתוך 5 ספרי תהילים</option>
           <option value="all" data-i18n="group.type_all">כל ה-150 פרקים</option>
-          <option value="day" data-i18n="group.type_day">פרקי תהילים של היום (לפי לוח עברי)</option>
+          <option value="day" data-i18n="group.type_day">המשנה היומית (לפי לוח עברי)</option>
           <option value="range" data-i18n="group.type_range">טווח פרקים מותאם</option>
         </select>
         <div id="challBookRow">
@@ -454,7 +454,7 @@ async function renderGroupsList() {
       <div class="empty-list">
         <div class="empty-list-icon">👥</div>
         <div class="empty-list-title">עדיין אין קבוצות</div>
-        <div class="empty-list-sub">צור קבוצה חדשה עם המשפחה, חברים או חברותא<br>וקראו תהילים יחד!</div>
+        <div class="empty-list-sub">צור קבוצה חדשה עם המשפחה, חברים או חברותא<br>ולמדו משניות יחד!</div>
       </div>`;
     return;
   }
@@ -764,9 +764,9 @@ window.closeChallengeBuilder=()=>{document.getElementById('challBuilder').style.
 window.onChallTypeChange=()=>{const t=document.getElementById('challType').value;document.getElementById('challBookRow').style.display=t==='book'?'':'none';document.getElementById('challRangeRow').style.display=t==='range'?'':'none';};
 window.createGroupChallenge=function(){
   const type=document.getElementById('challType').value;let chapters=[],title='';
-  if(type==='book'){const b=document.getElementById('challBook').value;chapters=chapsForType('book',b);const L={'1-41':'ספר א׳','42-72':'ספר ב׳','73-89':'ספר ג׳','90-106':'ספר ד׳','107-150':'ספר ה׳'};title=L[b]||'ספר תהילים';}
+  if(type==='book'){const b=document.getElementById('challBook').value;chapters=chapsForType('book',b);const L={'1-41':'ספר א׳','42-72':'ספר ב׳','73-89':'ספר ג׳','90-106':'ספר ד׳','107-150':'ספר ה׳'};title=L[b]||'סדר מהמשנה';}
   else if(type==='all'){chapters=chapsForType('all');title='כל ה-150 פרקים';}
-  else if(type==='day'){chapters=chapsForType('day');title='פרקי תהילים של היום';}
+  else if(type==='day'){chapters=chapsForType('day');title='המשנה היומית';}
   else if(type==='range'){const f=parseInt(document.getElementById('challFrom').value)||1;const t2=parseInt(document.getElementById('challTo').value)||f;if(t2<f){toast('⚠️ טווח לא חוקי');return;}chapters=chapsForType('range',[f,t2]);title='פרקים '+f+'-'+t2;}
   if(!chapters.length){toast('⚠️ בחר טווח חוקי');return;}
   const deadline=document.getElementById('challDeadline').value||null;
@@ -830,8 +830,8 @@ window.shareInvite=function(){
   const g=S.get('tehillim_group');if(!g)return;
   const isDeployed=location.protocol==='https:';
   const joinUrl=isDeployed?(location.origin+location.pathname.replace('08-group.html','')+'08-group.html?join='+g.code):('https://mishnayot-alpha.vercel.app/08-group.html?join='+g.code);
-  const text=`📖 הצטרף לקבוצת התהילים שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח תהילהון ← קבוצות ← הצטרף ← הזן קוד`;
-  if(IS_MOBILE&&navigator.share)navigator.share({title:'תהילהון — '+g.name,text}).catch(()=>{});
+  const text=`📖 הצטרף לקבוצת המשנה שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח משניון ← קבוצות ← הצטרף ← הזן קוד`;
+  if(IS_MOBILE&&navigator.share)navigator.share({title:'משניון — '+g.name,text}).catch(()=>{});
   else{navigator.clipboard.writeText(text).catch(()=>{});window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');toast('✅ נפתח WhatsApp');}
 };
 
