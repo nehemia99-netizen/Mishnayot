@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>משניון — קורא</title>
 <style>
-:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--verse-bg:#FAFAF8;}
-html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--verse-bg:#1A1A1A;}
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--verse-bg:#FAFAF8;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--verse-bg:#1A1A1A;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
 body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
@@ -109,8 +109,8 @@ html.dark .shinun-hint{color:#9B6FE0;}
 html.dark .shinun-score-banner{background:#1C1235;border-color:#5B3090;color:#9B6FE0;}
 
 /* Dedication banner */
-.dedication-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;background:linear-gradient(135deg,#E6F1FB,#D4E9FF);border-bottom:.5px solid #B5D4F4;flex-shrink:0;}
-html.dark .dedication-banner{background:linear-gradient(135deg,#152436,#0E1A2A);border-bottom-color:#2A5580;}
+.dedication-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;background:linear-gradient(135deg,#E9F2E9,#DCF0DE);border-bottom:.5px solid #BBD6BB;flex-shrink:0;}
+html.dark .dedication-banner{background:linear-gradient(135deg,#15291B,#0E1E14);border-bottom-color:#2E5E34;}
 .ded-icon{font-size:16px;flex-shrink:0;}
 .ded-text{flex:1;font-size:13px;font-weight:700;color:var(--primary);line-height:1.3;}
 .ded-sub{font-size:10px;font-weight:400;color:var(--primary);opacity:.75;display:block;margin-top:1px;}
@@ -1570,7 +1570,7 @@ function assessVerse(idx, knew) {
 
 /* ── Medal system ── */
 const MEDALS_DEF = [
-  { level:'platinum', label:'פלטינה', emoji:'💎', minMin:45, color:'#5090C8', bonus:50 },
+  { level:'platinum', label:'פלטינה', emoji:'💎', minMin:45, color:'#5A9E68', bonus:50 },
   { level:'gold',     label:'זהב',    emoji:'🥇', minMin:30, color:'#C8A800', bonus:35 },
   { level:'silver',   label:'כסף',    emoji:'🥈', minMin:15, color:'#909098', bonus:20 },
   { level:'bronze',   label:'ארד',    emoji:'🥉', minMin: 5, color:'#CD7F32', bonus:10 },

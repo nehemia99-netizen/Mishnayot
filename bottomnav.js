@@ -91,7 +91,7 @@
     '  transition: transform .15s;',
     '}',
     '#_bnav a.active {',
-    '  color: var(--primary, #185FA5);',
+    '  color: var(--primary, #3A7D44);',
     '}',
     '#_bnav a.active .bn-icon {',
     '  transform: scale(1.18);',

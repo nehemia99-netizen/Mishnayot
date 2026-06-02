@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>תהילהון — קהילה</title>
 <style>
-:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--hot-bg:#FAECE7;--hot-color:#993C1D;--purple:#7B2FF7;--purple-light:#F5F0FF;}
-html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--hot-bg:#351A1A;--hot-color:#E07755;--purple:#9B6FE0;--purple-light:#1C1235;}
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--hot-bg:#FAECE7;--hot-color:#993C1D;--purple:#7B2FF7;--purple-light:#F5F0FF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--hot-bg:#351A1A;--hot-color:#E07755;--purple:#9B6FE0;--purple-light:#1C1235;}
 *{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
 body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;}
 .app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
@@ -64,8 +64,8 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .go-group-btn{display:inline-block;padding:11px 28px;border-radius:14px;background:var(--purple);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;text-decoration:none;}
 
 /* Group header card */
-.group-header-card{margin:12px 16px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,#185FA5,#1048A0);color:#fff;}
-html.dark .group-header-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);}
+.group-header-card{margin:12px 16px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,#3A7D44,#246034);color:#fff;}
+html.dark .group-header-card{background:linear-gradient(135deg,#16401E,#122E18);}
 .ghc-name{font-size:18px;font-weight:800;margin-bottom:2px;}
 .ghc-meta{font-size:12px;opacity:.75;}
 .ghc-code{display:inline-block;margin-top:8px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:1.5px;}
@@ -99,7 +99,7 @@ html.dark .group-header-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);
 .mission-pct{font-size:13px;font-weight:700;color:var(--primary);}
 .mission-sub{font-size:11px;color:var(--text-muted);margin-bottom:9px;}
 .mission-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px;}
-.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#5AA8E8);transition:width .7s cubic-bezier(.16,1,.3,1);}
+.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#6FBF7A);transition:width .7s cubic-bezier(.16,1,.3,1);}
 .mission-nums{display:flex;justify-content:space-between;font-size:11px;}
 .mission-nums .done{color:var(--primary);font-weight:700;}
 .mission-nums .tot{color:var(--text-muted);}
@@ -287,7 +287,7 @@ function toGem2(n) {
   return ones[n] || String(n);
 }
 function avatarColor(str) {
-  const colors=['#185FA5','#7A4A00','#6A1B9A','#2E7D32','#880E4F','#1565C0','#F57F17','#00695C','#C62828','#37474F'];
+  const colors=['#3A7D44','#7A4A00','#6A1B9A','#2E7D32','#880E4F','#2F7D45','#F57F17','#00695C','#C62828','#37474F'];
   let h=0; for(const c of (str||'')) h=(h*31+c.charCodeAt(0))&0xffff;
   return colors[h % colors.length];
 }
@@ -443,7 +443,7 @@ function getUid() {
 }
 const MY_ID = getUid();
 
-const COLORS = ['#185FA5','#3B8C14','#7B2FF7','#C8A800','#C04040','#5090C8','#CD7F32'];
+const COLORS = ['#3A7D44','#3B8C14','#7B2FF7','#C8A800','#C04040','#5A9E68','#CD7F32'];
 function avatarBg(name) {
   let h=0; for(const c of (name||'X')) h=(h*31+c.charCodeAt(0))|0;
   return COLORS[Math.abs(h)%COLORS.length];

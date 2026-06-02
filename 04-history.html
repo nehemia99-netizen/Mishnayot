@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>תהילהון — היסטוריה</title>
 <style>
-:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;}
-html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;}
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
 body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
@@ -159,8 +159,8 @@ html.dark .badge-card.earned{background:#3A2E0A;border-color:#F5C842;}
 
 
 /* === Level card + chapter map (2.0.6) === */
-.level-card{margin:14px 16px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#185FA5,#1048A0);color:#fff;text-align:center;}
-html.dark .level-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);}
+.level-card{margin:14px 16px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#3A7D44,#246034);color:#fff;text-align:center;}
+html.dark .level-card{background:linear-gradient(135deg,#16401E,#122E18);}
 .level-emoji{font-size:38px;line-height:1;margin-bottom:6px;}
 .level-name{font-size:18px;font-weight:800;margin-bottom:2px;}
 .level-sub{font-size:12px;opacity:.85;}
@@ -179,19 +179,19 @@ html.dark .level-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);}
 .sc-cell.sc2{background:#66BB6A;border-color:#2E7D32;}
 .sc-cell.sc3{background:#2E7D32;border-color:#1B5E20;}
 .sc-cell.sc4{background:#1B5E20;border-color:#003300;}
-html.dark .sc-cell{background:#1A1A2E;border-color:#333;}
+html.dark .sc-cell{background:#16241A;border-color:#333;}
 html.dark .sc-cell.sc1{background:#1B3A1F;border-color:#2E7D32;}
 html.dark .sc-cell.sc2{background:#1F5C24;border-color:#388E3C;}
 html.dark .sc-cell.sc3{background:#2A7A30;border-color:#4CAF50;}
 html.dark .sc-cell.sc4{background:#3DAA45;border-color:#81C784;}
 .streak-cal-legend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:10px;color:var(--text-muted);justify-content:flex-end;}
 .sc-leg{width:11px;height:11px;border-radius:2px;border:.5px solid var(--border);}
-.sc-cell.shabbat{background:#DDEEFF;border-color:#4A90D9;}
-html.dark .sc-cell.shabbat{background:#0D2340;border-color:#4A90D9;}
-.sc-cell.shabbat.sc1{background:#B8D8F8;border-color:#1565C0;}
-.sc-cell.shabbat.sc2{background:#82B8F0;border-color:#0D47A1;}
-.sc-cell.shabbat.sc3{background:#4090D0;border-color:#01337A;}
-.sc-cell.shabbat.sc4{background:#1565C0;border-color:#003070;}
+.sc-cell.shabbat{background:#E3F4E5;border-color:#54A463;}
+html.dark .sc-cell.shabbat{background:#0E2416;border-color:#54A463;}
+.sc-cell.shabbat.sc1{background:#BFDCC2;border-color:#2F7D45;}
+.sc-cell.shabbat.sc2{background:#88C492;border-color:#225E32;}
+.sc-cell.shabbat.sc3{background:#4C9E60;border-color:#0E4A24;}
+.sc-cell.shabbat.sc4{background:#2F7D45;border-color:#0C4622;}
 .lstat{text-align:center;}
 .lstat-num{font-size:18px;font-weight:800;}
 .lstat-lbl{font-size:9.5px;opacity:.8;}
@@ -337,7 +337,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div class="sc-leg" style="background:#2E7D32;border-color:#1B5E20;"></div>
         <div class="sc-leg" style="background:#1B5E20;border-color:#003300;"></div><span data-i18n="hist.cal_many">הרבה</span>
         <span style="margin-right:6px;">|</span>
-        <div class="sc-leg" style="background:#DDEEFF;border-color:#4A90D9;"></div><span data-i18n="hist.cal_shabbat">שישי/שבת</span>
+        <div class="sc-leg" style="background:#E3F4E5;border-color:#54A463;"></div><span data-i18n="hist.cal_shabbat">שישי/שבת</span>
       </div>
     </div>
 
@@ -468,7 +468,7 @@ const MEDALS = [
   },
   {
     level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minMin:45, bonus:50,
-    color:'#5090C8', bg:'#F0F8FF', textColor:'#1A3F6A',
+    color:'#5A9E68', bg:'#F0F8FF', textColor:'#18441F',
     achievement:'קראת 45 דקות! הישג יוצא מהכלל. רצונך בתורת ה׳ הוא אוצר אמיתי שאין כמוהו.',
     achievementEn:'You read for 45 minutes! An extraordinary achievement. Your desire for Torah is a true treasure beyond compare.',
     quote:'טוֹב לִי תוֹרַת פִּיךָ\nמֵאַלְפֵי זָהָב וָכָסֶף',
@@ -613,7 +613,7 @@ function renderAchievementsTab() {
 
   // === 5 books ===
   const booksDef = [
-    {name:'ספר א׳', from:1, to:41, color:'#185FA5'},
+    {name:'ספר א׳', from:1, to:41, color:'#3A7D44'},
     {name:'ספר ב׳', from:42, to:72, color:'#3B8C14'},
     {name:'ספר ג׳', from:73, to:89, color:'#7B2FF7'},
     {name:'ספר ד׳', from:90, to:106, color:'#C07A00'},
@@ -812,7 +812,7 @@ function renderToday() {
 
   // Color dots per book
   const bookColor = n =>
-    n<=41?'#185FA5': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+    n<=41?'#3A7D44': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
 
   let html = '';
   items.forEach(item => {
@@ -987,7 +987,7 @@ function renderYesterday() {
   // רשימת פרקים
   if (doneCh.size > 0) {
     html += '<div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">פרקים שנקראו</div>';
-    const bookColor = n => n<=41?'#185FA5': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+    const bookColor = n => n<=41?'#3A7D44': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
     const chapMap = {};
     dayRecs.forEach(r => {
       if (!chapMap[r.chap]) chapMap[r.chap] = { secs:0, done:false };
@@ -1059,7 +1059,7 @@ function renderYesterday() {
     }
 
     const dark = document.documentElement.classList.contains('dark');
-    const lineColor = dark ? '#7EB8F7' : '#1a5fa8';
+    const lineColor = dark ? '#84C58D' : '#3A7D44';
     const fillColor = dark ? 'rgba(126,184,247,0.15)' : 'rgba(26,95,168,0.12)';
     if (canvas._chartInst) canvas._chartInst.destroy();
     canvas._chartInst = new Chart(canvas.getContext('2d'), {
@@ -1160,7 +1160,7 @@ function _renderStreakCalendar(readings) {
     const _cellClick = "_streakPopup('" + title + "')";
     const _dayNum = parseInt(c.key.slice(8));
     // צבע המספר — בהיר על רקע כהה, כהה על רקע בהיר
-    const _numColor = (lvl === 'sc3' || lvl === 'sc4') ? 'rgba(255,255,255,.8)' : (isShabbat && !lvl) ? '#4A90D9' : 'var(--text-muted)';
+    const _numColor = (lvl === 'sc3' || lvl === 'sc4') ? 'rgba(255,255,255,.8)' : (isShabbat && !lvl) ? '#54A463' : 'var(--text-muted)';
     html += '<div class="sc-cell ' + lvl + shabbatCls + '" onclick="' + _cellClick + '" style="color:' + _numColor + ';' + border + '">' + _dayNum + '</div>';
     if (c.count > 0) activeDays++;
   });

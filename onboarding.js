@@ -17,26 +17,26 @@ function _getLang() {
 }
 
 const STEPS_HE = [
-  { icon:'📖', title:'ברוך הבא למשניון!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#185FA5' },
-  { icon:'⭐', title:'מערכת מעלות', body:'כל פרק שתלמד ייתן לך נקודות "מעלות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#0C447C' },
+  { icon:'📖', title:'ברוך הבא למשניון!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#3A7D44' },
+  { icon:'⭐', title:'מערכת מעלות', body:'כל פרק שתלמד ייתן לך נקודות "מעלות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#1E5A2E' },
   { icon:'📚', title:'פירוש למשנה', body:'לחץ על כפתור הפירוש בקורא כדי לקרוא פירוש לכל משנה — ברטנורא ותוספות יום טוב. הפירוש מופיע מתחת לכל משנה ומעמיק את ההבנה.', bg:'#993556' },
   { icon:'🎯', title:'אתגרים יומיים', body:'יש לך 3 אתגרים פעילים בכל זמן: יומי, שבועי, וחודשי. השלם אותם ותקבל בונוס מעלות. אתגר חדש בכל יום חדש.', bg:'#3B6D11' },
   { icon:'🧠', title:'שינון בעל פה', body:'סמן פרק בכוכב ☆ אחרי ששיננת אותו בעל פה. הכפתור 🧠 יפתח לך כלי לימוד עם 4 רמות הסתרה — מהקלה עד למבחן מלא.', bg:'#7B2FF7' },
   { icon:'👥', title:'קבוצות ואתגרים משותפים', bg:'#6B3AAA', groupSlide:true },
   { icon:'📲', title:'כמה דברים חשובים', bg:'#1A6B3A', infoSlide:true },
-  { icon:'🕯️', title:'באיזה מצב להפעיל את האפליקציה?', body:'', bg:'#185FA5', modeSelect:true },
+  { icon:'🕯️', title:'באיזה מצב להפעיל את האפליקציה?', body:'', bg:'#3A7D44', modeSelect:true },
   { icon:'🎉', title:'בוא נתחיל!', body:'אתה מוכן! התחבר עם Google כדי לשמור את הנתונים שלך ולסנכרן בין מכשירים — בחינם ובשניות.', bg:'#C07A00', final:true, googleBtn:true }
 ];
 
 const STEPS_EN = [
-  { icon:'📖', title:'Welcome to Mishnayon!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#185FA5' },
-  { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Maalot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#0C447C' },
+  { icon:'📖', title:'Welcome to Mishnayon!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#3A7D44' },
+  { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Maalot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#1E5A2E' },
   { icon:'📚', title:'Mishnah Commentary', body:'Tap the commentary button in the reader to see explanations for each Mishnah — Bartenura and Tosafot Yom Tov. Commentary appears below each Mishnah.', bg:'#993556' },
   { icon:'🎯', title:'Daily Challenges', body:'You have 3 active challenges at all times: daily, weekly, and monthly. Complete them for bonus points. A new challenge every new day.', bg:'#3B6D11' },
   { icon:'🧠', title:'Memorization Mode', body:'Mark a chapter with a star ☆ after memorizing it. The 🧠 button opens a learning tool with 4 levels of concealment — from easy to a full test.', bg:'#7B2FF7' },
   { icon:'👥', title:'Groups & Shared Challenges', bg:'#6B3AAA', groupSlide:true },
   { icon:'📲', title:'A Few Important Things', bg:'#1A6B3A', infoSlide:true },
-  { icon:'🕯️', title:'Which mode would you like?', body:'', bg:'#185FA5', modeSelect:true },
+  { icon:'🕯️', title:'Which mode would you like?', body:'', bg:'#3A7D44', modeSelect:true },
   { icon:'🎉', title:"Let's Begin!", body:"You're ready! Sign in with Google to save your data and sync across devices — free and instant.", bg:'#C07A00', final:true, googleBtn:true }
 ];
 
@@ -77,7 +77,7 @@ function build() {
       <div style="display:flex;justify-content:center;gap:6px;padding:0 0 14px;" id="_onb_dots"></div>
       <div style="display:flex;gap:8px;padding:0 24px 24px;">
         <button id="_onb_skip" style="flex:1;padding:12px;border-radius:14px;border:.5px solid #ccc;background:#f5f5f5;font-size:14px;color:#666;cursor:pointer;font-family:inherit;">${skipLabel}</button>
-        <button id="_onb_next" style="flex:2;padding:12px;border-radius:14px;border:none;background:#185FA5;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">${nextLabel}</button>
+        <button id="_onb_next" style="flex:2;padding:12px;border-radius:14px;border:none;background:#3A7D44;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">${nextLabel}</button>
       </div>
     </div>
   `;
@@ -124,10 +124,10 @@ function render() {
       modeEl.style.cssText = 'padding:0 24px 8px;display:flex;flex-direction:column;gap:10px;';
       const isEn = lang === 'en';
       modeEl.innerHTML = `
-        <button id="_onb_m_simple" style="padding:14px 14px 12px;border-radius:16px;border:2.5px solid #185FA5;background:#EEF4FB;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#185FA5;text-align:right;line-height:1.5;">
+        <button id="_onb_m_simple" style="padding:14px 14px 12px;border-radius:16px;border:2.5px solid #3A7D44;background:#EAF2EA;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#3A7D44;text-align:right;line-height:1.5;">
           <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">📖</span>${isEn ? 'Simple Reading' : 'קריאה תמימה'}</div>
           <div style="font-size:12px;font-weight:400;color:#555;margin-top:3px;">${isEn ? 'Just open and read, without distractions or settings.' : 'רק לפתוח ולקרוא, בלי הסחות דעת ובלי הגדרות.'}</div>
-          <div style="font-size:11px;font-weight:400;color:#185FA5;margin-top:5px;font-style:italic;line-height:1.4;">"הֲפֹךְ בָּהּ וַהֲפֹךְ בָּהּ דְּכֹלָּא בָהּ"<br><span style="color:#888;">(אבות ה', כ"ב)</span></div>
+          <div style="font-size:11px;font-weight:400;color:#3A7D44;margin-top:5px;font-style:italic;line-height:1.4;">"הֲפֹךְ בָּהּ וַהֲפֹךְ בָּהּ דְּכֹלָּא בָהּ"<br><span style="color:#888;">(אבות ה', כ"ב)</span></div>
         </button>
         <button id="_onb_m_full" style="padding:14px 14px 12px;border-radius:16px;border:2px solid #ddd;background:#f9f9f9;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#333;text-align:right;line-height:1.5;">
           <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">🏆</span>${isEn ? 'Challenge Mode' : 'מסלול אתגרי'}</div>
@@ -149,10 +149,10 @@ function render() {
         const fb = document.getElementById('_onb_m_full');
         if (!sb || !fb) return;
         if (isSimple) {
-          sb.style.border = '2.5px solid #185FA5'; sb.style.background = '#EEF4FB'; sb.style.color = '#185FA5';
+          sb.style.border = '2.5px solid #3A7D44'; sb.style.background = '#EAF2EA'; sb.style.color = '#3A7D44';
           fb.style.border = '2px solid #ddd'; fb.style.background = '#f9f9f9'; fb.style.color = '#333';
         } else {
-          fb.style.border = '2.5px solid #185FA5'; fb.style.background = '#EEF4FB'; fb.style.color = '#185FA5';
+          fb.style.border = '2.5px solid #3A7D44'; fb.style.background = '#EAF2EA'; fb.style.color = '#3A7D44';
           sb.style.border = '2px solid #ddd'; sb.style.background = '#f9f9f9'; sb.style.color = '#333';
         }
         try {
@@ -187,9 +187,9 @@ function render() {
             ? 'Mishnayon is a Web App. To open it easily:<br><b>iPhone:</b> Share → "Add to Home Screen"<br><b>Android:</b> Menu ⋮ → "Add to Home Screen"'
             : 'משניון היא אפליקציית Web. כדי לפתוח בנוחות:<br><b>iPhone:</b> כפתור שיתוף ← "הוסף למסך הבית"<br><b>Android:</b> תפריט ⋮ ← "הוסף למסך הבית"'}</div>`
         + '</div>'
-        + '<div style="background:#EEF4FB;border-radius:14px;padding:12px 14px;">'
+        + '<div style="background:#EAF2EA;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">🔐</div>'
-        + `<div style="font-size:14px;font-weight:700;color:#185FA5;margin-bottom:3px;">${isEn ? 'Sign in with Google' : 'הירשם עם Google'}</div>`
+        + `<div style="font-size:14px;font-weight:700;color:#3A7D44;margin-bottom:3px;">${isEn ? 'Sign in with Google' : 'הירשם עם Google'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
             ? 'To save your points and chapters — sign in with Google. Free and instant.'
             : 'כדי שהמעלות והפרקים שלמדת <b>יישמרו</b> — חשוב להתחבר עם חשבון Google. בחינם ובשניות.'}</div>`

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#185FA5">
+  <meta name="theme-color" content="#3A7D44">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,8 +12,8 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>תהילהון — קבוצות</title>
 <style>
-:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#7B2FF7;--purple-light:#F0EAFF;}
-html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#A87BF7;--purple-light:#1E1030;}
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#7B2FF7;--purple-light:#F0EAFF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#A87BF7;--purple-light:#1E1030;}
 *{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
 body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;}
 .app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
@@ -122,7 +122,7 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .mission-pct{font-size:13px;font-weight:700;color:var(--primary);}
 .mission-sub{font-size:11px;color:var(--text-muted);margin-bottom:10px;}
 .mission-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:7px;}
-.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#5AA8E8);transition:width .7s cubic-bezier(.16,1,.3,1);}
+.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#6FBF7A);transition:width .7s cubic-bezier(.16,1,.3,1);}
 .mission-nums{display:flex;justify-content:space-between;font-size:11px;}
 .mission-nums .done{color:var(--primary);font-weight:700;}
 .mission-nums .total{color:var(--text-muted);}
@@ -365,7 +365,7 @@ function toast(msg) {
 
 /* ── Group types ── */
 const GROUP_TYPES = {
-  family:   { label:'משפחה',   icon:'👨‍👩‍👧‍👦', color:'#185FA5', bg:'linear-gradient(135deg,#185FA5,#1048A0)' },
+  family:   { label:'משפחה',   icon:'👨‍👩‍👧‍👦', color:'#3A7D44', bg:'linear-gradient(135deg,#3A7D44,#246034)' },
   friends:  { label:'חברים',   icon:'🤝',      color:'#3B8C14', bg:'linear-gradient(135deg,#3B8C14,#2A6B0E)' },
   chavruta: { label:'חברותא',  icon:'📖',      color:'#7B2FF7', bg:'linear-gradient(135deg,#7B2FF7,#5B1FD7)' },
   work:     { label:'עבודה',   icon:'🏢',      color:'#C07A00', bg:'linear-gradient(135deg,#C07A00,#9A5F00)' }
@@ -519,7 +519,7 @@ function withTimeout(p, ms, label) {
   return Promise.race([p, new Promise((_,rej) => setTimeout(() => rej(new Error('timeout:'+label)), ms))]);
 }
 
-const COLORS = ['#185FA5','#3B8C14','#7B2FF7','#C8A800','#C04040','#5090C8','#CD7F32'];
+const COLORS = ['#3A7D44','#3B8C14','#7B2FF7','#C8A800','#C04040','#5A9E68','#CD7F32'];
 function avatarBg(name) {
   let h=0; for (const c of (name||'X')) h=(h*31+c.charCodeAt(0))|0;
   return COLORS[Math.abs(h)%COLORS.length];

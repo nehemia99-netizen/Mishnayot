@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>(function(){try{var u=new URLSearchParams(location.search).get('lang');if(u==='en'||u==='he'){var s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(s.lang!==u){s.lang=u;localStorage.setItem('tehillim_settings',JSON.stringify(s));}}}catch(e){}}());</script>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#185FA5">
+  <meta name="theme-color" content="#3A7D44">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -81,7 +81,7 @@ function updateGamStrip(){
       if(!shieldEl){
         shieldEl = document.createElement('div');
         shieldEl.id = '_streakShield';
-        shieldEl.style.cssText = 'font-size:9px;color:#4A90D9;margin-top:1px;';
+        shieldEl.style.cssText = 'font-size:9px;color:#54A463;margin-top:1px;';
         if(sn.parentNode) sn.parentNode.appendChild(shieldEl);
       }
       shieldEl.textContent = '🛡️ ×' + freezes;
@@ -271,14 +271,14 @@ async function shareGraph(ev){
 <style>
 :root {
   --bg: #EEEDE8; --card: #fff; --text: #1A1A1A; --text-sec: #6B6B6B;
-  --text-muted: #9E9E9E; --border: rgba(0,0,0,0.12); --primary: #185FA5;
-  --primary-light: #E6F1FB; --primary-border: #B5D4F4; --surface: #F5F5F3;
+  --text-muted: #9E9E9E; --border: rgba(0,0,0,0.12); --primary: #3A7D44;
+  --primary-light: #E9F2E9; --primary-border: #BBD6BB; --surface: #F5F5F3;
   --green: #3B8C14; --red: #B03020; --hot-bg: #FAECE7; --hot-color: #993C1D;
 }
 html.dark {
   --bg: #111; --card: #1E1E1E; --text: #F0EFE9; --text-sec: #ABABAB;
-  --text-muted: #666; --border: rgba(255,255,255,0.09); --primary: #5AA8E8;
-  --primary-light: #152436; --primary-border: #2A5580; --surface: #272727;
+  --text-muted: #666; --border: rgba(255,255,255,0.09); --primary: #6FBF7A;
+  --primary-light: #15291B; --primary-border: #2E5E34; --surface: #272727;
   --green: #5DBF35; --red: #E06050; --hot-bg: #351A1A; --hot-color: #E07755;
 }
 *{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
@@ -396,16 +396,16 @@ input[type=range]{flex:1;accent-color:var(--primary);}
 .graph-share-btn:active{transform:scale(.92);}
 .graph-share-btn:hover{background:var(--primary-light);}
 /* 2.0.1 - status strip */
-.gam-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 16px 0;padding:3px 12px;background:#E6F1FB;border:.5px solid #B5D4F4;border-radius:10px;color:#185FA5;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent;}
-html.dark .gam-strip{background:#152436;border-color:#2A5580;color:#85B7EB;}
+.gam-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 16px 0;padding:3px 12px;background:#E9F2E9;border:.5px solid #BBD6BB;border-radius:10px;color:#3A7D44;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent;}
+html.dark .gam-strip{background:#15291B;border-color:#2E5E34;color:#86C28F;}
 .gam-stat{flex:1;text-align:center;padding:0 4px;}
-.gam-stat-num{font-size:15px;font-weight:700;line-height:1.1;color:#185FA5;}
-html.dark .gam-stat-num{color:#85B7EB;}
+.gam-stat-num{font-size:15px;font-weight:700;line-height:1.1;color:#3A7D44;}
+html.dark .gam-stat-num{color:#86C28F;}
 .gam-stat-label{font-size:10px;opacity:.75;margin-top:1px;}
-.gam-divider{width:.5px;background:#B5D4F4;height:18px;flex-shrink:0;}
-html.dark .gam-divider{background:#2A5580;}
-.gam-progress{height:3px;border-radius:2px;background:#D6E5F3;margin:4px 16px 0;overflow:hidden;}
-html.dark .gam-progress{background:#1A2E40;}
+.gam-divider{width:.5px;background:#BBD6BB;height:18px;flex-shrink:0;}
+html.dark .gam-divider{background:#2E5E34;}
+.gam-progress{height:3px;border-radius:2px;background:#DCEADD;margin:4px 16px 0;overflow:hidden;}
+html.dark .gam-progress{background:#16291C;}
 .gam-progress-fill{height:100%;background:#FFD060;border-radius:2px;transition:width .6s cubic-bezier(.16,1,.3,1);}
 /* 2.0.1 - main 2 column grid — replaced by new 3-row layout */
 .main-grid-row{display:none;}
@@ -1623,7 +1623,7 @@ function getRealData(tab,metric){
 }
 function chartColors(metric,dark){
   if(metric==='score')return{line:dark?'#F5C842':'#C07A00',fill:dark?'rgba(245,200,66,0.12)':'rgba(192,122,0,0.10)',unit:'מעלות'};
-  return{line:dark?'#5AA8E8':'#185FA5',fill:dark?'rgba(90,168,232,0.12)':'rgba(24,95,165,0.10)',unit:'דק׳'};
+  return{line:dark?'#6FBF7A':'#3A7D44',fill:dark?'rgba(90,168,232,0.12)':'rgba(24,95,165,0.10)',unit:'דק׳'};
 }
 let chartInst;
 function buildChart(tab){

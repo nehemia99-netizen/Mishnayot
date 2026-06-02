@@ -303,7 +303,7 @@ function showMaalotToast(meta) {
   if (old) old.remove();
   const div = document.createElement('div');
   div.id = '_gam_toast_';
-  div.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100%);background:#185FA5;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;font-weight:600;font-family:system-ui;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.16,1,.3,1);direction:rtl;';
+  div.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100%);background:#3A7D44;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;font-weight:600;font-family:system-ui;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.16,1,.3,1);direction:rtl;';
   let html = '⭐ +' + meta.pts + ' מעלות';
   if (meta.levelUp) html += ' · עלית לרמת ' + meta.levelUp.icon + ' ' + meta.levelUp.key + '!';
   div.innerHTML = html;
