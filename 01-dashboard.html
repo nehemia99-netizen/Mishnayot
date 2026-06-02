@@ -17,7 +17,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
-<script src="corpus.js?v=1.0.0"></script>
+<script src="corpus.js?v=1.0.1"></script>
 <script src="gamification.js?v=2.2.84"></script>
 <script src="notifications.js?v=2.2.31"></script>
 <script src="onboarding.js?v=2.2.84"></script>
@@ -504,7 +504,7 @@ html.dark .lottery-trigger{opacity:.85;}
 .lres-go{background:var(--primary);color:#fff;margin-left:8px;}
 .lres-close{background:var(--surface);color:var(--text);border:.5px solid var(--border);}
 </style>
-<script src="i18n.js?v=2.2.85" defer></script>
+<script src="i18n.js?v=2.2.86" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -1302,12 +1302,10 @@ window.switchToFullMode = function() {
 })();
 
 window.goToDailyChapter = function() {
-  // פרק יומי דטרמיניסטי על פני כל הקורפוס (ביניים — עד שילוב לוח "המשנה היומית")
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,1)) / 86400000);
-  if (typeof Corpus !== 'undefined') {
-    const all = Corpus.flatChapters();
-    const pick = all[dayOfYear % all.length];
-    location.href = '03-reader.html?chap=' + pick.id;
+  // המשנה היומית — פותח את פרק משנת היום (2 משניות ליום, מחזור עולמי)
+  if (typeof Corpus !== 'undefined' && Corpus.mishnahYomit) {
+    const y = Corpus.mishnahYomit();
+    location.href = '03-reader.html?chap=' + y.first.chapId;
   } else {
     location.href = '03-reader.html?mode=random';
   }

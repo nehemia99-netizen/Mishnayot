@@ -38,7 +38,7 @@ const DICT = {
   // מוד תמימה
   'home.mode_simple_small':  { he: '📖 קריאה תמימה',              en: '📖 Simple reading' },
   'home.simple_read_cycle':  { he: 'למד את כל המשנה',            en: 'Study the Mishnah' },
-  'home.simple_daily_chap':  { he: 'פרק יומי',                   en: 'Daily chapter' },
+  'home.simple_daily_chap':  { he: 'משנה יומית',                 en: 'Daily Mishnah' },
   'home.blessing_before':    { he: 'ברכה לפני<br>קריאה',         en: 'Blessing<br>before reading' },
   'home.blessing_after':     { he: 'ברכה אחרי<br>קריאה',         en: 'Blessing<br>after reading' },
   // הגדרות — תזכורת

@@ -141,6 +141,32 @@
     return { tractate:pt.id, perek:pt.length };
   }
 
+  // רשימה שטוחה של כל המשניות לפי סדר קנוני (4192): [{tractate, perek, mishnah, chapId}]
+  var _FLAT_M = null;
+  function flatMishnayot(){
+    if(_FLAT_M) return _FLAT_M;
+    var out = [];
+    TRACTATES.forEach(function(t){
+      for(var p=1; p<=t.length; p++){
+        var cnt = t.perakim[p-1] || 0;
+        for(var m=1; m<=cnt; m++){ out.push({ tractate:t.id, perek:p, mishnah:m, chapId:chapId(t.id,p) }); }
+      }
+    });
+    _FLAT_M = out; return out;
+  }
+  // ── משנה יומית (2 משניות ליום) ──
+  // עוגן: 2 ביוני 2026 = כלים ח׳:ב׳ (אינדקס 0-based 3240). אומת מול oraita.net (5786-9-17, 5786-9-24).
+  var YOMIT_ANCHOR_DAY = Math.floor(Date.UTC(2026,5,2)/86400000);
+  var YOMIT_ANCHOR_IDX = 3240;
+  function _dayNum(d){ d = d || new Date(); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())/86400000); }
+  function mishnahYomit(date){
+    var flat = flatMishnayot(), N = flat.length;
+    var days = _dayNum(date) - YOMIT_ANCHOR_DAY;
+    var i0 = (((YOMIT_ANCHOR_IDX + 2*days) % N) + N) % N;
+    var a = flat[i0], b = flat[(i0+1) % N];
+    return { first:a, second:b, sameChap:(a.tractate===b.tractate && a.perek===b.perek) };
+  }
+
   global.Corpus = {
     name: "Mishnah",
     orders: ORDERS,
@@ -156,6 +182,8 @@
     commentaryRef: commentaryRef,
     mishnayotIn: mishnayotIn,
     flatChapters: flatChapters,
+    flatMishnayot: flatMishnayot,
+    mishnahYomit: mishnahYomit,
     nextChapter: nextChapter,
     prevChapter: prevChapter
   };
