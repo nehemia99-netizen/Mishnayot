@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תהילהון — ברכות ותפילות</title>
+<script src="utils.js?v=2.2.0"></script>
+<script src="bottomnav.js?v=2.2.0"></script>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;flex-shrink:0;}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;flex-shrink:0;font-weight:600;cursor:pointer;font-family:inherit;}
+.page-title{font-size:17px;font-weight:700;color:var(--text);}
+
+/* ── Font controls ── */
+.font-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px 10px;border-bottom:.5px solid var(--border);background:var(--surface);}
+.font-bar span{font-size:11px;color:var(--text-muted);}
+.font-btn{width:32px;height:32px;border-radius:10px;border:.5px solid var(--border);background:var(--card);font-size:17px;cursor:pointer;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;}
+#blessFontVal{font-size:12px;color:var(--text-sec);min-width:38px;text-align:center;}
+
+/* ── Blessing items ── */
+.blessing-list{flex:1;overflow-y:auto;}
+.blessing-item{border-bottom:.5px solid var(--border);}
+.blessing-item:last-child{border-bottom:none;}
+.blessing-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.blessing-title{font-size:15px;font-weight:600;color:var(--primary);}
+.blessing-arrow{font-size:16px;color:var(--text-muted);transition:transform .2s;flex-shrink:0;}
+.blessing-item.open .blessing-arrow{transform:rotate(90deg);}
+.blessing-body{display:none;padding:0 16px 16px;font-size:15px;color:var(--text);line-height:1.9;font-family:'David Libre','David','Times New Roman',serif;}
+.blessing-item.open .blessing-body{display:block;}
+</style>
+<script>
+/* ── dark mode pre-render ── */
+try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.darkMode)document.documentElement.classList.add('dark');}catch(e){}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← חזרה</button>
+    <span class="page-title">🙏 ברכות ותפילות</span>
+    <div style="width:72px"></div><!-- מרווח ימין לאיזון -->
+  </div>
+
+  <div class="font-bar">
+    <span>גודל פונט:</span>
+    <button class="font-btn" onclick="changeBlessingFont(-1)">−</button>
+    <span id="blessFontVal">15px</span>
+    <button class="font-btn" onclick="changeBlessingFont(1)">+</button>
+  </div>
+
+  <div class="blessing-list">
+
+    <!-- b1: לפני קריאת תהילים -->
+    <div class="blessing-item" id="b1">
+      <div class="blessing-header" onclick="toggleBlessing('b1')">
+        <span class="blessing-title">לפני קריאת תהילים</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁיְּהֵא חָשׁוּב וּמְקֻבָּל וְנָעִים לְפָנֶיךָ מִקְרָא מִזְמוֹרֵי תְהִלִּים שֶׁאֲנִי קוֹרֵא, כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם. וּכְשֵׁם שֶׁלֹּא הִגִּיעַ אֵלָיו דִּבַּת מְשַׁנְּאָיו, כֵּן לֹא תַגִּיעַ עָלֵינוּ דִּבַּת שׂוֹנְאֵינוּ. וּבִזְכוּת מִזְמוֹרֵי תְהִלִּים שֶׁאֲנוּ קוֹרְאִים תַּצִּילֵנוּ מֵרוּחוֹת רָעוֹת וּמִמַּזִּיקִים, וּמִכָּל צָרָה וְצוּקָה, וּתְקַבֵּל תְּפִלּוֹתֵינוּ בְּרַחֲמִים וּבְרָצוֹן. אָמֵן.
+        <div style="padding-top:12px;text-align:center;">
+          <button onclick="goDailyChapter()" style="width:100%;padding:13px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 קרא פרק היום ←</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- b2: אחרי קריאת תהילים -->
+    <div class="blessing-item" id="b2">
+      <div class="blessing-header" onclick="toggleBlessing('b2')">
+        <span class="blessing-title">אחרי קריאת תהילים</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁמִּזְמוֹרֵי תְהִלִּים שֶׁקָּרָאתִי יִהְיוּ כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם בְּעַצְמוֹ. וְיַעֲלוּ לְפָנֶיךָ כְּרֵיחַ נִיחוֹחַ וִיכַפְּרוּ עַל כָּל עֲוֹנוֹתַי וּפְשָׁעַי, וְיִהְיֶה לֵב מַלְכֻיּוֹת פָּנוּי לְטוֹבָה לְיִשְׂרָאֵל, וּתְמַלֵּא כָּל מִשְׁאֲלוֹת לְבָבֵנוּ לְטוֹבָה. אָמֵן.</div>
+    </div>
+
+    <!-- b8: יהי רצון החיד"א -->
+    <div class="blessing-item" id="b8">
+      <div class="blessing-header" onclick="toggleBlessing('b8')">
+        <span class="blessing-title">יהי רצון של החיד"א (אחרי הקריאה)</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, הַבּוֹחֵר בְּדָוִד עַבְדּוֹ וּבְזַרְעוֹ אַחֲרָיו, וְהַבּוֹחֵר בְּשִׁירוֹת וְתִשְׁבָּחוֹת, שֶׁתֵּפֶן בְּרַחֲמִים אֶל קְרִיאַת מִזְמוֹרֵי תְהִלִּים שֶׁאֶקְרָא, כְּאִלּוּ אֲמָרָם דָּוִד מֶלֶךְ יִשְׂרָאֵל בְּעַצְמוֹ, זְכוּתוֹ יָגֵן עָלֵינוּ.<br><br>וְיַעֲמוֹד לָנוּ זְכוּת פְּסוּקֵי מִזְמוֹרֵי תְהִלִּים וּזְכוּת תֵּבוֹתֵיהֶם וְאוֹתִיּוֹתֵיהֶם וּנְקֻדּוֹתֵיהֶם וְטַעֲמֵיהֶם, וְהַשֵּׁמוֹת הַיּוֹצְאִים מֵהֶם מֵרָאשֵׁי תֵּבוֹת וּמִסּוֹפֵי תֵּבוֹת, לְכַפֵּר פְּשָׁעֵינוּ וַעֲוֹנוֹתֵינוּ וְחַטֹּאתֵינוּ, וּלְזַמֵּר עָרִיצִים וּלְהַכְרִית כָּל הַחוֹחִים וְהַקּוֹצִים הַסּוֹבְבִים אֶת הַשּׁוֹשַׁנָּה הָעֶלְיוֹנָה, וּלְחַבֵּר אֵשֶׁת נְעוּרִים עִם דּוֹדָהּ בְּאַהֲבָה וְאַחֲוָה וְרֵעוּת.<br><br>וּמִשָּׁם יִמָּשֵׁךְ לָנוּ שֶׁפַע לְנֶפֶשׁ רוּחַ וּנְשָׁמָה לְטַהֲרֵנוּ מֵעֲוֹנוֹתֵינוּ וְלִסְלוֹחַ חַטֹּאתֵינוּ וּלְכַפֵּר פְּשָׁעֵינוּ, כְּמוֹ שֶׁסָּלַחְתָּ לְדָוִד שֶׁאָמַר מִזְמוֹרִים אֵלּוּ לְפָנֶיךָ.<br><br>וְאַל תִּקָּחֵנוּ מֵהָעוֹלָם הַזֶּה קוֹדֶם זְמַנֵּנוּ, עַד מְלֹאת שְׁנוֹתֵינוּ — בָּהֶם שִׁבְעִים שָׁנָה — בְּאוֹפֶן שֶׁנּוּכַל לְתַקֵּן אֶת אֲשֶׁר שִׁחַתְנוּ. וּזְכוּת דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם יָגֵן עָלֵינוּ. אָמֵן סֶלָה.<br><br><span style="font-size:12px;color:var(--text-muted)">— "יהי רצון" של מרן החיד"א, רבי חיים יוסף דוד אזולאי זצ"ל</span></div>
+    </div>
+
+    <!-- b10: פרקי אבות -->
+    <div class="blessing-item" id="b10">
+      <div class="blessing-header" onclick="toggleBlessing('b10')">
+        <span class="blessing-title">📜 פרקי אבות — <span id="avotChapLabel" style="color:var(--text-muted);font-weight:400;">יומי</span></span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div id="avotDailyInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border-radius:8px;border-right:3px solid var(--primary);">משנה היומית, סבב חצי שנתי</div>
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px;text-align:center;" id="avotRef"></div>
+        <div id="avotText" style="line-height:1.9;color:var(--text);font-family:'David Libre','Times New Roman',serif;text-align:right;"></div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:14px;padding-top:10px;border-top:.5px solid var(--border);">
+          <button onclick="navAvot(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 14px;color:var(--text-sec);font-size:13px;cursor:pointer;font-family:inherit;">‹ קודם</button>
+          <button onclick="resetAvotToday()" style="background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:12px;padding:5px 12px;border-radius:14px;cursor:pointer;font-family:inherit;">📅 היום</button>
+          <button onclick="navAvot(1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 14px;color:var(--text-sec);font-size:13px;cursor:pointer;font-family:inherit;">הבא ›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- b3: מי שברך לחולים -->
+    <div class="blessing-item" id="b3">
+      <div class="blessing-header" onclick="toggleBlessing('b3')">
+        <span class="blessing-title">מי שברך לחולים</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב, מֹשֶׁה אַהֲרֹן דָּוִד וּשְׁלֹמֹה, הוּא יְבָרֵךְ וִירַפֵּא אֶת הַחוֹלֶה [שם החולה] בֶּן/בַּת [שם האם] בַּעֲבוּר שֶׁ[שם המתפלל] יִתֵּן צְדָקָה בַּעֲבוּרוֹ/בַּעֲבוּרָהּ. בִּשְׂכַר זֶה, הַקָּדוֹשׁ בָּרוּךְ הוּא יִמָּלֵא רַחֲמִים עָלָיו/עָלֶיהָ לְהַחֲלִימוֹ וּלְרַפְּאוֹתוֹ, לְחַזְּקוֹ וּלְהַחֲיוֹתוֹ, וְיִשְׁלַח לוֹ/לָהּ מְהֵרָה רְפוּאָה שְׁלֵמָה מִן הַשָּׁמַיִם — רְפוּאַת הַנֶּפֶשׁ וּרְפוּאַת הַגּוּף — בְּתוֹךְ שְׁאָר חוֹלֵי יִשְׂרָאֵל, הַשְׁתָּא בַּעֲגָלָא וּבִזְמַן קָרִיב, וְאִמְרוּ: אָמֵן.</div>
+    </div>
+
+    <!-- b4: מי שברך לחיילים -->
+    <div class="blessing-item" id="b4">
+      <div class="blessing-header" onclick="toggleBlessing('b4')">
+        <span class="blessing-title">מי שברך לחיילים</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב, הוּא יְבָרֵךְ אֶת חַיָּלֵי צְבָא הַהֲגַנָּה לְיִשְׂרָאֵל הָעוֹמְדִים עַל מִשְׁמַר אַרְצֵנוּ וְעָרֵי אֱלֹהֵינוּ, מִגְּבוּל הַלְּבָנוֹן וְעַד מִדְבַּר מִצְרַיִם, וּמִן הַיָּם הַגָּדוֹל עַד לְבוֹא הָעֲרָבָה, בַּיַּבָּשָׁה בָּאֲוִיר וּבַיָּם. יִתֵּן ה' אֶת אוֹיְבֵינוּ הַקָּמִים עָלֵינוּ נִגָּפִים לִפְנֵיהֶם. הַקָּדוֹשׁ בָּרוּךְ הוּא יִשְׁמֹר וְיַצִּיל אֶת חַיָּלֵינוּ מִכָּל צָרָה וְצוּקָה וּמִכָּל נֶגַע וּמַחֲלָה, וְיִשְׁלַח בְּרָכָה וְהַצְלָחָה בְּכָל מַעֲשֵׂה יְדֵיהֶם. יַדְבֵּר שׂוֹנְאֵינוּ תַּחְתֵּיהֶם, וִיעַטֵּר אֶת חַיָּלֵינוּ בְּכֶתֶר יְשׁוּעָה וּבַעֲטֶרֶת נִצָּחוֹן. וְנֹאמַר: אָמֵן.</div>
+    </div>
+
+    <!-- b5: תפילת שמירת הלשון -->
+    <div class="blessing-item" id="b5">
+      <div class="blessing-header" onclick="toggleBlessing('b5')">
+        <span class="blessing-title">תפילת שמירת הלשון — החפץ חיים</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">רִבּוֹנוֹ שֶׁל עוֹלָם, יְהִי רָצוֹן מִלְּפָנֶיךָ, אֵל רַחוּם וְחַנּוּן, שֶׁתְּזַכֵּנִי הַיּוֹם וּבְכָל יוֹם לִשְׁמוֹר פִּי וּלְשׁוֹנִי מִלָּשׁוֹן-הָרָע וּרְכִילוּת וּמִקַּבָּלָתָם.<br><br>וְאֶזָּהֵר מִלְדַבֵּר אֲפִלּוּ עַל אִישׁ יְחִידִי, וְכָל שֶׁכֵּן מִלְדַבֵּר עַל כְּלַל יִשְׂרָאֵל אוֹ עַל חֵלֶק מֵהֶם. וְכָל שֶׁכֵּן מִלְּהִתְרַעֵם עַל מִדּוֹתָיו שֶׁל הַקָּדוֹשׁ-בָּרוּךְ-הוּא.<br><br>וְאֶזָּהֵר מִלְּדַבֵּר דִּבְרֵי שֶׁקֶר, חֲנֻפָּה, לֵצָנוּת, מַחֲלֹקֶת, כַּעַס, גַּאֲוָה, אוֹנָאַת-דְּבָרִים, הַלְבָּנַת-פָּנִים, וְכָל דְּבָרִים אֲסוּרִים.<br><br>וְזַכֵּנִי שֶׁלֹּא לְדַבֵּר כִּי-אִם דָּבָר הַצָּרִיךְ לְעִנְיָנֵי גוּפִי אוֹ נַפְשִׁי. וְשֶׁיִּהְיוּ כָּל מַעֲשַׂי לְשֵׁם שָׁמַיִם.<br><br><span style="font-size:12px;color:var(--text-muted)">— מרן החפץ חיים, רבי ישראל מאיר הכהן מראדין זצ״ל</span></div>
+    </div>
+
+    <!-- b7: ברכה מעין שלוש -->
+    <div class="blessing-item" id="b7">
+      <div class="blessing-header" onclick="toggleBlessing('b7')">
+        <span class="blessing-title">ברכה מעין שלוש</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">ברכה אחרונה על מזונות · יין · פירות שבעת המינים</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;text-align:center;">ניתן לבחור כמה אופציות יחד</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;">
+          <button onclick="toggleMayan(1)" id="mTab1" style="flex:1;font-size:12px;padding:6px;border-radius:16px;border:.5px solid var(--primary);background:var(--primary);color:#fff;cursor:pointer;font-family:inherit;">🌾 מחיה</button>
+          <button onclick="toggleMayan(2)" id="mTab2" style="flex:1;font-size:12px;padding:6px;border-radius:16px;border:.5px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;font-family:inherit;">🍷 גפן</button>
+          <button onclick="toggleMayan(3)" id="mTab3" style="flex:1;font-size:12px;padding:6px;border-radius:16px;border:.5px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;font-family:inherit;">🫒 עץ</button>
+        </div>
+        <div id="mTextOut" style="font-family:'David Libre','Times New Roman',serif;line-height:1.9;color:var(--text);"></div>
+      </div>
+    </div>
+
+    <!-- b6: איגרת הרמב"ן -->
+    <div class="blessing-item" id="b6">
+      <div class="blessing-header" onclick="toggleBlessing('b6')">
+        <span class="blessing-title">איגרת הרמב"ן</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body" style="line-height:2;font-family:'David Libre','Times New Roman',serif;">"שְׁמַע בְּנִי מוּסַר אָבִיךָ, וְאַל תִּטֹּשׁ תּוֹרַת אִמֶּךָ".<br><br>תִּתְנַהֵג תָּמִיד לְדַבֵּר כָּל דְּבָרֶיךָ בְּנַחַת, לְכָל אָדָם וּבְכָל עֵת, וּבַזֶּה תִּנָּצֵל מִן הַכַּעַס, שֶׁהִיא מִדָּה רָעָה לְהַחְטִיא בְּנֵי אָדָם. וְכֵן אָמְרוּ רַבּוֹתֵינוּ ז"ל: כָּל הַכּוֹעֵס – כָּל מִינֵי גֵיהִנּוֹם שׁוֹלְטִים בּוֹ, שֶׁנֶּאֱמַר: "וְהָסֵר כַּעַס מִלִּבֶּךָ, וְהַעֲבֵר רָעָה מִבְּשָׂרֶךָ". וְאֵין "רָעָה" אֶלָּא גֵיהִנּוֹם, שֶׁנֶּאֱמַר: "וְגַם רָשָׁע לְיוֹם רָעָה".<br><br>וְכַאֲשֶׁר תִּנָּצֵל מִן הַכַּעַס, תַּעֲלֶה עַל לִבְּךָ מִדַּת הָעֲנָוָה, שֶׁהִיא מִדָּה טוֹבָה מִכָּל מִדּוֹת טוֹבוֹת, שֶׁנֶּאֱמַר: "עֵקֶב עֲנָוָה, יִרְאַת ה'". וּבַעֲבוּר הָעֲנָוָה, תַּעֲלֶה עַל לִבְּךָ מִדַּת הַיִּרְאָה, כִּי תִתֵּן אֶל לִבְּךָ תָּמִיד: מֵאַיִן בָּאתָ, וּלְאַן אַתָּה הוֹלֵךְ; וְשֶׁאַתָּה רִמָּה וְתוֹלֵעָה בְּחַיֶּיךָ, וְאַף כִּי בְּמוֹתָךְ; וְלִפְנֵי מִי אַתָּה עָתִיד לִתֵּן דִּין וְחֶשְׁבּוֹן – לִפְנֵי מֶלֶךְ הַכָּבוֹד, שֶׁנֶּאֱמַר: "הִנֵּה הַשָּׁמַיִם וּשְׁמֵי הַשָׁמַיִם לֹא יְכַלְכְּלוּךָ", אַף כִּי לִבּוֹת בְּנֵי אָדָם. וְנֶאֱמַר: "הֲלֹא אֵת הַשָׁמַיִם וְאֵת הָאָרֶץ אֲנִי מָלֵא, נְאֻם ה'". וְכַאֲשֶׁר תַּחֲשֹׁב אֶת כָּל אֵלֶּה, תִּירָא מִבּוֹרְאֶךָ וְתִשָּׁמֵר מִן הַחֵטְא. וּבַמִּדוֹת הָאֵלֶּה תִּהְיֶה שָׂמֵחַ בְּחֶלְקֶךָ.<br><br>וְכַאֲשֶׁר תִּתְנַהֵג בְּמִדַּת הָעֲנָוָה לְהִתְבּוֹשֵׁשׁ מִכָּל אָדָם, וּלְהִתְפַּחֵד מִמֶּנּוּ וּמִן הַחֵטְא – אָז תִּשְׁרֶה עָלֶיךָ רוּחַ הַשְּׁכִינָה, וְזִיו כְּבוֹדָהּ, וְחַיֵּי עוֹלָם הַבָּא.<br><br>וְעַתָּה, בְּנִי, דַע וּרְאֵה כִּי הַמִּתְגָּאֶה בְּלִבּוֹ עַל הַבְּרִיוֹת – מוֹרֵד הוּא בְּמַלְכוּת שָׁמַיִם, כִּי מִתְפָּאֵר הוּא בִּלְבוּשׁ מַלְכוּת שָׁמַיִם, שֶׁנֶּאֱמַר: "ה' מָלָךְ גֵּאוּת לָבֵשׁ". וּבַמֶּה יִתְגָּאֶה לֵב הָאָדָם? אִם בְּעֹשֶׁר – "ה' מוֹרִישׁ וּמַעֲשִׁיר". וְאִם בְּכָבוֹד – הֲלֹא לֵאלֹהִים הוּא, שֶׁנֶּאֱמַר: "וְהָעֹשֶׁר וְהַכָּבוֹד מִלְפָנֶיךָ". וְאִם מִתְפָּאֵר בְּחָכְמָה: "מֵסִיר שָׂפָה לְנֶאֱמָנִים, וְטַעַם זְקֵנִים יִקַּח". נִמְצָא: הַכֹּל שָׁוֶה לִפְנֵי הַמָּקוֹם, כִּי בְאַפּוֹ מַשְׁפִּיל גֵּאִים, וּבִרְצוֹנוֹ מַגְבִּיהַ שְׁפָלִים. לָכֵן הַשְׁפֵּל עַצְמְךָ, וִינַשְּׂאֲךָ הַמָּקוֹם.<br><br>עַל כֵּן אֲפָרֵשׁ לְךָ אֵיךְ תִּתְנַהֵג בְּמִדַּת הָעֲנָוָה, לָלֶכֶת בָּהּ תָּמִיד: כָּל דְּבָרֶיךָ יִהְיוּ בְּנַחַת, וְרֹאשְׁךָ כָּפוּף; וְעֵינֶיךָ יַבִּיטוּ לְמַטָּה לָאָרֶץ, וְלִבְּךָ לְמַעְלָה; וְאַל תַּבִּיט בִּפְנֵי אָדָם בְּדַבֶּרְךָ עִמּוֹ. וְכָל אָדָם יִהְיֶה גָּדוֹל מִמְּךָ בְּעֵינֶיךָ: אִם חָכָם אוֹ עָשִׁיר הוּא – עָלֶיךָ לְכַבְּדוֹ. וְאִם רָשׁ הוּא, וְאַתָּה עָשִׁיר אוֹ חָכָם מִמֶּנּוּ – חֲשֹׁב בְּלִבְּךָ כִּי אַתָּה חַיָּב מִמֶּנּוּ, וְהוּא זַכַּאי מִמְּךָ. שֶׁאִם הוּא חוֹטֵא – הוּא שׁוֹגֵג, וְאַתָּה מֵזִיד.<br><br>בְּכָל דְּבָרֶיךָ וּמַעֲשֶׂיךָ וּמַחְשְׁבוֹתֶיךָ, וּבְכָל עֵת – חֲשׁוֹב בְּלִבְּךָ כְּאִלּוּ אַתָּה עוֹמֵד לִפְנֵי הַקָּדוֹשׁ בָּרוּךְ הוּא, וּשְׁכִינָתוֹ עָלֶיךָ, כִּי כְּבוֹדוֹ מָלֵא הָעוֹלָם. וּדְבָרֶיךָ יִהְיוּ בְּאֵימָה וּבְיִרְאָה, כְּעֶבֶד לִפְנֵי רַבּוֹ. וְתִתְבַּיֵּשׁ מִכָּל אָדָם. וְאִם יִקְרָאֲךָ אִישׁ – אַל תַּעֲנֵהוּ בְּקוֹל רָם, רַק בְּנַחַת כְּעוֹמֵד לִפְנֵי רַבּוֹ.<br><br>וֶהֱוֵי זָהִיר לִקְרוֹת בַּתּוֹרָה תָּמִיד, אֲשֶׁר תּוּכַל לְקַיְּמָהּ. וְכַאֲשֶׁר תָּקוּם מִן הַסֵּפֶר – תְּחַפֵּשׂ בַּאֲשֶׁר לָמַדְתָּ אִם יֵשׁ בּוֹ דָבָר אֲשֶׁר תּוּכַל לְקַיְּמוֹ. וּתְפַשְׁפֵּשׁ בְּמַעֲשֶׂיךָ בַּבֹּקֶר וּבָעֶרֶב, וּבָזֶה יִהְיוּ כָּל יָמֶיךָ בִּתְשׁוּבָה.<br><br>וְהָסֵר כָּל דִּבְרֵי הָעוֹלָם מִלִּבְּךָ בְּעֵת הַתְּפִלָּה, וְהָכֵן לִבְּךָ לִפְנֵי הַמָּקוֹם בָּרוּךְ הוּא. וְטַהֵר רַעְיוֹנֶיךָ, וַחֲשֹׁב הַדִּבּוּר קֹדֶם שֶׁתּוֹצִיאֶנּוּ מִפִּיךָ. וְכֵן תַּעֲשֶׂה כָּל יְמֵי חַיֵּי הֶבְלֶךָ בְּכָל דָּבָר וְדָבָר, וְלֹא תֶחֱטָא. וּבָזֶה יִהְיוּ דְּבָרֶיךָ וּמַעֲשֶׂיךָ וּמַחְשְׁבוֹתֶיךָ יְשָׁרִים; וּתְפִלָּתְךָ תִּהְיֶה זַכָּה וּבָרָה וּנְקִיָּה, וּמְכֻוֶּנֶת וּמְקֻבֶּלֶת לִפְנֵי הַמָּקוֹם בָּרוּךְ הוּא, שֶׁנֶּאֱמַר: "תָּכִין לִבָּם – תַּקְשִׁיב אָזְנֶךָ".<br><br>תִּקְרָא הָאִגֶּרֶת הַזֹּאת פַּעַם אַחַת בְּשָׁבוּעַ וְלֹא תִפְחֹת, לְקַיְּמָהּ וְלָלֶכֶת בָּהּ תָּמִיד אַחַר הַשֵּׁם יִתְבָּרַךְ. לְמַעַן תַּצְלִיחַ בְּכָל דְּרָכֶיךָ, וְתִזְכֶּה לָעוֹלָם הַבָּא הַצָּפוּן לַצַּדִּיקִים. וּבְכָל יוֹם שֶׁתִּקְרָאֶנָּה – יַעֲנוּךָ מִן הַשָּׁמַיִם כַּאֲשֶׁר יַעֲלֶה עַל לִבְּךָ לִשְׁאֹל, עַד עוֹלָם.<br><br><strong>אָמֵן סֶלָה.</strong><br><br><span style="font-size:12px;color:var(--text-muted)">— כְּתָבָהּ רַבֵּנוּ מֹשֶׁה בֶּן נַחְמָן (הָרַמְבַּ"ן) לִבְנוֹ, ספרד, ~1275</span></div>
+    </div>
+
+    <!-- b11: מצווה יומית רמב"ם -->
+    <div class="blessing-item" id="b11">
+      <div class="blessing-header" onclick="toggleBlessing('b11')">
+        <span class="blessing-title">📚 מצווה יומית — הרמב"ם</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div id="rambamDailyInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border-radius:8px;border-right:3px solid var(--primary);">מצוות הרמב"ם — סיבוב חודשי</div>
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px;text-align:center;" id="rambamRef"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;text-align:center;" id="rambamName"></div>
+        <div id="rambamText" style="line-height:1.9;font-family:'David Libre','Times New Roman',serif;text-align:right;color:var(--text);"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:.5px solid var(--border);">
+          <div style="display:flex;gap:6px;">
+            <button onclick="navRambam(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">‹ קודם</button>
+            <button onclick="resetRambamToday()" style="background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:11px;padding:5px 10px;border-radius:14px;cursor:pointer;font-family:inherit;">📅 היום</button>
+            <button onclick="navRambam(1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">הבא ›</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button onclick="changeRambamFont(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">−</button>
+            <span id="rambamFontVal" style="font-size:11px;color:var(--text-muted);min-width:28px;text-align:center;">15px</span>
+            <button onclick="changeRambamFont(+1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- b9: אשר יצר -->
+    <div class="blessing-item" id="b9">
+      <div class="blessing-header" onclick="toggleBlessing('b9')">
+        <span class="blessing-title">אשר יצר אתכם בדין — בבית העלמין</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;text-align:center;">ניתן לבחור נוסח</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;">
+          <button onclick="setCemNusach('ashk')" id="cemAshk" style="flex:1;font-size:12px;padding:6px;border-radius:16px;border:.5px solid var(--primary);background:var(--primary);color:#fff;cursor:pointer;font-family:inherit;">נוסח אשכנז</button>
+          <button onclick="setCemNusach('sef')"  id="cemSef"  style="flex:1;font-size:12px;padding:6px;border-radius:16px;border:.5px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;font-family:inherit;">נוסח ספרד</button>
+        </div>
+        <div id="cemAshkText">בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר יָצַר אֶתְכֶם בַּדִּין, וְזָן וְכִלְכֵּל אֶתְכֶם בַּדִּין, וְהֵמִית אֶתְכֶם בַּדִּין, וְיוֹדֵעַ מִסְפַּר כֻּלְּכֶם בַּדִּין, וְהוּא עָתִיד לְהַחֲיוֹתְכֶם וּלְהָקִים אֶתְכֶם בַּדִּין. בָּרוּךְ אַתָּה יְהֹוָה, מְחַיֵּה הַמֵּתִים.<br><br><span style="font-size:11px;color:var(--text-muted)">הברכה נאמרת בכניסה לבית הקברות לאחר שלושים יום.</span></div>
+        <div id="cemSefText" style="display:none;">בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר יָצַר אֶתְכֶם בַּדִּין, וְדָן אֶתְכֶם בַּדִּין, וְזָן אֶתְכֶם בַּדִּין, וְכִלְכֵּל אֶתְכֶם בַּדִּין, וְהֵמִית אֶתְכֶם בַּדִּין, וְיוֹדֵעַ מִסְפַּר כֻּלְּכֶם, וְהוּא עָתִיד לְהַחֲיוֹתְכֶם וּלְהַעֲמִידְכֶם בַּדִּין לְחַיֵּי הָעוֹלָם הַבָּא. בָּרוּךְ אַתָּה יְהֹוָה, מְחַיֵּה הַמֵּתִים.<br><br><span style="font-size:11px;color:var(--text-muted)">הברכה נאמרת בכניסה לבית הקברות לאחר שלושים יום.</span></div>
+      </div>
+    </div>
+
+    <!-- b12: תפילת הדרך -->
+    <div class="blessing-item" id="b12">
+      <div class="blessing-header" onclick="toggleBlessing('b12')">
+        <span class="blessing-title">תפילת הדרך</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, שֶׁתּוֹלִיכֵנוּ לְשָׁלוֹם וְתַצְעִידֵנוּ לְשָׁלוֹם וְתַדְרִיכֵנוּ לְשָׁלוֹם, וְתִסְמְכֵנוּ לְשָׁלוֹם, וְתַגִּיעֵנוּ לִמְחוֹז חֶפְצֵנוּ לְחַיִּים וּלְשִׂמְחָה וּלְשָׁלוֹם.<br><br>וְתַצִּילֵנוּ מִכַּף כָּל אוֹיֵב וְאוֹרֵב וְלִסְטִים וְחַיּוֹת רָעוֹת בַּדֶּרֶךְ, וּמִכָּל מִינֵי פֻּרְעָנִיּוֹת הַמִּתְרַגְּשׁוֹת לָבוֹא לָעוֹלָם. וְתִשְׁלַח בְּרָכָה בְּכָל מַעֲשֵׂה יָדֵינוּ, וְתִתְּנֵנוּ לְחֵן וּלְחֶסֶד וּלְרַחֲמִים בְּעֵינֶיךָ וּבְעֵינֵי כָל רוֹאֵינוּ.<br><br>וְתִשְׁמַע קוֹל תַּחֲנוּנֵינוּ, כִּי אֵל שׁוֹמֵעַ תְּפִלָּה וְתַחֲנוּן אָתָּה. בָּרוּךְ אַתָּה יְהֹוָה, שׁוֹמֵעַ תְּפִלָּה.<br><br><span style="font-size:11px;color:var(--text-muted)">נאמרת בצאת לדרך מחוץ לעיר, לפני שהרחיק יותר מ-72 דקות הליכה.</span></div>
+    </div>
+
+  </div><!-- /blessing-list -->
+</div><!-- /app -->
+
+<script>
+/* ── S helper ── */
+const S = TH ? TH.S : {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  remove: k => localStorage.removeItem(k)
+};
+
+/* ── כלי: טוגל אקורדיון ── */
+const ALL_BLESSINGS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12'];
+
+function toggleBlessing(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  ALL_BLESSINGS.forEach(b => {
+    const x = document.getElementById(b);
+    if (x) x.classList.remove('open');
+  });
+  if (!wasOpen) {
+    el.classList.add('open');
+    if (id === 'b7') { if (!mayanActive || !mayanActive.size) { mayanActive = new Set([1]); } applyMayan(); }
+    if (id === 'b10') initAvot();
+    if (id === 'b11') { _rambamIdx = _getRambamDayIdx(); _clearBadRambamCache(); _loadRambamFont(); setTimeout(renderRambam, 10); }
+  }
+}
+
+/* ── גודל פונט ברכות ── */
+function changeBlessingFont(delta) {
+  const s = S.get('tehillim_settings') || {};
+  let cur = s.blessingFontSize || 15;
+  cur = Math.max(11, Math.min(28, cur + delta));
+  s.blessingFontSize = cur;
+  S.set('tehillim_settings', s);
+  applyBlessingFont();
+}
+function applyBlessingFont() {
+  const s = S.get('tehillim_settings') || {};
+  const sz = s.blessingFontSize || 15;
+  document.querySelectorAll('.blessing-body').forEach(el => { el.style.fontSize = sz + 'px'; });
+  const avotEl = document.getElementById('avotText'); if (avotEl) avotEl.style.fontSize = sz + 'px';
+  const valEl = document.getElementById('blessFontVal'); if (valEl) valEl.textContent = sz + 'px';
+}
+
+/* ── ברכה מעין שלוש ── */
+let mayanActive = new Set([1]);
+function toggleMayan(n) {
+  if (mayanActive.has(n)) { if (mayanActive.size > 1) mayanActive.delete(n); }
+  else { mayanActive.add(n); }
+  applyMayan();
+}
+function applyMayan() {
+  for (let i = 1; i <= 3; i++) {
+    const btn = document.getElementById('mTab'+i), on = mayanActive.has(i);
+    if (btn) { btn.style.background = on ? 'var(--primary)' : 'var(--surface)'; btn.style.color = on ? '#fff' : 'var(--text-sec)'; btn.style.borderColor = on ? 'var(--primary)' : 'var(--border)'; }
+  }
+  const out = document.getElementById('mTextOut');
+  if (out) { out.innerHTML = buildMayanText(); try { applyBlessingFont(); } catch(e){} }
+}
+function buildMayanText() {
+  const parts = [], close1 = [], openings = [];
+  if (mayanActive.has(1)) { parts.push('עַל הַמִּחְיָה וְעַל הַכַּלְכָּלָה'); close1.push('הַמִּחְיָה'); }
+  if (mayanActive.has(2)) { parts.push('עַל הַגֶּפֶן וְעַל פְּרִי הַגֶּפֶן'); close1.push('פְּרִי הַגֶּפֶן'); }
+  if (mayanActive.has(3)) { parts.push('עַל הָעֵץ וְעַל פְּרִי הָעֵץ'); close1.push('פְּרִי הָעֵץ'); }
+  const op = parts.join(', וְ'), cl = close1.join(' וְעַל ');
+  return 'בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, ' + op +
+    ', וְעַל תְּנוּבַת הַשָּׂדֶה, וְעַל אֶרֶץ חֶמְדָּה טוֹבָה וּרְחָבָה שֶׁרָצִיתָ וְהִנְחַלְתָּ לַאֲבוֹתֵינוּ לֶאֱכוֹל מִפִּרְיָהּ וְלִשְׂבּוֹעַ מִטּוּבָהּ. ' +
+    'רַחֵם נָא יְהֹוָה אֱלֹהֵינוּ עַל יִשְׂרָאֵל עַמֶּךָ, וְעַל יְרוּשָׁלַיִם עִירֶךָ, וְעַל צִיּוֹן מִשְׁכַּן כְּבוֹדֶךָ, וְעַל מִזְבְּחֶךָ וְעַל הֵיכָלֶךָ. ' +
+    'וּבְנֵה יְרוּשָׁלַיִם עִיר הַקֹּדֶשׁ בִּמְהֵרָה בְיָמֵינוּ, וְהַעֲלֵנוּ לְתוֹכָהּ וְשַׂמְּחֵנוּ בְּבִנְיָנָהּ, וְנֹאכַל מִפִּרְיָהּ וְנִשְׂבַּע מִטּוּבָהּ, וּנְבָרֶכְךָ עָלֶיהָ בִּקְדֻשָּׁה וּבְטָהֳרָה. ' +
+    '<span style="color:var(--text-muted)">[בשבת: וּרְצֵה וְהַחֲלִיצֵנוּ בְּיוֹם הַשַּׁבָּת הַזֶּה.] [בראש חודש: וְזָכְרֵנוּ לְטוֹבָה בְּיוֹם רֹאשׁ הַחֹדֶשׁ הַזֶּה.]</span> ' +
+    'כִּי אַתָּה יְהֹוָה טוֹב וּמֵטִיב לַכֹּל, וְנוֹדֶה לְּךָ עַל הָאָרֶץ וְעַל ' + cl +
+    '. בָּרוּךְ אַתָּה יְהֹוָה, עַל הָאָרֶץ וְעַל ' + cl + '.';
+}
+
+/* ── נוסח בית עלמין ── */
+function setCemNusach(n) {
+  const isA = (n === 'ashk');
+  const a = document.getElementById('cemAshk'), sf = document.getElementById('cemSef');
+  const at = document.getElementById('cemAshkText'), st = document.getElementById('cemSefText');
+  if (a)  { a.style.background = isA ? 'var(--primary)' : 'var(--surface)'; a.style.color = isA ? '#fff' : 'var(--text-sec)'; a.style.borderColor = isA ? 'var(--primary)' : 'var(--border)'; }
+  if (sf) { sf.style.background = isA ? 'var(--surface)' : 'var(--primary)'; sf.style.color = isA ? 'var(--text-sec)' : '#fff'; sf.style.borderColor = isA ? 'var(--border)' : 'var(--primary)'; }
+  if (at) at.style.display = isA ? '' : 'none';
+  if (st) st.style.display = isA ? 'none' : '';
+}
+
+/* ── פרקי אבות ── */
+const AVOT_MISHNAYOT = [{"r":"א:א","t":"מֹשֶׁה קִבֵּל תּוֹרָה מִסִּינַי וּמְסָרָהּ לִיהוֹשֻׁעַ, וִיהוֹשֻׁעַ לִזְקֵנִים, וּזְקֵנִים לִנְבִיאִים, וּנְבִיאִים מְסָרוּהָ לְאַנְשֵׁי כְנֶסֶת הַגְּדוֹלָה. הֵם אָמְרוּ שְׁלֹשָׁה דְבָרִים: הֱווּ מְתוּנִים בַּדִּין, וְהַעֲמִידוּ תַּלְמִידִים הַרְבֵּה, וַעֲשׂוּ סְיָג לַתּוֹרָה."},{"r":"א:ב","t":"שִׁמְעוֹן הַצַּדִּיק הָיָה מִשְּׁיָרֵי כְּנֶסֶת הַגְּדוֹלָה. הוּא הָיָה אוֹמֵר: עַל שְׁלֹשָׁה דְבָרִים הָעוֹלָם עוֹמֵד — עַל הַתּוֹרָה, וְעַל הָעֲבוֹדָה, וְעַל גְּמִילוּת חֲסָדִים."},{"r":"א:ג","t":"אַנְטִיגְנוֹס אִישׁ סוֹכוֹ אוֹמֵר: אַל תִּהְיוּ כַעֲבָדִים הַמְשַׁמְּשִׁין אֶת הָרַב עַל מְנָת לְקַבֵּל פְּרָס, אֶלָּא הֱווּ כַעֲבָדִים הַמְשַׁמְּשִׁין אֶת הָרַב שֶׁלֹּא עַל מְנָת לְקַבֵּל פְּרָס, וִיהִי מוֹרָא שָׁמַיִם עֲלֵיכֶם."},{"r":"א:ד","t":"יוֹסֵי בֶּן יוֹעֶזֶר אוֹמֵר: יְהִי בֵיתְךָ בֵּית וַעַד לַחֲכָמִים, וֶהֱוֵי מִתְאַבֵּק בַּעֲפַר רַגְלֵיהֶם, וֶהֱוֵי שׁוֹתֶה בְצָמָא אֶת דִּבְרֵיהֶם."},{"r":"א:ה","t":"יוֹסֵי בֶּן יוֹחָנָן אִישׁ יְרוּשָׁלַיִם אוֹמֵר: יְהִי בֵיתְךָ פָתוּחַ לִרְוָחָה, וְיִהְיוּ עֲנִיִּים בְּנֵי בֵיתֶךָ."},{"r":"א:ו","t":"יְהוֹשֻׁעַ בֶּן פְּרַחְיָה אוֹמֵר: עֲשֵׂה לְךָ רַב, וּקְנֵה לְךָ חָבֵר, וֶהֱוֵי דָן אֶת כָּל הָאָדָם לְכַף זְכוּת."},{"r":"א:ז","t":"נִתַּאי הָאַרְבֵּלִי אוֹמֵר: הַרְחֵק מִשָּׁכֵן רָע, וְאַל תִּתְחַבֵּר לָרָשָׁע, וְאַל תִּתְיָאֵשׁ מִן הַפֻּרְעָנוּת."},{"r":"א:ח","t":"יְהוּדָה בֶּן טַבַּאי אוֹמֵר: אַל תַּעַשׂ עַצְמְךָ כְעוֹרְכֵי הַדַּיָּנִים. וּכְשֶׁיִּהְיוּ בַעֲלֵי דִינִים עוֹמְדִים לְפָנֶיךָ — יִהְיוּ בְעֵינֶיךָ כִּרְשָׁעִים."},{"r":"א:ט","t":"שִׁמְעוֹן בֶּן שָׁטָח אוֹמֵר: הֱוֵי מַרְבֶּה לַחְקֹר אֶת הָעֵדִים, וֶהֱוֵי זָהִיר בִּדְבָרֶיךָ, שֶׁמָּא מִתּוֹכָם יִלְמְדוּ לְשַׁקֵּר."},{"r":"א:י","t":"שְׁמַעְיָה אוֹמֵר: אֱהוֹב אֶת הַמְּלָאכָה, וּשְׂנָא אֶת הָרַבָּנוּת, וְאַל תִּתְוַדַּע לָרָשׁוּת."},{"r":"א:יא","t":"אַבְטַלְיוֹן אוֹמֵר: חֲכָמִים, הִזָּהֲרוּ בְדִבְרֵיכֶם — שֶׁמָּא תָּחוּבוּ חוֹבַת גָּלוּת וְתִגְלוּ לִמְקוֹם מַיִם הָרָעִים."},{"r":"א:יב","t":"הִלֵּל אוֹמֵר: הֱוֵי מִתַּלְמִידָיו שֶׁל אַהֲרֹן — אוֹהֵב שָׁלוֹם וְרוֹדֵף שָׁלוֹם, אוֹהֵב אֶת הַבְּרִיּוֹת וּמְקָרְבָן לַתּוֹרָה."},{"r":"א:יג","t":"הוּא הָיָה אוֹמֵר: נְגַד שְׁמָא — אֲבַד שְׁמֵיהּ; וּדְלָא מוֹסִיף — יָסֵף; וּדְלָא יָלֵיף — קְטָלָא חַיָּב; וּדְאִשְׁתַּמַּשׁ בְּתַגָּא — חָלָף."},{"r":"א:יד","t":"הוּא הָיָה אוֹמֵר: אִם אֵין אֲנִי לִי — מִי לִי? וּכְשֶׁאֲנִי לְעַצְמִי — מָה אֲנִי? וְאִם לֹא עַכְשָׁו — אֵימָתָי?"},{"r":"א:טו","t":"שַׁמַּאי אוֹמֵר: עֲשֵׂה תּוֹרָתְךָ קֶבַע, אֱמוֹר מְעַט וַעֲשֵׂה הַרְבֵּה, וֶהֱוֵי מְקַבֵּל אֶת כָּל הָאָדָם בְּסֵבֶר פָּנִים יָפוֹת."},{"r":"א:טז","t":"רַבָּן גַּמְלִיאֵל הָיָה אוֹמֵר: עֲשֵׂה לְךָ רַב, וְהִסְתַּלֵּק מִן הַסָּפֵק, וְאַל תַּרְבֶּה לְעַשֵּׂר אוּמָדוֹת."},{"r":"א:יז","t":"שִׁמְעוֹן בְּנוֹ אוֹמֵר: כָּל יָמַי גָּדַלְתִּי בֵּין הַחֲכָמִים — וְלֹא מָצָאתִי לַגּוּף טוֹב אֶלָּא שְׁתִיקָה."},{"r":"א:יח","t":"רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל אוֹמֵר: עַל שְׁלֹשָׁה דְבָרִים הָעוֹלָם קַיָּם — עַל הַדִּין, וְעַל הָאֱמֶת, וְעַל הַשָּׁלוֹם."},{"r":"ב:א","t":"רַבִּי אוֹמֵר: אֵיזוֹהִי דֶּרֶךְ יְשָׁרָה שֶׁיָּבוֹר לוֹ הָאָדָם? כֹּל שֶׁהִיא תִּפְאֶרֶת לְעוֹשֶׂיהָ, וְתִפְאֶרֶת לוֹ מִן הָאָדָם."},{"r":"ב:ב","t":"רַבָּן גַּמְלִיאֵל בְּנוֹ שֶׁל רַבִּי יְהוּדָה הַנָּשִׂיא אוֹמֵר: יָפֶה תַלְמוּד תּוֹרָה עִם דֶּרֶךְ אֶרֶץ, שֶׁיְּגִיעַת שְׁנֵיהֶם מְשַׁכַּחַת עָוֹן."},{"r":"ב:ג","t":"הֱווּ זְהִירִין בָּרָשׁוּת — שֶׁאֵין מְקָרְבִין לוֹ לָאָדָם אֶלָּא לְצֹרֶךְ עַצְמָן."},{"r":"ב:ד","t":"הִלֵּל אוֹמֵר: אַל תִּפְרֹשׁ מִן הַצִּבּוּר. וְאַל תַּאֲמִין בְּעַצְמְךָ עַד יוֹם מוֹתְךָ. וְאַל תָּדִין אֶת חֲבֵרְךָ עַד שֶׁתַּגִּיעַ לִמְקוֹמוֹ."},{"r":"ב:ה","t":"אֵין בּוּר יְרֵא חֵטְא, וְלֹא עַם הָאָרֶץ חָסִיד. וּבְמָקוֹם שֶׁאֵין אֲנָשִׁים — הִשְׁתַּדֵּל לִהְיוֹת אִישׁ."},{"r":"ב:ז","t":"הוּא הָיָה אוֹמֵר: מַרְבֶּה תוֹרָה — מַרְבֶּה חַיִּים. קָנָה שֵׁם טוֹב — קָנָה לְעַצְמוֹ. קָנָה לוֹ דִבְרֵי תוֹרָה — קָנָה לוֹ חַיֵּי הָעוֹלָם הַבָּא."},{"r":"ב:ח","t":"רַבָּן יוֹחָנָן בֶּן זַכַּאי הָיָה אוֹמֵר: אִם לָמַדְתָּ תּוֹרָה הַרְבֵּה — אַל תַּחֲזִיק טוֹבָה לְעַצְמְךָ, כִּי לְכָךְ נוֹצָרְתָּ."},{"r":"ב:ט","t":"אָמַר לָהֶם: צְאוּ וּרְאוּ אֵיזוֹהִי דֶרֶךְ יְשָׁרָה שֶׁיִּדְבַּק בָּהּ הָאָדָם. רַבִּי אֱלִיעֶזֶר: עַיִן טוֹבָה. רַבִּי יְהוֹשֻׁעַ: חָבֵר טוֹב. רַבִּי שִׁמְעוֹן: הָרוֹאֶה אֶת הַנּוֹלָד. רַבִּי אֶלְעָזָר: לֵב טוֹב."},{"r":"ב:י","t":"רַבִּי אֱלִיעֶזֶר אוֹמֵר: יְהִי כְבוֹד חֲבֵרְךָ חָבִיב עָלֶיךָ כְּשֶׁלָּךְ; וְאַל תְּהִי נוֹחַ לִכְעוֹס; וְשׁוּב יוֹם אֶחָד לִפְנֵי מִיתָתְךָ."},{"r":"ב:יא","t":"רַבִּי יְהוֹשֻׁעַ אוֹמֵר: עַיִן הָרָע, וְיֵצֶר הָרָע, וְשִׂנְאַת הַבְּרִיּוֹת — מוֹצִיאִין אֶת הָאָדָם מִן הָעוֹלָם."},{"r":"ב:יב","t":"רַבִּי יוֹסֵי אוֹמֵר: יְהִי מָמוֹן חֲבֵרְךָ חָבִיב עָלֶיךָ כְּשֶׁלָּךְ. וְהַתְקֵן עַצְמְךָ לִלְמוֹד תּוֹרָה. וְכָל מַעֲשֶׂיךָ — יִהְיוּ לְשֵׁם שָׁמַיִם."},{"r":"ב:יג","t":"רַבִּי שִׁמְעוֹן אוֹמֵר: הֱוֵי זָהִיר בִּקְרִיאַת שְׁמַע וּבִתְפִלָּה. וּכְשֶׁאַתָּה מִתְפַּלֵּל — אַל תַּעַשׂ תְּפִלָּתְךָ קֶבַע, אֶלָּא רַחֲמִים וְתַחֲנוּנִים לִפְנֵי הַמָּקוֹם."},{"r":"ב:יד","t":"רַבִּי אֶלְעָזָר אוֹמֵר: הֱוֵי שָׁקוּד לִלְמוֹד תּוֹרָה, וְדַע מַה שֶּׁתָּשִׁיב לְאֶפִּיקוֹרוֹס."},{"r":"ב:טו","t":"רַבִּי טַרְפוֹן אוֹמֵר: הַיּוֹם קָצֵר, וְהַמְּלָאכָה מְרֻבָּה, וְהַפּוֹעֲלִים עֲצֵלִים, וְהַשָּׂכָר הַרְבֵּה — וּבַעַל הַבַּיִת דּוֹחֵק."},{"r":"ב:טז","t":"הוּא הָיָה אוֹמֵר: לֹא עָלֶיךָ הַמְּלָאכָה לִגְמוֹר, וְלֹא אַתָּה בֶן חוֹרִין לְהִבָּטֵל מִמֶּנָּה."},{"r":"ג:א","t":"עֲקַבְיָא בֶן מַהֲלַלְאֵל אוֹמֵר: הִסְתַּכֵּל בִּשְׁלֹשָׁה דְבָרִים וְאֵין אַתָּה בָּא לִידֵי עֲבֵרָה: דַּע מֵאַיִן בָּאתָ, וּלְאָן אַתָּה הוֹלֵךְ, וְלִפְנֵי מִי אַתָּה עָתִיד לִתֵּן דִּין וְחֶשְׁבּוֹן."},{"r":"ג:ב","t":"רַבִּי חֲנַנְיָה סְגַן הַכֹּהֲנִים אוֹמֵר: הֱוֵי מִתְפַּלֵּל בִּשְׁלוֹמָהּ שֶׁל מַלְכוּת, שֶׁאִלְמָלֵא מוֹרָאָהּ — אִישׁ אֶת רֵעֵהוּ חַיִּים בְּלָעוֹ."},{"r":"ג:ג","t":"רַבִּי שִׁמְעוֹן אוֹמֵר: שְׁלֹשָׁה שֶׁאָכְלוּ עַל שֻׁלְחָן אֶחָד וְלֹא אָמְרוּ עָלָיו דִּבְרֵי תוֹרָה — כְּאִלּוּ אָכְלוּ מִזִּבְחֵי מֵתִים."},{"r":"ג:ה","t":"רַבִּי נְחוּנְיָא בֶן הַקָּנָה אוֹמֵר: כָּל הַמְקַבֵּל עָלָיו עֹל תּוֹרָה — מַעֲבִירִין מִמֶּנּוּ עֹל מַלְכוּת וְעֹל דֶּרֶךְ אֶרֶץ."},{"r":"ג:י","t":"רַבִּי חֲנִינָא בֶן דּוֹסָא אוֹמֵר: כָּל שֶׁיִּרְאַת חֶטְאוֹ קוֹדֶמֶת לְחָכְמָתוֹ — חָכְמָתוֹ מִתְקַיֶּמֶת."},{"r":"ג:יד","t":"רַבִּי אֶלְעָזָר הַמּוֹדָעִי אוֹמֵר: הַמְחַלֵּל אֶת הַקָּדָשִׁים, וְהַמְבַזֶּה אֶת הַמּוֹעֲדוֹת — אֵין לוֹ חֵלֶק לָעוֹלָם הַבָּא."},{"r":"ג:יז","t":"הוּא הָיָה אוֹמֵר: חָבִיב אָדָם שֶׁנִּבְרָא בְצֶלֶם. חֲבִיבִין יִשְׂרָאֵל שֶׁנִּקְרְאוּ בָנִים לַמָּקוֹם."},{"r":"ג:יח","t":"הַכֹּל צָפוּי, וְהָרְשׁוּת נְתוּנָה, וּבְטוֹב הָעוֹלָם נִדּוֹן. וְהַכֹּל לְפִי רֹב הַמַּעֲשֶׂה."},{"r":"ד:א","t":"בֶּן זוֹמָא אוֹמֵר: אֵיזֶהוּ חָכָם — הַלּוֹמֵד מִכָּל אָדָם. אֵיזֶהוּ גִבּוֹר — הַכּוֹבֵשׁ אֶת יִצְרוֹ. אֵיזֶהוּ עָשִׁיר — הַשָּׂמֵחַ בְּחֶלְקוֹ. אֵיזֶהוּ מְכֻבָּד — הַמְכַבֵּד אֶת הַבְּרִיּוֹת."},{"r":"ד:ב","t":"בֶּן עַזַּאי אוֹמֵר: הֱוֵי רָץ לְמִצְוָה קַלָּה כְבַחֲמוּרָה, וּבוֹרֵחַ מִן הָעֲבֵרָה. שֶׁמִּצְוָה גּוֹרֶרֶת מִצְוָה, וַעֲבֵרָה גּוֹרֶרֶת עֲבֵרָה."},{"r":"ד:ג","t":"הוּא הָיָה אוֹמֵר: אַל תְּהִי בָז לְכָל אָדָם, וְאַל תְּהִי מַפְלִיג לְכָל דָּבָר. שֶׁאֵין לְךָ אָדָם שֶׁאֵין לוֹ שָׁעָה."},{"r":"ד:יא","t":"רַבִּי מֵאִיר אוֹמֵר: הֱוֵי מְמַעֵט בָּעֵסֶק, וַעֲסֹק בַּתּוֹרָה. וֶהֱוֵי שְׁפַל רוּחַ בִּפְנֵי כָל אָדָם."},{"r":"ד:יט","t":"רַבִּי יַעֲקֹב אוֹמֵר: הָעוֹלָם הַזֶּה דּוֹמֶה לִפְרוֹזְדוֹר בִּפְנֵי הָעוֹלָם הַבָּא. הַתְקֵן עַצְמְךָ בַּפְּרוֹזְדוֹר, כְּדֵי שֶׁתִּכָּנֵס לַטְּרַקְלִין."},{"r":"ד:יט ב","t":"יָפָה שָׁעָה אַחַת בִּתְשׁוּבָה וּמַעֲשִׂים טוֹבִים בָּעוֹלָם הַזֶּה — מִכָּל חַיֵּי הָעוֹלָם הַבָּא."},{"r":"ד:כא","t":"רַבִּי אֶלְעָזָר הַקַּפָּר אוֹמֵר: הַקִּנְאָה, וְהַתַּאֲוָה, וְהַכָּבוֹד — מוֹצִיאִין אֶת הָאָדָם מִן הָעוֹלָם."},{"r":"ה:א","t":"בַּעֲשָׂרָה מַאֲמָרוֹת נִבְרָא הָעוֹלָם. וּמַה תַּלְמוּד לוֹמַר? אֶלָּא לְהִפָּרַע מִן הָרְשָׁעִים, וְלִתֵּן שָׂכָר טוֹב לַצַּדִּיקִים."},{"r":"ה:כ","t":"יְהוּדָה בֶן תֵּימָא אוֹמֵר: הֱוֵי עַז כַּנָּמֵר, וְקַל כַּנֶּשֶׁר, וְרָץ כַּצְּבִי, וְגִבּוֹר כָּאֲרִי — לַעֲשׂוֹת רְצוֹן אָבִיךָ שֶׁבַּשָּׁמַיִם."},{"r":"ה:כב","t":"בֶּן בַּג בַּג אוֹמֵר: הֲפֹךְ בָּהּ וַהֲפֹךְ בָּהּ — דְּכֹלָּא בָהּ. וּבָהּ תֶּחֱזֵי, וְסִיב וּבְלֵה בָהּ — וּמִנַּהּ לֹא תָזוּעַ."},{"r":"ה:כג","t":"בֶּן הֵא הֵא אוֹמֵר: לְפוּם צַעֲרָא — אַגְרָא."},{"r":"ו:א","t":"רַבִּי מֵאִיר אוֹמֵר: כָּל הָעוֹסֵק בַּתּוֹרָה לִשְׁמָהּ — זוֹכֶה לִדְבָרִים הַרְבֵּה."},{"r":"ו:ד","t":"כָּךְ הִיא דַּרְכָּהּ שֶׁל תּוֹרָה: פַּת בַּמֶּלַח תֹּאכֵל, וּמַיִם בַּמְּשׂוּרָה תִשְׁתֶּה, וְעַל הָאָרֶץ תִּישָׁן, וְחַיֵּי צַעַר תִּחְיֶה, וּבַתּוֹרָה אַתָּה עָמֵל."},{"r":"ו:ה","t":"אַל תְּבַקֵּשׁ גְּדֻלָּה לְעַצְמְךָ, וְאַל תַּחְמוֹד כָּבוֹד. יוֹתֵר מִלִּמּוּדְךָ — עֲשֵׂה."},{"r":"ו:יא","t":"כָּל מַה שֶּׁבָּרָא הַקָּדוֹשׁ-בָּרוּךְ-הוּא בְּעוֹלָמוֹ — לֹא בְרָאוֹ אֶלָּא לִכְבוֹדוֹ."},{"r":"סיום","t":"רַבִּי חֲנַנְיָה בֶן עֲקַשְׁיָא אוֹמֵר: רָצָה הַקָּדוֹשׁ-בָּרוּךְ-הוּא לְזַכּוֹת אֶת יִשְׂרָאֵל, לְפִיכָךְ הִרְבָּה לָהֶם תּוֹרָה וּמִצְוֹת."}];
+
+let _avotIdx = 0;
+function getAvotIdx() {
+  const now = new Date(), start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now - start) / 86400000) % AVOT_MISHNAYOT.length;
+}
+function initAvot() { _avotIdx = getAvotIdx(); renderAvot(); }
+function renderAvot() {
+  const m = AVOT_MISHNAYOT[_avotIdx]; if (!m) return;
+  const ref = document.getElementById('avotRef'), txt = document.getElementById('avotText'), info = document.getElementById('avotDailyInfo');
+  if (ref) ref.textContent = formatAvotRef(m.r);
+  if (txt) txt.textContent = m.t;
+  if (info) info.textContent = (_avotIdx === getAvotIdx()) ? '📅 המשנה של היום' : 'משנה ' + (_avotIdx+1) + '/' + AVOT_MISHNAYOT.length + ' — לא של היום';
+  try { applyBlessingFont(); } catch(e){}
+}
+function formatAvotRef(r) {
+  if (!r || r === 'סיום') return 'סיום פרקי אבות';
+  const p = r.split(':'); if (p.length < 2) return 'משנה ' + r;
+  const gem = s => { const c = s.replace(/\s+/g,''); if (!c.length) return s; return c.length === 1 ? c+'׳' : c.slice(0,-1)+'"'+c.slice(-1); };
+  return 'פרק ' + gem(p[0]) + ' · משנה ' + gem(p[1].trim().split(' ')[0]);
+}
+function navAvot(dir) { _avotIdx = (_avotIdx + dir + AVOT_MISHNAYOT.length) % AVOT_MISHNAYOT.length; renderAvot(); }
+function resetAvotToday() { _avotIdx = getAvotIdx(); renderAvot(); }
+
+/* ── רמב"ם ── */
+let _rambamIdx = 0, _rambamCache = {}, _rambamFontSize = 15;
+function _getRambamForDay() {
+  const now = new Date(), start = new Date(now.getFullYear(), 0, 0);
+  const day = Math.floor((now - start) / 86400000);
+  return day <= 248 ? { type:'Positive', num:day, label:'מצות עשה' } : { type:'Negative', num:Math.min(day-248, 365), label:'מצות לא תעשה' };
+}
+function _getRambamDayIdx() { const d = _getRambamForDay(); return d.num - 1; }
+function _clearBadRambamCache() {
+  try { const bad = []; for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('rambam_cache_')){const c=JSON.parse(localStorage.getItem(k)||'null');if(!c||!c.text||c.text.length<10)bad.push(k);}} bad.forEach(k=>localStorage.removeItem(k)); _rambamCache={}; } catch(e){}
+}
+function _loadRambamFont() {
+  try { const s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}'); if(s.rambamFontSize){_rambamFontSize=s.rambamFontSize;const el=document.getElementById('rambamText');if(el)el.style.fontSize=_rambamFontSize+'px';const v=document.getElementById('rambamFontVal');if(v)v.textContent=_rambamFontSize+'px';} } catch(e){}
+}
+async function fetchRambamMitzvah(type, num) {
+  const key = type+':'+num;
+  if (_rambamCache[key]) return _rambamCache[key];
+  try { const c=JSON.parse(localStorage.getItem('rambam_cache_'+key)||'null'); if(c&&c.ts&&Date.now()-c.ts<86400000*30){_rambamCache[key]=c;return c;} } catch(e){}
+  const sec = type==='Positive' ? 'Positive_Commandments' : 'Negative_Commandments';
+  try {
+    const data = await fetch('https://www.sefaria.org/api/texts/Sefer_HaMitzvot,_'+sec+'.'+num+'?lang=he&context=0').then(r=>r.json());
+    const flat = he => !he?'':typeof he==='string'?he:Array.isArray(he)?he.map(flat).join(' '):String(he);
+    const text = flat(data.he).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    const label = type==='Positive'?'מצות עשה':'מצות לא תעשה';
+    const title = (data.heRef||'').replace(/ספר המצוות[,،]?\s*/i,'').trim()||(label+' '+num);
+    const res = {type,num,label,title,text:text.slice(0,500),ts:Date.now()};
+    _rambamCache[key]=res; try{localStorage.setItem('rambam_cache_'+key,JSON.stringify(res));}catch(e){}
+    return res;
+  } catch(e) { return {type,num,label:type==='Positive'?'מצות עשה':'מצות לא תעשה',title:(type==='Positive'?'מצות עשה':'מצות לא תעשה')+' '+num,text:'לא ניתן לטעון כעת. נסה שוב.'}; }
+}
+async function renderRambam() {
+  const ref=document.getElementById('rambamRef'),name=document.getElementById('rambamName'),txt=document.getElementById('rambamText'),info=document.getElementById('rambamDailyInfo');
+  if(!ref||!name||!txt)return;
+  const today=_getRambamForDay(),type=_rambamIdx<248?'Positive':'Negative',num=_rambamIdx<248?_rambamIdx+1:_rambamIdx-247,label=type==='Positive'?'מצות עשה':'מצות לא תעשה';
+  ref.textContent=label+' '+num; name.textContent='⏳ טוען...'; txt.textContent='';
+  if(info)info.textContent=(_rambamIdx+1===today.num&&((type==='Positive'&&today.type==='Positive')||(type==='Negative'&&today.type==='Negative')))?'מצווה של היום':'מצווה '+(_rambamIdx+1)+'/613';
+  const m=await fetchRambamMitzvah(type,num);
+  name.textContent=m.title||(label+' '+num); txt.textContent=m.text||'';
+}
+function changeRambamFont(delta) {
+  _rambamFontSize=Math.max(11,Math.min(26,_rambamFontSize+delta));
+  const el=document.getElementById('rambamText');if(el)el.style.fontSize=_rambamFontSize+'px';
+  const v=document.getElementById('rambamFontVal');if(v)v.textContent=_rambamFontSize+'px';
+  try{const s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');s.rambamFontSize=_rambamFontSize;localStorage.setItem('tehillim_settings',JSON.stringify(s));}catch(e){}
+}
+function navRambam(dir){_rambamIdx=Math.max(0,Math.min(612,_rambamIdx+dir));renderRambam();}
+function resetRambamToday(){const d=_getRambamForDay();_rambamIdx=d.type==='Positive'?d.num-1:247+d.num;renderRambam();}
+
+/* ── קרא פרק היום ── */
+function goDailyChapter() {
+  const day = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,1)) / 86400000);
+  location.href = '03-reader.html?chap=' + ((day % 150) + 1);
+}
+
+/* ── init: פתח דרך URL param ── */
+document.addEventListener('DOMContentLoaded', function() {
+  applyBlessingFont();
+  const param = new URLSearchParams(location.search).get('open');
+  if (param && document.getElementById(param)) {
+    toggleBlessing(param);
+    setTimeout(() => {
+      const el = document.getElementById(param);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}
+});
+</script>
+</body>
+</html>

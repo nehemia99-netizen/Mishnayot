@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#185FA5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="תהילהון">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>תהילהון — קבוצות</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#7B2FF7;--purple-light:#F0EAFF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#A87BF7;--purple-light:#1E1030;}
+*{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);position:sticky;top:0;background:var(--card);z-index:10;}
+.topbar-title{font-size:17px;font-weight:600;color:var(--text);}
+.home-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;white-space:nowrap;font-weight:600;}
+
+/* ── Views ── */
+.view{display:none;}.view.active{display:block;padding-bottom:calc(80px + env(safe-area-inset-bottom, 20px));}
+
+/* ── Loading ── */
+.loading-state{padding:70px 20px;text-align:center;color:var(--text-muted);}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Groups List ── */
+.list-header{padding:20px 16px 10px;}
+.list-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.list-sub{font-size:13px;color:var(--text-muted);}
+.group-card{margin:0 16px 10px;border-radius:14px;border:.5px solid var(--border);overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.group-card:active{opacity:.8;}
+.group-card-header{padding:14px 16px 10px;display:flex;align-items:center;gap:12px;}
+.group-card-icon{font-size:26px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.group-card-info{flex:1;min-width:0;}
+.group-card-name{font-size:15px;font-weight:700;color:var(--text);}
+.group-card-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.group-card-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.group-card-footer{padding:8px 16px 12px;border-top:.5px solid var(--border-row);display:flex;justify-content:space-between;align-items:center;}
+.group-card-stat{font-size:12px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+.group-card-stat-num{font-size:15px;font-weight:800;color:var(--text);}
+.group-card-score{font-size:12px;color:var(--text-muted);}
+.group-card-arrow{font-size:14px;color:var(--text-muted);}
+.add-group-btn{margin:4px 16px 16px;width:calc(100% - 32px);padding:13px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px;}
+.add-group-btn:active{opacity:.85;}
+.join-strip{margin:0 16px 20px;display:flex;gap:8px;}
+.join-input{flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:16px;color:var(--text);font-family:inherit;outline:none;text-align:center;letter-spacing:3px;text-transform:uppercase;transition:border-color .2s;}
+.join-input:focus{border-color:var(--primary);}
+.join-input::placeholder{font-size:12px;letter-spacing:0;color:var(--text-muted);}
+.join-btn{padding:11px 16px;border-radius:12px;background:var(--primary-light);border:1.5px solid var(--primary);color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.join-btn:active{background:var(--primary);color:#fff;}
+.empty-list{padding:50px 24px;text-align:center;color:var(--text-muted);}
+.empty-list-icon{font-size:52px;margin-bottom:14px;}
+.empty-list-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.empty-list-sub{font-size:13px;line-height:1.65;margin-bottom:24px;}
+
+/* ── Group type selector ── */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-opt{padding:12px 10px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.type-opt.selected{border-color:var(--primary);background:var(--primary-light);}
+.type-opt-icon{font-size:22px;margin-bottom:4px;}
+.type-opt-label{font-size:12px;font-weight:700;color:var(--text);}
+
+/* ── Form ── */
+.form-wrap{padding:20px 16px;}
+.form-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.form-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px;line-height:1.5;}
+.form-label{font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;letter-spacing:.3px;}
+.form-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:15px;color:var(--text);font-family:inherit;outline:none;margin-bottom:16px;transition:border-color .2s;}
+.form-input:focus{border-color:var(--primary);}
+.form-input::placeholder{color:var(--text-muted);}
+.form-submit{width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:opacity .2s;}
+.form-submit:disabled{opacity:.45;cursor:default;}
+.form-back{width:100%;padding:11px;border-radius:12px;background:transparent;border:.5px solid var(--border);color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;-webkit-tap-highlight-color:transparent;}
+
+/* ── Group header ── */
+.group-header{padding:18px 16px 16px;}
+.group-name-row{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+.group-type-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;}
+.group-name{font-size:20px;font-weight:800;color:#fff;}
+.group-meta{font-size:12px;opacity:.75;margin-bottom:12px;color:#fff;}
+.group-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.code-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;color:#fff;}
+.code-chip:active{background:rgba(255,255,255,.3);}
+.invite-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;-webkit-tap-highlight-color:transparent;transition:background .15s;font-family:inherit;}
+.invite-btn:active{background:rgba(255,255,255,.25);}
+.back-to-list{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;font-family:inherit;}
+
+/* ── Section label ── */
+.section-label{font-size:11px;color:var(--text-muted);padding:14px 16px 5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
+
+/* ── Member rows ── */
+.member-row{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:.5px solid var(--border-row);}
+.member-row:last-child{border-bottom:none;}
+.member-rank{font-size:17px;width:26px;text-align:center;flex-shrink:0;}
+.member-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.member-info{flex:1;min-width:0;}
+.member-name{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.you-badge{font-size:10px;color:var(--primary);background:var(--primary-light);border-radius:8px;padding:1px 7px;font-weight:600;}
+.admin-badge{font-size:10px;color:#7B2FF7;background:var(--purple-light);border-radius:8px;padding:1px 7px;font-weight:600;}
+.member-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.member-right{text-align:left;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.member-score{font-size:15px;font-weight:700;color:#C07A00;}
+.member-trend{font-size:11px;font-weight:600;}
+.trend-up{color:var(--green);}
+.trend-down{color:#C04040;}
+.trend-same{color:var(--text-muted);}
+.kick-btn{font-size:10px;color:#C04040;border:.5px solid #C04040;background:transparent;border-radius:8px;padding:2px 7px;cursor:pointer;font-family:inherit;}
+
+/* ── Mission card ── */
+.mission-wrap{margin:12px 16px 4px;}
+.mission-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;}
+.mission-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.mission-title{font-size:14px;font-weight:700;color:var(--text);}
+.mission-pct{font-size:13px;font-weight:700;color:var(--primary);}
+.mission-sub{font-size:11px;color:var(--text-muted);margin-bottom:10px;}
+.mission-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:7px;}
+.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#5AA8E8);transition:width .7s cubic-bezier(.16,1,.3,1);}
+.mission-nums{display:flex;justify-content:space-between;font-size:11px;}
+.mission-nums .done{color:var(--primary);font-weight:700;}
+.mission-nums .total{color:var(--text-muted);}
+
+/* ── Leave / manage btn ── */
+.leave-wrap{padding:16px;display:flex;gap:8px;flex-direction:column;}
+.leave-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid #D04040;background:transparent;color:#D04040;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.leave-btn:active{background:#FFF0F0;}
+html.dark .leave-btn:active{background:#2A1010;}
+
+/* ── Empty ── */
+.empty-members{padding:30px 20px;text-align:center;color:var(--text-muted);font-size:13px;line-height:1.7;}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:calc(62px + env(safe-area-inset-bottom,0px) + 10px);left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:600;white-space:nowrap;pointer-events:none;}
+html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
+.toast.show{opacity:1;}
+</style>
+<script src="utils.js?v=2.2.0"></script>
+<script src="i18n.js?v=2.2.31" defer></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <a href="01-dashboard.html" class="home-btn" data-i18n="read.back">← בית</a>
+    <div class="topbar-title" id="topbarTitle">👥 הקבוצות שלי</div>
+  </div>
+
+  <!-- View: loading -->
+  <div class="view active" id="viewLoading">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <div data-i18n="group.loading">טוען...</div>
+    </div>
+  </div>
+
+  <!-- ══ View: list of groups ══ -->
+  <div class="view" id="viewList">
+    <div class="list-header">
+      <div class="list-title" data-i18n="group.list_title">👥 הקבוצות שלי</div>
+      <div class="list-sub" data-i18n="group.list_sub">קרא תהילים יחד עם משפחה, חברים וחברותא</div>
+    </div>
+    <div id="groupsListContainer"></div>
+    <button class="add-group-btn" onclick="showCreate()" data-i18n="group.create_btn">➕ צור קבוצה חדשה</button>
+    <div class="join-strip">
+      <input class="join-input" id="joinCodeInput" maxlength="8" placeholder="קוד הצטרפות" data-i18n-placeholder="group.join_placeholder"
+        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" />
+      <button class="join-btn" onclick="joinWithCode()" data-i18n="group.join_btn2">הצטרף ›</button>
+    </div>
+  </div>
+
+  <!-- ══ View: create group ══ -->
+  <div class="view" id="viewCreate">
+    <div class="form-wrap">
+      <div class="form-title" data-i18n="group.create_title">✨ קבוצה חדשה</div>
+      <div class="form-sub" data-i18n="group.create_sub">בחר סוג, שם וכינוי שלך בקבוצה.</div>
+
+      <label class="form-label" data-i18n="group.type_section">סוג הקבוצה</label>
+      <div class="type-grid" id="typeGrid">
+        <div class="type-opt selected" data-type="family" onclick="selectType('family')">
+          <div class="type-opt-icon">👨‍👩‍👧‍👦</div>
+          <div class="type-opt-label" data-i18n="group.type_family">משפחה</div>
+        </div>
+        <div class="type-opt" data-type="friends" onclick="selectType('friends')">
+          <div class="type-opt-icon">🤝</div>
+          <div class="type-opt-label" data-i18n="group.type_friends">חברים</div>
+        </div>
+        <div class="type-opt" data-type="chavruta" onclick="selectType('chavruta')">
+          <div class="type-opt-icon">📖</div>
+          <div class="type-opt-label" data-i18n="group.type_chavruta">חברותא</div>
+        </div>
+        <div class="type-opt" data-type="work" onclick="selectType('work')">
+          <div class="type-opt-icon">🏢</div>
+          <div class="type-opt-label" data-i18n="group.type_work">עבודה / ארגון</div>
+        </div>
+      </div>
+
+      <label class="form-label" data-i18n="group.name_label">שם הקבוצה</label>
+      <input class="form-input" id="groupNameInput" maxlength="30"
+        placeholder='למשל: "משפחת לוי" או "חברותא שלנו"' data-i18n-placeholder="group.name_placeholder" />
+      <label class="form-label" data-i18n="group.my_name_label">השם שלי בקבוצה</label>
+      <input class="form-input" id="myNameInput" maxlength="20"
+        placeholder='למשל: "אבא" או "ישראל"' data-i18n-placeholder="group.my_name_placeholder" />
+      <button class="form-submit" id="createBtn" onclick="doCreateGroup()" data-i18n="group.create_btn_submit">צור קבוצה ←</button>
+      <button class="form-back" onclick="showList()" data-i18n="group.back_list">← חזרה לרשימה</button>
+    </div>
+  </div>
+
+  <!-- ══ View: single group dashboard ══ -->
+  <div class="view" id="viewGroup">
+    <!-- Header (color set dynamically) -->
+    <div class="group-header" id="groupHeader">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <button class="back-to-list" onclick="showList()" data-i18n="group.all_groups">← כל הקבוצות</button>
+        <div class="group-type-tag" id="gTypeTag"></div>
+      </div>
+      <div class="group-name" id="gName">...</div>
+      <div class="group-meta" id="gMeta"></div>
+      <div class="group-actions">
+        <div class="code-chip" id="codeChip" onclick="copyCode()">📋 ...</div>
+        <button class="invite-btn" onclick="shareInvite()" data-i18n="group.share_invite">🔗 שתף הזמנה</button>
+      </div>
+    </div>
+
+    <!-- Members -->
+    <div class="section-label" data-i18n="group.members_label">חברי הקבוצה</div>
+    <div id="membersContainer">
+      <div class="loading-state" style="padding:30px 0;"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Mission -->
+    <div class="mission-wrap">
+      <div class="mission-card" id="missionCard">
+        <div class="mission-top">
+          <div class="mission-title" id="missionTitle">🎯 אתגר קבוצתי</div>
+          <div class="mission-pct" id="missionPct">0%</div>
+        </div>
+        <div class="mission-sub" id="missionSub">אין אתגר פעיל. כל חבר יכול ליצור אתגר.</div>
+        <div class="mission-bar-wrap"><div class="mission-bar" id="missionBar" style="width:0%"></div></div>
+        <div class="mission-nums">
+          <span class="done" id="missionDone">0 פרקים הושלמו</span>
+          <span class="total" id="missionTotal">מתוך 150</span>
+        </div>
+        <div id="missionActions" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <button class="invite-btn" style="background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);" onclick="openChallengeBuilder()" data-i18n="group.new_challenge_btn">➕ אתגר חדש</button>
+          <button class="invite-btn" id="pickChunksBtn" style="background:var(--green-light);color:var(--green);border:1.5px solid var(--green);display:none;" onclick="openChunkPicker()" data-i18n="group.pick_chunk_btn">📌 בחר נתח שלי</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge builder modal -->
+    <div id="challBuilder" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;align-items:flex-end;justify-content:center;">
+      <div style="background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px 24px;max-height:88vh;overflow-y:auto;">
+        <div style="text-align:center;margin-bottom:14px;"><div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 10px;"></div><div style="font-size:16px;font-weight:700;color:var(--text);" data-i18n="group.new_challenge_title">🎯 אתגר חדש לקבוצה</div></div>
+        <label class="form-label" data-i18n="group.challenge_type">סוג האתגר</label>
+        <select class="form-input" id="challType" onchange="onChallTypeChange()">
+          <option value="book" data-i18n="group.type_book">ספר שלם מתוך 5 ספרי תהילים</option>
+          <option value="all" data-i18n="group.type_all">כל ה-150 פרקים</option>
+          <option value="day" data-i18n="group.type_day">פרקי תהילים של היום (לפי לוח עברי)</option>
+          <option value="range" data-i18n="group.type_range">טווח פרקים מותאם</option>
+        </select>
+        <div id="challBookRow">
+          <label class="form-label" data-i18n="group.book_label">בחר ספר</label>
+          <select class="form-input" id="challBook">
+            <option value="1-41" data-i18n="group.book_a">ספר א׳ (1-41)</option>
+            <option value="42-72" data-i18n="group.book_b">ספר ב׳ (42-72)</option>
+            <option value="73-89" data-i18n="group.book_c">ספר ג׳ (73-89)</option>
+            <option value="90-106" data-i18n="group.book_d">ספר ד׳ (90-106)</option>
+            <option value="107-150" data-i18n="group.book_e">ספר ה׳ (107-150)</option>
+          </select>
+        </div>
+        <div id="challRangeRow" style="display:none;">
+          <label class="form-label" data-i18n="group.range_label">מספרי פרקים (מ-עד)</label>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="challFrom" type="number" min="1" max="150" placeholder="מ-" style="flex:1;margin-bottom:0;">
+            <input class="form-input" id="challTo" type="number" min="1" max="150" placeholder="עד-" style="flex:1;margin-bottom:0;">
+          </div>
+        </div>
+        <label class="form-label" style="margin-top:12px;" data-i18n="group.deadline">תאריך יעד (אופציונלי)</label>
+        <input class="form-input" id="challDeadline" type="date">
+        <button class="form-submit" onclick="createGroupChallenge()" style="margin-top:6px;" data-i18n="group.create_challenge">צור אתגר</button>
+        <button class="form-back" onclick="closeChallengeBuilder()" data-i18n="group.cancel">ביטול</button>
+      </div>
+    </div>
+
+    <!-- Chunk picker modal -->
+    <div id="chunkPicker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;align-items:flex-end;justify-content:center;">
+      <div style="background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px calc(24px + 70px + env(safe-area-inset-bottom,0px));max-height:88vh;overflow-y:auto;">
+        <div style="text-align:center;margin-bottom:14px;"><div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 10px;"></div><div style="font-size:16px;font-weight:700;color:var(--text);" data-i18n="group.pick_chunk_title">📌 בחר נתח לעצמך</div></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;text-align:center;" data-i18n="group.chunk_instructions">לחץ על פרקים כדי "לקחת" אותם. פרק שנלקח על ידי חבר אחר — לא ניתן לקחת.</div>
+        <div id="chunkGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;font-size:12px;direction:ltr;"></div>
+        <button class="form-submit" onclick="closeChunkPicker()" style="margin-top:14px;" data-i18n="group.save_btn">שמור</button>
+      </div>
+    </div>
+
+    <!-- Leave / manage -->
+    <div class="leave-wrap">
+      <div id="adminActions"></div>
+      <button class="leave-btn" onclick="doLeaveGroup()" data-i18n="group.leave">↩ עזוב קבוצה</button>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, updateDoc, arrayRemove }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInAnonymously, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const FB_CFG = {
+  apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
+  authDomain:"mishnayot-71073.firebaseapp.com",projectId:"mishnayot-71073",
+  storageBucket:"mishnayot-71073.firebasestorage.app",
+  messagingSenderId:"445059664136",
+  appId:"1:445059664136:web:fec8a4f338fd326d3b04bd"
+};
+const fbApp = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
+const db    = getFirestore(fbApp);
+const _auth = getAuth(fbApp);
+
+const _authReady = new Promise(resolve => {
+  onAuthStateChanged(_auth, async user => {
+    if (user) { resolve(user); return; }
+    try { const c = await signInAnonymously(_auth); resolve(c.user); }
+    catch(e) { console.warn('auth failed',e.code); resolve(null); }
+  });
+});
+
+/* ── Storage ── */
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+/* ── UID ── */
+let MY_ID = (() => {
+  let uid = S.get('tehillim_uid');
+  if (!uid) { uid = 'u_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36); S.set('tehillim_uid',uid); }
+  return uid;
+})();
+_authReady.then(user => { if (user?.uid) { MY_ID = user.uid; S.set('tehillim_uid',user.uid); } });
+
+/* ── Dark mode ── */
+if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classList.add('dark');
+
+/* ── Toast ── */
+let _toastT;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastT); _toastT = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+/* ── Group types ── */
+const GROUP_TYPES = {
+  family:   { label:'משפחה',   icon:'👨‍👩‍👧‍👦', color:'#185FA5', bg:'linear-gradient(135deg,#185FA5,#1048A0)' },
+  friends:  { label:'חברים',   icon:'🤝',      color:'#3B8C14', bg:'linear-gradient(135deg,#3B8C14,#2A6B0E)' },
+  chavruta: { label:'חברותא',  icon:'📖',      color:'#7B2FF7', bg:'linear-gradient(135deg,#7B2FF7,#5B1FD7)' },
+  work:     { label:'עבודה',   icon:'🏢',      color:'#C07A00', bg:'linear-gradient(135deg,#C07A00,#9A5F00)' }
+};
+
+/* ── Views ── */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── Groups list (multi-group support) ── */
+// tehillim_groups = [{code, name, type, isAdmin}]
+function getAllGroups() {
+  const g  = S.get('tehillim_groups') || [];
+  // Migrate legacy single-group
+  const lg = S.get('tehillim_group');
+  if (lg && lg.code && !g.find(x => x.code === lg.code)) {
+    g.push({ code:lg.code, name:lg.name||'קבוצה שלי', type:'family', isAdmin:false, memberCount:lg.memberCount||0 });
+    S.set('tehillim_groups', g);
+  }
+  return g;
+}
+function saveGroups(arr) { S.set('tehillim_groups', arr); }
+function addGroup(entry) {
+  const arr = getAllGroups();
+  if (!arr.find(x => x.code === entry.code)) arr.push(entry);
+  else { const i = arr.findIndex(x=>x.code===entry.code); arr[i]={...arr[i],...entry}; }
+  saveGroups(arr);
+  // Keep legacy key for 07-community.html compatibility
+  S.set('tehillim_group', { code:entry.code, name:entry.name });
+}
+function removeGroup(code) {
+  const arr = getAllGroups().filter(x => x.code !== code);
+  saveGroups(arr);
+  const cur = S.get('tehillim_group');
+  if (cur && cur.code === code) S.set('tehillim_group', arr[0]||null);
+}
+
+window.showList = function() {
+  document.getElementById('topbarTitle').textContent = '👥 הקבוצות שלי';
+  if (_unsub) { _unsub(); _unsub = null; }
+  renderGroupsList();
+  showView('viewList');
+};
+
+async function renderGroupsList() {
+  let groups = getAllGroups();
+  const container = document.getElementById('groupsListContainer');
+
+  // שחזור מהענן אם הרשימה ריקה והמשתמש מחובר לחשבון אמיתי
+  if (!groups.length) {
+    try {
+      const user = await _authReady;
+      if (user && !user.isAnonymous) {
+        const snap = await getDocs(collection(db,'users',user.uid,'groups'));
+        if (!snap.empty) {
+          const restored = [];
+          snap.forEach(d => restored.push(d.data()));
+          S.set('tehillim_groups', restored);
+          groups = restored;
+          toast('✅ הקבוצות שוחזרו מהחשבון שלך');
+        }
+      }
+    } catch(e) { console.warn('[Cloud] restore groups failed', e); }
+  }
+
+  // שלוף מספר חברים מ-Firestore לכל קבוצה
+  try {
+    await Promise.all(groups.map(async g => {
+      try {
+        const snap = await getDocs(collection(db,'groups',g.code,'members'));
+        g.memberCount = snap.size;
+        // שמור בלוקאל
+        const arr = S.get('tehillim_groups')||[];
+        const idx = arr.findIndex(x=>x.code===g.code);
+        if(idx>=0){arr[idx].memberCount=snap.size;S.set('tehillim_groups',arr);}
+        // legacy
+        const lg=S.get('tehillim_group')||{};
+        if(lg.code===g.code){lg.memberCount=snap.size;S.set('tehillim_group',lg);}
+      } catch(e){}
+    }));
+  } catch(e){}
+  if (!groups.length) {
+    container.innerHTML = `
+      <div class="empty-list">
+        <div class="empty-list-icon">👥</div>
+        <div class="empty-list-title">עדיין אין קבוצות</div>
+        <div class="empty-list-sub">צור קבוצה חדשה עם המשפחה, חברים או חברותא<br>וקראו תהילים יחד!</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = groups.map((g,idx) => {
+    const t = GROUP_TYPES[g.type] || GROUP_TYPES.family;
+    const ch = S.get('tehillim_group_challenge_'+g.code);
+    const memberNum = g.memberCount || '—';
+    const challengeHtml = ch
+      ? `<span class="group-card-stat" style="max-width:55%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">🎯 ${ch.title}</span>`
+      : `<span class="group-card-stat" style="color:var(--text-muted);opacity:.6;">אין אתגר פעיל</span>`;
+    return `
+    <div class="group-card" data-idx="${idx}" onclick="openGroupByIdx(${idx})">
+      <div class="group-card-header">
+        <div class="group-card-icon" style="background:${t.bg}">${t.icon}</div>
+        <div class="group-card-info">
+          <div class="group-card-name">${g.name}${g.isAdmin?' <span style="font-size:12px;">👑</span>':''}</div>
+          <div class="group-card-meta">${t.label} · קוד: ${g.code}</div>
+        </div>
+        <div class="group-card-arrow">›</div>
+      </div>
+      <div class="group-card-footer">
+        <span class="group-card-stat">👥 <span class="group-card-stat-num">${memberNum}</span> חברים</span>
+        ${challengeHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Cloud group sync (only for real authenticated users) ── */
+async function saveGroupToCloud(code, name, type, isAdmin) {
+  const user = await _authReady;
+  if (!user || user.isAnonymous) return;
+  try {
+    await setDoc(doc(db,'users',user.uid,'groups',code), {code,name,type,isAdmin,joinedAt:Date.now()});
+  } catch(e) { console.warn('[Cloud] saveGroup failed', e); }
+}
+
+async function deleteGroupFromCloud(code) {
+  const user = await _authReady;
+  if (!user || user.isAnonymous) return;
+  try {
+    await deleteDoc(doc(db,'users',user.uid,'groups',code));
+  } catch(e) { console.warn('[Cloud] deleteGroup failed', e); }
+}
+
+/* ── Create group ── */
+let _selectedType = 'family';
+window.selectType = function(type) {
+  _selectedType = type;
+  document.querySelectorAll('.type-opt').forEach(el => el.classList.toggle('selected', el.dataset.type === type));
+};
+
+window.showCreate = function() {
+  const s = S.get('tehillim_settings')||{};
+  const gn = s.groupName || s.username;
+  if (gn) document.getElementById('myNameInput').value = gn;
+  document.getElementById('groupNameInput').value = '';
+  showView('viewCreate');
+};
+
+function withTimeout(p, ms, label) {
+  return Promise.race([p, new Promise((_,rej) => setTimeout(() => rej(new Error('timeout:'+label)), ms))]);
+}
+
+const COLORS = ['#185FA5','#3B8C14','#7B2FF7','#C8A800','#C04040','#5090C8','#CD7F32'];
+function avatarBg(name) {
+  let h=0; for (const c of (name||'X')) h=(h*31+c.charCodeAt(0))|0;
+  return COLORS[Math.abs(h)%COLORS.length];
+}
+
+function genCode() {
+  const ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6},()=>ch[Math.floor(Math.random()*ch.length)]).join('');
+}
+
+function buildMyStats(displayName) {
+  const today     = localDateStr();
+  const yesterday = localDateStr(new Date(Date.now()-86400000));
+  const readings  = S.get('tehillim_readings')||[];
+  const sc        = S.get('tehillim_score')||{};
+  const rd        = S.get('tehillim_reading')||{};
+  const vis       = S.get('tehillim_visits')||{};
+  const todayDone = new Set(readings.filter(r=>r.date===today&&!r.partial).map(r=>r.chap));
+  const allDone   = [...new Set(readings.filter(r=>!r.partial).map(r=>r.chap))];
+  const todayMins  = ((rd.dailyMinutes||{})[today]||0);
+  const todayScore = (sc.todayDate===today?sc.today:0)||0;
+  const yScore    = (sc.daily||{})[yesterday]||0;
+  const tScore    = (sc.daily||{})[today]||0;
+  const _s        = S.get('tehillim_settings')||{};
+  const name      = displayName||_s.groupName||_s.username||'אנונימי';
+  return {
+    displayName:name,todayDate:today,todayChaps:todayDone.size,
+    todayMins:Math.round(todayMins),todayScore,totalScore:sc.total||0,
+    totalChaps:allDone.length,trendDelta:tScore-yScore,
+    visitCount:(vis.count||0),lastActive:Date.now(),chapsDone:allDone
+  };
+}
+
+window.doCreateGroup = async function() {
+  const gName  = document.getElementById('groupNameInput').value.trim();
+  const myName = document.getElementById('myNameInput').value.trim();
+  if (!gName)  { toast('⚠️ הזן שם לקבוצה'); return; }
+  if (!myName) { toast('⚠️ הזן את השם שלך'); return; }
+  const btn = document.getElementById('createBtn');
+  btn.disabled=true; btn.textContent='⏳ יוצר...';
+  try {
+    const authUser = await _authReady;
+    const writerUid = (authUser && authUser.uid) ? authUser.uid : MY_ID;
+    const code = genCode();
+    const now  = Date.now();
+    await withTimeout(setDoc(doc(db,'groups',code),{name:gName,code,type:_selectedType,createdAt:now,createdBy:writerUid}),10000,'group-doc');
+    const stats = buildMyStats(myName);
+    await withTimeout(setDoc(doc(db,'groups',code,'members',writerUid),{...stats,joinedAt:now}),10000,'member-doc');
+    const sett = S.get('tehillim_settings')||{}; sett.groupName=myName; S.set('tehillim_settings',sett);
+    addGroup({code,name:gName,type:_selectedType,isAdmin:true});
+    saveGroupToCloud(code, gName, _selectedType, true);
+    toast('✅ קבוצה נוצרה! קוד: '+code);
+    startListener(code,gName,_selectedType,true);
+  } catch(e) {
+    console.error(e);
+    toast('⚠️ שגיאה: '+(e.code||e.message||'unknown'));
+    btn.disabled=false; btn.textContent='צור קבוצה ←';
+  }
+};
+
+window.joinWithCode = async function() {
+  const code = (document.getElementById('joinCodeInput').value||''). trim().toUpperCase();
+  if (code.length < 4) { toast('⚠️ הזן קוד תקין'); return; }
+  await joinByCode(code);
+};
+
+async function joinByCode(code) {
+  try {
+    const authUser = await _authReady;
+    if (authUser?.uid) MY_ID = authUser.uid;
+    const snap = await withTimeout(getDoc(doc(db,'groups',code)),10000,'get-group');
+    if (!snap.exists()) { toast('❌ קבוצה לא נמצאה — בדוק את הקוד'); return; }
+    const gd = snap.data();
+    const _sj = S.get('tehillim_settings')||{};
+    let myName = _sj.groupName || _sj.username;
+    if (!myName) {
+      myName = prompt('מה השם שלך בקבוצה?')||'אנונימי';
+      const s=S.get('tehillim_settings')||{}; s.groupName=myName; S.set('tehillim_settings',s);
+    }
+    const stats = buildMyStats(myName);
+    await withTimeout(setDoc(doc(db,'groups',code,'members',MY_ID),{...stats,joinedAt:Date.now()},{merge:true}),10000,'join-member');
+    const isAdmin = gd.createdBy === MY_ID;
+    addGroup({code,name:gd.name,type:gd.type||'family',isAdmin});
+    saveGroupToCloud(code, gd.name, gd.type||'family', isAdmin);
+    toast('✅ הצטרפת ל'+gd.name+'!');
+    startListener(code,gd.name,gd.type||'family',isAdmin);
+  } catch(e) {
+    console.error(e);
+    toast('⚠️ שגיאה: '+(e.code||e.message||'unknown'));
+  }
+}
+
+/* ── Open existing group from list ── */
+window.openGroupByIdx = async function(idx) {
+  const groups = getAllGroups();
+  const g = groups[idx];
+  if (!g) { showList(); return; }
+  // Show cached name immediately — don't wait for Firestore round-trip
+  const displayName = g.name || g.code;
+  document.getElementById('topbarTitle').textContent = displayName;
+  document.getElementById('gName').textContent = displayName;
+  await openGroup(g.code, g.name, g.type || 'family');
+};
+
+window.openGroup = async function(code, name, type) {
+  try {
+    const snap = await getDoc(doc(db,'groups',code));
+    const gd   = snap.exists() ? snap.data() : {};
+    const isAdmin = gd.createdBy === MY_ID;
+    // update local isAdmin
+    const arr = getAllGroups();
+    const idx = arr.findIndex(x=>x.code===code);
+    if (idx>=0) { arr[idx].isAdmin=isAdmin; saveGroups(arr); }
+    startListener(code, name||gd.name, gd.type||type||'family', isAdmin);
+  } catch(e) {
+    // fallback: open with cached info
+    const g = getAllGroups().find(x=>x.code===code)||{};
+    startListener(code, name, type||'family', g.isAdmin||false);
+  }
+};
+
+/* ── Real-time listener ── */
+let _unsub = null;
+let _curCode = null, _curAdmin = false;
+
+function startListener(code, groupName, type, isAdmin) {
+  _curCode  = code;
+  _curAdmin = isAdmin;
+  // Set header color by type
+  const t = GROUP_TYPES[type]||GROUP_TYPES.family;
+  const header = document.getElementById('groupHeader');
+  header.style.background = t.bg;
+  document.getElementById('gTypeTag').textContent = t.icon+' '+t.label;
+  document.getElementById('gTypeTag').style.cssText = 'background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;';
+  document.getElementById('gName').textContent = groupName;
+  document.getElementById('codeChip').textContent = '📋 '+code;
+  document.getElementById('topbarTitle').textContent = groupName;
+
+  // Admin actions
+  document.getElementById('adminActions').innerHTML = '';
+
+  // Sync my stats (after auth ready)
+  _authReady.then(() => {
+    const myStats = buildMyStats();
+    setDoc(doc(db,'groups',code,'members',MY_ID), myStats, {merge:true}).catch(console.warn);
+  });
+  // Set legacy key for community page
+  S.set('tehillim_group',{code,name:groupName});
+
+  if (_unsub) _unsub();
+
+  // Wait for Firebase auth before Firestore read (rules: request.auth != null)
+  _authReady.then(() => {
+    _unsub = onSnapshot(collection(db,'groups',code,'members'),
+      snap => {
+        const members = [];
+        snap.forEach(d => members.push({id:d.id,...d.data()}));
+        renderDashboard(members, code, groupName, type, isAdmin);
+      },
+      err => {
+        console.error('[Group] Firestore error:', err.code, err.message);
+        toast('⚠️ בעיית חיבור לענן: ' + (err.code||err.message));
+      }
+    );
+  });
+  showView('viewGroup');
+}
+
+function renderDashboard(members, code, groupName, type, isAdmin) {
+  const today = localDateStr();
+  members.sort((a,b) => {
+    const sd=(b.todayScore||0)-(a.todayScore||0);
+    return sd!==0?sd:(b.totalScore||0)-(a.totalScore||0);
+  });
+  document.getElementById('gMeta').textContent = members.length+' חברים · קוד: '+code;
+  const ranks=['🥇','🥈','🥉'];
+  let html='';
+  members.forEach((m,i) => {
+    const isMe  = m.id===MY_ID;
+    const act   = m.todayDate===today;
+    const trend = m.trendDelta||0;
+    const tHtml = trend>0?`<span class="trend-up">↑ +${trend}</span>`:trend<0?`<span class="trend-down">↓ ${trend}</span>`:`<span class="trend-same">→</span>`;
+    const rank  = i<3?ranks[i]:(i+1)+'.';
+    const sub   = act?`${m.todayChaps||0} פרקים · ${m.todayMins||0} דק׳`:'לא קרא היום';
+    // Admin can kick non-admin, non-self members
+    const kickBtn = (isAdmin && !isMe) ? `<button class="kick-btn" onclick="kickMember('${m.id}','${(m.displayName||'').replace(/'/g,"'")}')">הסר</button>` : '';
+    html+=`<div class="member-row">
+      <div class="member-rank">${rank}</div>
+      <div class="member-avatar" style="background:${avatarBg(m.displayName)}">${(m.displayName||'?')[0]}</div>
+      <div class="member-info">
+        <div class="member-name">${m.displayName||'?'}
+          ${isMe?'<span class="you-badge">אני</span>':''}</div>
+        <div class="member-sub">${sub}</div>
+      </div>
+      <div class="member-right">
+        <div class="member-score">+${m.todayScore||0} ⭐</div>
+        <div class="member-trend">${tHtml}</div>
+        ${kickBtn}
+      </div>
+    </div>`;
+  });
+  document.getElementById('membersContainer').innerHTML = html||'<div class="empty-members">⏳ מחכים לחברים...</div>';
+  renderGroupChallenge(members);
+}
+
+/* ── Kick member (admin only) ── */
+window.kickMemberEl = function(btn) {
+  const uid = btn.dataset.uid;
+  const name = btn.closest('.member-row').querySelector('.member-name').textContent.trim().split('\n')[0].trim();
+  window.kickMember(uid, name);
+};
+
+window.kickMember = async function(uid, name) {
+  if (!_curCode||!_curAdmin) return;
+  if (!confirm(`להסיר את ${name} מהקבוצה?`)) return;
+  try {
+    await deleteDoc(doc(db,'groups',_curCode,'members',uid));
+    toast('✅ '+name+' הוסר מהקבוצה');
+  } catch(e) { toast('⚠️ שגיאה: '+(e.code||e.message)); }
+};
+
+/* ── Challenge logic (same as before) ── */
+function _chKey() { const g=S.get('tehillim_group'); return g&&g.code?'tehillim_group_challenge_'+g.code:null; }
+function loadGroupChallenge() { const k=_chKey(); return k?S.get(k):null; }
+function saveGroupChallenge(ch) { const k=_chKey(); if(k)S.set(k,ch); }
+
+function getDailyChapsForToday() {
+  const M={1:[1,9],2:[10,17],3:[18,22],4:[23,28],5:[29,34],6:[35,38],7:[39,43],8:[44,48],9:[49,54],10:[55,59],11:[60,65],12:[66,68],13:[69,71],14:[72,76],15:[77,78],16:[79,82],17:[83,87],18:[88,89],19:[90,96],20:[97,103],21:[104,105],22:[106,107],23:[108,112],24:[113,118],25:[119,119],26:[120,134],27:[135,139],28:[140,144],29:[145,150],30:[145,150]};
+  let day=1;
+  try{const s=new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{day:'numeric'}).format(new Date());const n=parseInt(s.replace(/[^\d]/g,''));if(n>=1&&n<=30)day=n;}catch(e){}
+  const r=M[day]||M[1];const out=[];for(let i=r[0];i<=r[1];i++)out.push(i);return out;
+}
+function chapsForType(type,extra){
+  if(type==='all'){const o=[];for(let i=1;i<=150;i++)o.push(i);return o;}
+  if(type==='book'){const p=(extra||'1-41').split('-').map(Number);const o=[];for(let i=p[0];i<=p[1];i++)o.push(i);return o;}
+  if(type==='day')return getDailyChapsForToday();
+  if(type==='range'){const o=[];for(let i=extra[0];i<=extra[1];i++)if(i>=1&&i<=150)o.push(i);return o;}
+  return[];
+}
+window.openChallengeBuilder=()=>{document.getElementById('challBuilder').style.display='flex';};
+window.closeChallengeBuilder=()=>{document.getElementById('challBuilder').style.display='none';};
+window.onChallTypeChange=()=>{const t=document.getElementById('challType').value;document.getElementById('challBookRow').style.display=t==='book'?'':'none';document.getElementById('challRangeRow').style.display=t==='range'?'':'none';};
+window.createGroupChallenge=function(){
+  const type=document.getElementById('challType').value;let chapters=[],title='';
+  if(type==='book'){const b=document.getElementById('challBook').value;chapters=chapsForType('book',b);const L={'1-41':'ספר א׳','42-72':'ספר ב׳','73-89':'ספר ג׳','90-106':'ספר ד׳','107-150':'ספר ה׳'};title=L[b]||'ספר תהילים';}
+  else if(type==='all'){chapters=chapsForType('all');title='כל ה-150 פרקים';}
+  else if(type==='day'){chapters=chapsForType('day');title='פרקי תהילים של היום';}
+  else if(type==='range'){const f=parseInt(document.getElementById('challFrom').value)||1;const t2=parseInt(document.getElementById('challTo').value)||f;if(t2<f){toast('⚠️ טווח לא חוקי');return;}chapters=chapsForType('range',[f,t2]);title='פרקים '+f+'-'+t2;}
+  if(!chapters.length){toast('⚠️ בחר טווח חוקי');return;}
+  const deadline=document.getElementById('challDeadline').value||null;
+  saveGroupChallenge({id:'ch_'+Date.now().toString(36),type,chapters,title,deadline,createdAt:Date.now(),createdBy:MY_ID,chunks:{}});
+  closeChallengeBuilder();toast('🎯 אתגר נוצר: '+title);renderGroupChallenge();
+};
+window.openChunkPicker=function(){
+  const ch=loadGroupChallenge();if(!ch)return;
+  const mine=(ch.chunks&&ch.chunks[MY_ID])||[];
+  const taken={};for(const uid in(ch.chunks||{}))for(const c of(ch.chunks[uid]||[]))taken[c]=uid;
+  document.getElementById('chunkGrid').innerHTML=ch.chapters.map(n=>{
+    const isMine=mine.indexOf(n)!==-1;const byOther=taken[n]&&taken[n]!==MY_ID;
+    const bg=isMine?'#3B8C14':byOther?'#ccc':'var(--surface)';
+    const color=isMine?'#fff':byOther?'#666':'var(--text)';
+    const extra=byOther?'opacity:.55;cursor:not-allowed;':'cursor:pointer;';
+    return `<div data-chap="${n}" onclick="toggleChunk(${n})" style="background:${bg};color:${color};border:.5px solid ${bg};padding:6px 2px;text-align:center;border-radius:6px;font-weight:600;${extra}">${n}</div>`;
+  }).join('');
+  document.getElementById('chunkPicker').style.display='flex';
+};
+window.closeChunkPicker=()=>{document.getElementById('chunkPicker').style.display='none';renderGroupChallenge();};
+window.toggleChunk=function(n){
+  const ch=loadGroupChallenge();if(!ch)return;
+  ch.chunks=ch.chunks||{};ch.chunks[MY_ID]=ch.chunks[MY_ID]||[];
+  for(const uid in ch.chunks)if(uid!==MY_ID&&(ch.chunks[uid]||[]).indexOf(n)!==-1){toast('⚠️ הפרק כבר נלקח על ידי חבר אחר');return;}
+  const i=ch.chunks[MY_ID].indexOf(n);if(i===-1)ch.chunks[MY_ID].push(n);else ch.chunks[MY_ID].splice(i,1);
+  saveGroupChallenge(ch);openChunkPicker();
+};
+function renderGroupChallenge(members){
+  const ch=loadGroupChallenge();
+  const titleEl=document.getElementById('missionTitle');
+  const subEl=document.getElementById('missionSub');
+  const totalEl=document.getElementById('missionTotal');
+  const doneEl=document.getElementById('missionDone');
+  const pctEl=document.getElementById('missionPct');
+  const barEl=document.getElementById('missionBar');
+  const pickBtn=document.getElementById('pickChunksBtn');
+  const memArr=members||[];
+  const allDone=new Set();
+  memArr.forEach(m=>(m.chapsDone||[]).forEach(c=>allDone.add(+c)));
+  try{JSON.parse(localStorage.getItem('tehillim_readings')||'[]').filter(r=>!r.partial).forEach(r=>allDone.add(+r.chap));}catch(e){}
+  if(!ch){
+    titleEl.textContent='🎯 אתגר קבוצתי';subEl.textContent='אין אתגר פעיל. כל חבר יכול ליצור אתגר.';totalEl.textContent='מתוך 150';
+    const pct=Math.min(100,Math.round(allDone.size/150*100));
+    pctEl.textContent=pct+'%';barEl.style.width=pct+'%';doneEl.textContent=allDone.size+' פרקים הושלמו';
+    if(pickBtn)pickBtn.style.display='none';return;
+  }
+  titleEl.textContent='🎯 '+ch.title;
+  const myChunks=(ch.chunks&&ch.chunks[MY_ID])||[];
+  subEl.textContent=(myChunks.length?'אתה לקחת '+myChunks.length+' פרקים':'לא לקחת נתח עדיין')+(ch.deadline?' · יעד: '+ch.deadline:'');
+  totalEl.textContent='מתוך '+ch.chapters.length;
+  let done=0;for(const c of ch.chapters)if(allDone.has(c))done++;
+  const pct=Math.min(100,Math.round(done/ch.chapters.length*100));
+  pctEl.textContent=pct+'%';barEl.style.width=pct+'%';doneEl.textContent=done+' פרקים הושלמו';
+  if(pickBtn)pickBtn.style.display='';
+}
+
+window.copyCode=function(){const g=S.get('tehillim_group');if(!g)return;navigator.clipboard.writeText(g.code).then(()=>toast('✅ קוד הועתק: '+g.code)).catch(()=>toast('קוד: '+g.code));};
+
+const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+window.shareInvite=function(){
+  const g=S.get('tehillim_group');if(!g)return;
+  const isDeployed=location.protocol==='https:';
+  const joinUrl=isDeployed?(location.origin+location.pathname.replace('08-group.html','')+'08-group.html?join='+g.code):('https://tehilon.vercel.app/08-group.html?join='+g.code);
+  const text=`📖 הצטרף לקבוצת התהילים שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח תהילהון ← קבוצות ← הצטרף ← הזן קוד`;
+  if(IS_MOBILE&&navigator.share)navigator.share({title:'תהילהון — '+g.name,text}).catch(()=>{});
+  else{navigator.clipboard.writeText(text).catch(()=>{});window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');toast('✅ נפתח WhatsApp');}
+};
+
+window.doLeaveGroup=async function(){
+  const g=S.get('tehillim_group');if(!g)return;
+  if(!confirm(`לעזוב את הקבוצה "${g.name}"?`))return;
+  try{
+    await deleteDoc(doc(db,'groups',g.code,'members',MY_ID));
+    if(_unsub){_unsub();_unsub=null;}
+    removeGroup(g.code);
+    deleteGroupFromCloud(g.code);
+    toast('↩ עזבת את הקבוצה');
+    showList();
+  }catch(e){console.error(e);toast('⚠️ שגיאה בעזיבה');}
+};
+
+/* ── Init ── */
+async function init() {
+  const params   = new URLSearchParams(location.search);
+  const joinCode = params.get('join');
+  const openCur  = params.get('open');
+
+  if (joinCode) {
+    showView('viewList');
+    await joinByCode(joinCode.toUpperCase());
+    return;
+  }
+
+  if (openCur === 'current') {
+    // Open the current (last used) group directly — skip the list
+    const g = S.get('tehillim_group');
+    if (g && g.code) {
+      const groups = getAllGroups();
+      const found  = groups.find(x => x.code === g.code);
+      const entry  = found || { code:g.code, name:g.name||g.code||'קבוצה', type:'family', isAdmin:false };
+      // שם חסין: entry.name → g.name (legacy) → קוד הקבוצה
+      const displayName = entry.name || g.name || g.code;
+      // הצג שם מיד לפני כל קריאת רשת
+      document.getElementById('topbarTitle').textContent = displayName;
+      document.getElementById('gName').textContent = displayName;
+      startListener(entry.code, displayName, entry.type || 'family', entry.isAdmin || false);
+      return;
+    }
+    // No current group — show list
+    showList();
+    return;
+  }
+
+  showList();
+}
+init();
+</script>
+<script src="bottomnav.js?v=2.2.0"></script>
+</body>
+</html>

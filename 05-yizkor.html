@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תהילהון — אזכרה</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#5B2DA0;--purple-light:#F0EAFF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#9B6FE0;--purple-light:#1E1435;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;display:flex;flex-direction:column;position:relative;}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;flex-shrink:0;}
+.topbar-center{flex:1;text-align:center;font-size:17px;font-weight:700;color:var(--text);}
+.topbar-side{min-width:64px;}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;display:inline-block;cursor:pointer;font-family:system-ui,sans-serif;white-space:nowrap;font-weight:600;}
+.counter-badge{font-size:12px;color:var(--text-muted);text-align:left;}
+
+/* ── Screens ── */
+.screen{display:none;flex-direction:column;flex:1;}
+.screen.active{display:flex;}
+
+/* ── Setup Screen ── */
+.setup-scroll{flex:1;overflow-y:auto;padding:16px 16px 36px;}
+.hero{text-align:center;padding:20px 0 22px;}
+.hero-candle{font-size:52px;line-height:1;display:block;margin-bottom:8px;}
+.hero-title{font-size:22px;font-weight:800;color:var(--text);}
+.hero-sub{font-size:13px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+
+.field-label{font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px;display:block;letter-spacing:.3px;}
+.name-input{width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);font-size:20px;font-family:'David Libre','FrankRuehl','Times New Roman',serif;color:var(--text);outline:none;text-align:center;direction:rtl;transition:border-color .2s;}
+.name-input:focus{border-color:var(--purple);}
+.name-input::placeholder{color:var(--text-muted);font-size:16px;}
+.input-wrap{margin-bottom:14px;}
+
+/* Gender */
+.gender-row{display:flex;gap:8px;margin-bottom:14px;}
+.gender-btn{flex:1;padding:10px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:system-ui,sans-serif;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.gender-btn.on{border-color:var(--purple);background:var(--purple-light);color:var(--purple);}
+
+/* Toggle card */
+.toggle-card{background:var(--surface);border-radius:14px;padding:13px 14px;margin-bottom:12px;border:1.5px solid transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s;}
+.toggle-card.on{border-color:var(--primary);}
+.toggle-header{display:flex;align-items:center;justify-content:space-between;}
+.toggle-left .toggle-title{font-size:14px;font-weight:700;color:var(--text);}
+.toggle-left .toggle-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.sw{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;flex-shrink:0;transition:background .2s;}
+.sw.on{background:var(--primary);}
+.sw-thumb{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:right .2s;}
+.sw.on .sw-thumb{right:21px;}
+.psalm-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.psalm-chip{font-size:11px;padding:3px 9px;border-radius:9px;background:var(--primary-light);color:var(--primary);font-weight:600;}
+
+/* Preview */
+.preview-card{background:var(--surface);border-radius:14px;padding:13px 14px;margin-bottom:14px;}
+.preview-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:.4px;}
+.preview-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:6px;}
+.preview-row:last-child{margin-bottom:0;}
+.row-tag{font-size:10px;color:var(--text-muted);min-width:52px;flex-shrink:0;}
+.letter-pip{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;font-size:15px;font-weight:800;font-family:'David Libre','Times New Roman',serif;}
+.pip-pre{background:var(--primary-light);color:var(--primary);}
+.pip-name{background:var(--purple-light);color:var(--purple);}
+.pip-nesh{background:var(--green-light);color:var(--green);}
+.preview-count{font-size:11px;color:var(--text-muted);margin-top:8px;text-align:left;}
+
+/* Generate button */
+.gen-btn{width:100%;padding:15px;border-radius:16px;background:var(--purple);border:none;font-size:16px;font-weight:700;color:#fff;cursor:pointer;font-family:system-ui,sans-serif;transition:opacity .15s;-webkit-tap-highlight-color:transparent;}
+.gen-btn:disabled{opacity:.4;cursor:default;}
+.gen-btn:not(:disabled):active{opacity:.8;}
+
+/* Free reading dedication button */
+.free-read-btn{width:100%;padding:13px 16px;border-radius:14px;background:var(--primary-light);border:1.5px solid var(--primary);color:var(--primary);font-size:14px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.free-read-btn:disabled{opacity:.35;cursor:default;}
+.free-read-btn:not(:disabled):active{opacity:.7;}
+
+/* ── Mode selector ── */
+.mode-row{display:flex;gap:6px;margin-bottom:18px;}
+/* ── NSH sub-mode ── */
+.sub-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:.3px;}
+.psalm-chip.sel{background:var(--purple);color:#fff;font-weight:800;cursor:pointer;}
+.psalm-chip{cursor:pointer;transition:all .15s;}
+.psalm-chip:active{opacity:.7;}
+.mode-btn{flex:1;padding:9px 4px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:system-ui,sans-serif;transition:all .15s;-webkit-tap-highlight-color:transparent;line-height:1.4;text-align:center;}
+.mode-btn.on{background:var(--purple-light);border-color:var(--purple);color:var(--purple);}
+.mode-btn.on.green{background:var(--green-light);border-color:var(--green);color:var(--green);}
+
+/* ── Reading Screen ── */
+.progress-bar-row{padding:8px 16px 6px;border-bottom:.5px solid var(--border);flex-shrink:0;}
+.pbar-track{height:3px;background:var(--surface);border-radius:2px;overflow:hidden;}
+.pbar-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .4s ease;}
+.pbar-sub{font-size:10px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between;}
+
+/* ── Font size button ── */
+.font-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px 8px;font-size:13px;font-weight:700;color:var(--text-sec);cursor:pointer;font-family:'David Libre',serif;line-height:1;-webkit-tap-highlight-color:transparent;}
+/* Font size classes applied to verses-area */
+.verses-area.fs1 .verse-text{font-size:22px;line-height:2.0;}
+.verses-area.fs2 .verse-text{font-size:26px;line-height:2.1;}
+
+/* ── Share button ── */
+.share-request-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;background:#1DB954;border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:system-ui,sans-serif;margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
+
+.section-tag-row{padding:14px 16px 0;}
+.role-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 11px;border-radius:9px;}
+
+.letter-hero{font-size:86px;font-family:'David Libre','FrankRuehl','Times New Roman',serif;line-height:1;text-align:center;padding:6px 0 2px;}
+
+.section-heading{font-size:19px;font-weight:800;color:var(--text);padding:4px 16px 2px;}
+.section-sub-line{font-size:12px;color:var(--text-muted);padding:0 16px 12px;}
+
+.verses-area{flex:1;overflow-y:auto;padding:4px 16px 12px;}
+.verse-row{display:flex;gap:10px;padding:6px 0;border-bottom:.5px solid var(--border);}
+.verse-row:last-child{border-bottom:none;}
+.verse-num{font-size:11px;color:var(--text-muted);flex-shrink:0;width:20px;padding-top:4px;text-align:left;}
+.verse-text{font-size:19px;line-height:1.9;color:var(--text);font-family:'David Libre','FrankRuehl','Times New Roman',serif;}
+
+.loading-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-muted);}
+.spin{font-size:28px;animation:spin 1.2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;color:var(--text-muted);}
+.retry-btn{padding:10px 24px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);font-size:14px;cursor:pointer;font-family:system-ui,sans-serif;color:var(--primary);}
+
+.reader-footer{display:flex;gap:8px;padding:12px 16px 22px;border-top:.5px solid var(--border);flex-shrink:0;}
+.nav-btn{flex:1;padding:13px;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;border:none;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.nav-btn:active{opacity:.75;}
+.nav-prev{background:var(--surface);color:var(--text-sec);border:1px solid var(--border);}
+.nav-next{background:var(--purple);color:#fff;}
+
+/* ── Prayers Screen ── */
+.prayers-scroll{flex:1;overflow-y:auto;padding-bottom:28px;}
+.done-banner{text-align:center;padding:24px 20px 18px;}
+.done-icon{font-size:48px;margin-bottom:8px;display:block;}
+.done-title{font-size:20px;font-weight:800;color:var(--text);}
+.done-tnzb{font-size:14px;color:var(--text-muted);margin-top:5px;font-family:'David Libre','Times New Roman',serif;font-style:italic;}
+
+.prayer-card{margin:0 14px 10px;border-radius:14px;border:1.5px solid var(--border);overflow:hidden;transition:border-color .2s;}
+.prayer-card.done{border-color:var(--green);}
+.prayer-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ph-left{display:flex;align-items:center;gap:10px;}
+.ph-icon{font-size:22px;width:32px;text-align:center;flex-shrink:0;}
+.ph-name{font-size:15px;font-weight:700;color:var(--text);}
+.ph-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.ph-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.prayer-card.done .ph-check{border-color:var(--green);background:var(--green);}
+.ph-check-v{font-size:11px;color:#fff;display:none;}
+.prayer-card.done .ph-check-v{display:block;}
+.prayer-card.open .ph-check{border-color:var(--purple);}
+
+.prayer-body{display:none;padding:0 14px 14px;}
+.prayer-card.open .prayer-body{display:block;}
+.prayer-text{font-size:17px;line-height:2.1;color:var(--text);font-family:'David Libre','FrankRuehl','Times New Roman',serif;white-space:pre-line;}
+.congregation{color:var(--text-muted);font-size:14px;}
+.note-line{font-size:12px;color:var(--text-muted);background:var(--surface);border-radius:8px;padding:6px 10px;margin:8px 0 0;line-height:1.5;}
+.mark-done-btn{margin-top:12px;width:100%;padding:10px;border-radius:11px;background:var(--green-light);border:1.5px solid var(--green);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;-webkit-tap-highlight-color:transparent;}
+
+.finish-section{padding:14px;}
+.finish-btn{display:block;width:100%;padding:15px;border-radius:16px;background:var(--primary);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:system-ui,sans-serif;text-align:center;text-decoration:none;}
+</style>
+<script src="utils.js?v=2.2.0"></script>
+<script src="i18n.js?v=2.2.31" defer></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════════════════════════════════
+     SCREEN 0 — SETUP
+══════════════════════════════════════════ -->
+<div id="s0" class="screen active">
+  <div class="topbar">
+    <a href="01-dashboard.html" class="back-btn" data-i18n="read.back">← בית</a>
+    <div class="topbar-center" id="setupTitle">רפואה</div>
+    <div class="topbar-side"></div>
+  </div>
+  <div class="setup-scroll">
+
+    <!-- Mode selector — רפואה ראשון (ימין) -->
+    <div class="mode-row">
+      <button class="mode-btn on green" id="m_ref" onclick="setMode('ref')" data-i18n="yizkor.mode_ref">💙<br>רפואה</button>
+      <button class="mode-btn" id="m_nsh" onclick="setMode('nsh')" data-i18n="yizkor.mode_nsh">✡️<br>עילוי נשמה</button>
+      <button class="mode-btn" id="m_azk" onclick="setMode('azk')" data-i18n="yizkor.mode_azk">🕯️<br>אזכרה</button>
+    </div>
+
+    <div class="hero">
+      <span class="hero-candle" id="heroIcon">💙</span>
+      <div class="hero-title" id="heroTitle">תפילה לרפואה שלמה</div>
+      <div class="hero-sub" id="heroSub">קריאת תהילים לרפואת החולה<br>לאחר הקריאה — מי שבירך ושיתוף</div>
+    </div>
+
+    <!-- Name -->
+    <div class="input-wrap">
+      <label class="field-label" id="nameLbl">שם החולה</label>
+      <input id="nameInp" class="name-input" type="text" placeholder="הכנס שם בעברית..." data-i18n-placeholder="yizkor.ph_name" autocomplete="off" autocorrect="off" oninput="onNameInput()">
+    </div>
+
+    <!-- Mother's name (רפואה only) -->
+    <div class="input-wrap" id="motherWrap">
+      <label class="field-label" data-i18n="yizkor.mother_name">שם האם (לנוסח מי שבירך — אם ידוע)</label>
+      <input id="motherInp" class="name-input" type="text" placeholder="שם האם בעברית..." data-i18n-placeholder="yizkor.ph_mother" autocomplete="off" autocorrect="off" style="font-size:17px;">
+    </div>
+
+    <!-- Gender -->
+    <div class="gender-row">
+      <button class="gender-btn on" id="gm" onclick="setGender('m')" data-i18n="yizkor.male">בן (זכר)</button>
+      <button class="gender-btn"    id="gf" onclick="setGender('f')" data-i18n="yizkor.female">בת (נקבה)</button>
+    </div>
+
+    <!-- עילוי נשמה — sub-mode (letters vs. specific psalm) -->
+    <div id="nshOptions" style="display:none;margin-bottom:14px;">
+      <div class="sub-label" data-i18n="yizkor.reading_type">סוג קריאה</div>
+      <div class="gender-row" style="margin-bottom:10px;">
+        <button class="gender-btn on" id="nsh_letters" onclick="setNshSub('letters')" data-i18n="yizkor.by_letters">📖 לפי אותיות השם</button>
+        <button class="gender-btn"    id="nsh_psalm"   onclick="setNshSub('psalm')" data-i18n="yizkor.by_psalm">🔢 פרק לבחירה</button>
+      </div>
+      <div id="nshPsalmWrap" style="display:none;">
+        <div class="sub-label" data-i18n="yizkor.common_psalms">פרקים נפוצים לעילוי נשמה</div>
+        <div class="psalm-chips" id="nshQuickPsalms" style="margin-bottom:10px;">
+          <span class="psalm-chip" onclick="pickNshPsalm(16,this)">טז</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(23,this)">כג</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(24,this)">כד</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(33,this)">לג</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(49,this)">מט</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(91,this)">צא</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(104,this)">קד</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(121,this)">קכא</span>
+          <span class="psalm-chip" onclick="pickNshPsalm(130,this)">קל</span>
+        </div>
+        <input id="nshPsalmInp" class="name-input" type="number" placeholder="או הכנס מספר פרק (1–150)…" data-i18n-placeholder="yizkor.ph_psalm" min="1" max="150" style="font-size:18px;text-align:center;" oninput="onNshPsalmInput()">
+      </div>
+    </div>
+
+    <!-- Pre-psalms toggle -->
+    <div class="toggle-card on" id="preCard" onclick="togglePre()">
+      <div class="toggle-header">
+        <div class="toggle-left">
+          <div class="toggle-title" id="preTitle">פרקים לרפואה</div>
+          <div class="toggle-sub" id="preSub">כ, ו, יג, כב, ל, מא, פח, קג, קכא, קל</div>
+        </div>
+        <div class="sw on" id="preSw"><div class="sw-thumb"></div></div>
+      </div>
+      <div class="psalm-chips" id="preChips">
+        <span class="psalm-chip">כ</span><span class="psalm-chip">ו</span>
+        <span class="psalm-chip">יג</span><span class="psalm-chip">כב</span>
+        <span class="psalm-chip">ל</span><span class="psalm-chip">מא</span>
+        <span class="psalm-chip">פח</span><span class="psalm-chip">קג</span>
+        <span class="psalm-chip">קכא</span><span class="psalm-chip">קל</span>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div id="preview" class="preview-card" style="display:none">
+      <div class="preview-label" data-i18n="yizkor.reading_order">סדר הקריאה שייווצר</div>
+      <div class="preview-row" id="prevPre"></div>
+      <div class="preview-row" id="prevName"></div>
+      <div class="preview-row" id="prevNesh"></div>
+      <div class="preview-count" id="prevCount"></div>
+    </div>
+
+    <button id="genBtn" class="gen-btn" onclick="generate()" disabled>💙 יצר תפילה לרפואה</button>
+
+    <!-- Free reading dedication button (ref mode only) -->
+    <button id="freeReadBtn" class="free-read-btn" onclick="startFreeDedication()" disabled style="display:none;">
+      📖 קרא פרקים חופשית לרפואת <span id="freeReadName">...</span>
+    </button>
+    <div id="freeReadNote" style="display:none;text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5;">
+      שם החולה יופיע מעל כל פרק שתקרא היום
+    </div>
+
+    <!-- Share button (ref mode only — available before reading) -->
+    <button id="shareSetupBtn" class="share-request-btn" onclick="shareSetupRequest()"
+      style="margin-top:10px;" disabled data-i18n="yizkor.share_request">
+      💬 שתף בקשה לקריאת תהילים
+    </button>
+    <div id="shareSetupNote" style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:6px;">
+      שלח לחברים ומשפחה — הם יוכלו לקרוא תהילים לרפואת החולה
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — READING
+══════════════════════════════════════════ -->
+<div id="s1" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goSetup()" data-i18n="yizkor.back">← חזרה</button>
+    <div class="topbar-center" id="rTitle">—</div>
+    <div class="topbar-side" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+      <button class="font-btn" id="fontBtn" onclick="cycleFontSize()" title="גודל גופן" data-i18n-title="yizkor.font_size">א</button>
+      <span class="counter-badge" id="rCounter"></span>
+    </div>
+  </div>
+  <div class="progress-bar-row">
+    <div class="pbar-track"><div class="pbar-fill" id="pFill" style="width:0%"></div></div>
+    <div class="pbar-sub">
+      <span id="pSubLeft"></span>
+      <span id="pSubRight"></span>
+    </div>
+  </div>
+  <div id="sectionMeta"></div>
+  <div id="versesArea" class="verses-area"></div>
+  <div class="reader-footer">
+    <button class="nav-btn nav-prev" id="prevBtn" onclick="nav(-1)" data-i18n="yizkor.prev">→ הקודם</button>
+    <button class="nav-btn nav-next" id="nextBtn" onclick="nav(1)" data-i18n="yizkor.next">הבא ←</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — PRAYERS
+══════════════════════════════════════════ -->
+<div id="s2" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goReading()" data-i18n="yizkor.back">← חזרה</button>
+    <div class="topbar-center" data-i18n="yizkor.prayers">תפילות</div>
+    <div class="topbar-side"></div>
+  </div>
+  <div class="prayers-scroll">
+    <div class="done-banner">
+      <span class="done-icon">✨</span>
+      <div class="done-title" data-i18n="yizkor.done">הקריאה הושלמה!</div>
+      <div class="done-tnzb" id="doneSub"></div>
+    </div>
+    <div id="prayersList"></div>
+    <div class="finish-section">
+      <a href="01-dashboard.html" class="finish-btn" data-i18n="yizkor.home">← חזרה לדף הבית</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.app -->
+
+<script>
+/* ── Storage ── */
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classList.add('dark');
+
+/* ── Bust stale per-letter caches from old code (they stored full 176-verse chapter) ── */
+'אבגדהוזחטיכלמנסעפצקרשת'.split('').forEach(l => localStorage.removeItem('yzk_119_' + l));
+
+/* ── Gematria ── */
+function gem(n) {
+  const sp={15:'ט"ו',16:'ט"ז',115:'קט"ו',116:'קט"ז'};
+  if(sp[n])return sp[n];
+  const h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],m=['','ק','ר','ש','ת'];
+  let r='',x=n;
+  if(x>=100){r+=m[Math.floor(x/100)];x%=100;}
+  if(x>=10){r+=t[Math.floor(x/10)];x%=10;}
+  r+=h[x];
+  return r.length===1?r+'׳':r.slice(0,-1)+'"'+r.slice(-1);
+}
+
+/* ── Data ── */
+const PS119 = {
+  'א':{s:1,e:8},'ב':{s:9,e:16},'ג':{s:17,e:24},'ד':{s:25,e:32},
+  'ה':{s:33,e:40},'ו':{s:41,e:48},'ז':{s:49,e:56},'ח':{s:57,e:64},
+  'ט':{s:65,e:72},'י':{s:73,e:80},'כ':{s:81,e:88},'ל':{s:89,e:96},
+  'מ':{s:97,e:104},'נ':{s:105,e:112},'ס':{s:113,e:120},'ע':{s:121,e:128},
+  'פ':{s:129,e:136},'צ':{s:137,e:144},'ק':{s:145,e:152},'ר':{s:153,e:160},
+  'ש':{s:161,e:168},'ת':{s:169,e:176}
+};
+const FINAL = {'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'};
+const NESHAMAH = ['נ','ש','מ','ה'];
+const PSALM_SUB = {6:'תְּפִלָּה בְּצָרָה',13:'עַד אָנָה ה׳',16:'מִכְתָּם לְדָוִד',17:'תְּפִלָּה לְדָוִד',20:'יַעַנְךָ ה׳ בְּיוֹם צָרָה',22:'אֵלִי אֵלִי לָמָה עֲזַבְתָּנִי',30:'מִזְמוֹר שִׁיר חֲנֻכַּת הַבַּיִת',33:'שִׁירוּ לַה׳ שִׁיר חָדָשׁ',41:'אַשְׁרֵי מַשְׂכִּיל',72:'לִשְׁלֹמֹה',88:'שִׁיר מִזְמוֹר',91:'יֹשֵׁב בְּסֵתֶר עֶלְיוֹן',103:'בָּרְכִי נַפְשִׁי',104:'בָּרְכִי נַפְשִׁי אֶת ה׳',121:'שִׁיר לַמַּעֲלוֹת',130:'שִׁיר הַמַּעֲלוֹת'};
+
+function _rLang() {
+  try { return (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : (JSON.parse(localStorage.getItem('tehillim_settings')||'{}').lang || 'he'); } catch(e) { return 'he'; }
+}
+
+const MODE_CFG = {
+  azk: {
+    icon:'🕯️',
+    title:'סדר אזכרת נשמות',       en_title:'Memorial Reading Order',
+    sub:'קריאת תהילים לעילוי נשמת הנפטר/ת<br>לפי אותיות השם ואותיות נשמה',
+    en_sub:'Reading Psalms for the soul of the departed<br>by name letters &amp; Neshamah letters',
+    nameLbl:'שם הנפטר / הנפטרת',   en_nameLbl:"Departed's name",
+    genM:'זכר 👴', genF:'נקבה 👵', en_genM:'Male 👴', en_genF:'Female 👵',
+    prePsalms:[33,16,17,72,91,104,130], preTitle:'פרקים לפני השם', preSub:'פרק לג, טז, יז, עב, צא, קד, קל',
+    useLetters:true, showMother:false, topbar:'אזכרה', en_topbar:'Yahrzeit'
+  },
+  nsh: {
+    icon:'✡️',
+    title:'קריאה לעילוי נשמה',      en_title:'Soul Elevation Reading',
+    sub:'קריאת פרק קיט לפי אותיות השם<br>ואותיות נשמה',
+    en_sub:'Reading Psalm 119 by name letters<br>&amp; Neshamah letters',
+    nameLbl:'שם הנפטר / הנפטרת',   en_nameLbl:"Departed's name",
+    genM:'זכר 👴', genF:'נקבה 👵', en_genM:'Male 👴', en_genF:'Female 👵',
+    prePsalms:[], preTitle:'', preSub:'',
+    useLetters:true, showMother:false, topbar:'עילוי נשמה', en_topbar:'In Memory'
+  },
+  ref: {
+    icon:'💙',
+    title:'תפילה לרפואה שלמה',      en_title:'Prayer for Full Recovery',
+    sub:'קריאת תהילים לרפואת החולה<br>לאחר הקריאה — מי שבירך ושיתוף',
+    en_sub:'Reading Psalms for the patient<br>After reading — Mi Sheberach &amp; sharing',
+    nameLbl:'שם החולה',             en_nameLbl:"Patient's name",
+    genM:'בן (זכר)', genF:'בת (נקבה)', en_genM:'Son (male)', en_genF:'Daughter (female)',
+    prePsalms:[20,6,13,22,30,41,88,103,121,130], preTitle:'פרקים לרפואה', preSub:'כ, ו, יג, כב, ל, מא, פח, קג, קכא, קל',
+    useLetters:false, showMother:true, topbar:'רפואה', en_topbar:'Healing'
+  }
+};
+
+/* ── State ── */
+let appMode = 'ref';
+let deceased = '', gender = 'm', usePre = true;
+let sections = [], cur = 0;
+let fontSize = 0; // 0=normal 1=large 2=xl
+let nshSubMode = 'letters'; // 'letters' | 'psalm'
+let nshPsalmNum = 0;
+
+/* ── Name helpers ── */
+function extractLetters(name) {
+  // כל הופעה של אות — גם כפולה — מייצרת קריאה נפרדת (מנהג)
+  const out = [];
+  for (const ch of name) {
+    if (/[א-ת]/.test(ch)) {
+      const l = FINAL[ch] || ch; // אות סופית → רגילה
+      if (PS119[l]) out.push(l);
+    }
+  }
+  return out;
+}
+
+// מחזיר את כל אותיות השם לתצוגה (זהה ל-extractLetters)
+function extractDisplayLetters(name) {
+  return extractLetters(name);
+}
+
+/* ── UI: Setup ── */
+function setGender(g) {
+  gender = g;
+  document.getElementById('gm').classList.toggle('on', g==='m');
+  document.getElementById('gf').classList.toggle('on', g==='f');
+}
+
+function togglePre() {
+  usePre = !usePre;
+  document.getElementById('preCard').classList.toggle('on', usePre);
+  document.getElementById('preSw').classList.toggle('on', usePre);
+  renderPreview();
+}
+
+function onNameInput() {
+  deceased = document.getElementById('nameInp').value.trim();
+  updateGenBtn();
+  renderPreview();
+}
+
+function updateGenBtn() {
+  const name = document.getElementById('nameInp').value.trim();
+  let ok = !!name;
+  if (appMode === 'nsh' && nshSubMode === 'psalm') ok = ok && nshPsalmNum >= 1;
+  document.getElementById('genBtn').disabled = !ok;
+  // Share button on setup screen (ref + nsh) — enabled as soon as a name is entered
+  const shareBtn = document.getElementById('shareSetupBtn');
+  if (shareBtn.style.display !== 'none') shareBtn.disabled = !name;
+  // Free reading dedication button (ref mode only)
+  const freeBtn  = document.getElementById('freeReadBtn');
+  const freeNote = document.getElementById('freeReadNote');
+  if (appMode === 'ref') {
+    freeBtn.style.display  = '';
+    freeNote.style.display = '';
+    freeBtn.disabled = !name;
+    document.getElementById('freeReadName').textContent = name || '...';
+  } else {
+    freeBtn.style.display  = 'none';
+    freeNote.style.display = 'none';
+  }
+}
+
+function startFreeDedication() {
+  const name = document.getElementById('nameInp').value.trim();
+  if (!name) return;
+  const today = localDateStr();
+  S.set('tehillim_dedication', {
+    name,
+    gender,
+    type: 'ref',
+    date: today
+  });
+  location.href = '03-reader.html';
+}
+
+function setNshSub(sub) {
+  nshSubMode = sub;
+  document.getElementById('nsh_letters').classList.toggle('on', sub === 'letters');
+  document.getElementById('nsh_psalm').classList.toggle('on', sub === 'psalm');
+  document.getElementById('nshPsalmWrap').style.display = sub === 'psalm' ? '' : 'none';
+  if (sub === 'letters') { nshPsalmNum = 0; }
+  updateGenBtn();
+  renderPreview();
+}
+
+function pickNshPsalm(n, el) {
+  nshPsalmNum = n;
+  document.getElementById('nshPsalmInp').value = n;
+  document.querySelectorAll('#nshQuickPsalms .psalm-chip').forEach(c => c.classList.remove('sel'));
+  if (el) el.classList.add('sel');
+  updateGenBtn();
+  renderPreview();
+}
+
+function onNshPsalmInput() {
+  const v = parseInt(document.getElementById('nshPsalmInp').value);
+  nshPsalmNum = (v >= 1 && v <= 150) ? v : 0;
+  document.querySelectorAll('#nshQuickPsalms .psalm-chip').forEach(c => c.classList.remove('sel'));
+  updateGenBtn();
+  renderPreview();
+}
+
+function renderPreview() {
+  const cfg = MODE_CFG[appMode];
+  const name = document.getElementById('nameInp').value.trim();
+  const preview = document.getElementById('preview');
+  if (!name) { preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+
+  // Special: nsh + psalm — single psalm preview
+  if (appMode === 'nsh' && nshSubMode === 'psalm') {
+    document.getElementById('prevPre').style.display = 'none';
+    document.getElementById('prevNesh').style.display = 'none';
+    const nameRow = document.getElementById('prevName');
+    if (nshPsalmNum > 0) {
+      nameRow.style.display = 'flex';
+      nameRow.innerHTML = '<span class="row-tag">הפרק:</span>' +
+        `<span class="letter-pip pip-name" style="width:auto;padding:0 10px;font-family:system-ui;font-size:11px;">תהילים ${gem(nshPsalmNum)}</span>` +
+        (PSALM_SUB[nshPsalmNum] ? `<span style="font-size:11px;color:var(--text-muted);align-self:center;">${PSALM_SUB[nshPsalmNum]}</span>` : '');
+      document.getElementById('prevCount').textContent = '1 קטע קריאה';
+    } else {
+      nameRow.style.display = 'none';
+      document.getElementById('prevCount').textContent = '';
+    }
+    return;
+  }
+
+  const letters = cfg.useLetters ? extractLetters(name) : [];
+  const prePsalms = (usePre && cfg.prePsalms.length > 0) ? cfg.prePsalms : [];
+
+  /* Pre row */
+  const preRow = document.getElementById('prevPre');
+  if (prePsalms.length > 0) {
+    preRow.style.display = 'flex';
+    preRow.innerHTML = '<span class="row-tag">' + (cfg.useLetters ? 'לפני השם:' : 'פרקים:') + '</span>' +
+      prePsalms.map(n => `<span class="letter-pip pip-pre" style="font-family:system-ui;font-size:10px;width:auto;padding:0 6px;">${gem(n)}</span>`).join('');
+  } else {
+    preRow.style.display = 'none';
+  }
+
+  /* Name row */
+  const nameRow = document.getElementById('prevName');
+  if (cfg.useLetters) {
+    const dispLetters = extractDisplayLetters(name);
+    nameRow.style.display = dispLetters.length ? 'flex' : 'none';
+    nameRow.innerHTML = '<span class="row-tag">השם:</span>' +
+      dispLetters.map(l => `<span class="letter-pip pip-name">${l}</span>`).join('');
+  } else {
+    nameRow.style.display = 'none';
+  }
+
+  /* Neshamah row */
+  const neshRow = document.getElementById('prevNesh');
+  if (cfg.useLetters) {
+    neshRow.style.display = 'flex';
+    neshRow.innerHTML = '<span class="row-tag">נשמה:</span>' +
+      NESHAMAH.map(l => `<span class="letter-pip pip-nesh">${l}</span>`).join('');
+  } else {
+    neshRow.style.display = 'none';
+  }
+
+  let total = prePsalms.length;
+  if (cfg.useLetters) total += letters.length + NESHAMAH.length;
+  document.getElementById('prevCount').textContent = total + ' קטעי קריאה בסך הכל';
+}
+
+/* ── Build sections ── */
+function buildSections() {
+  const cfg = MODE_CFG[appMode];
+  const out = [];
+
+  // Special: nsh + specific psalm — just the one psalm
+  if (appMode === 'nsh' && nshSubMode === 'psalm' && nshPsalmNum > 0) {
+    out.push({ type:'psalm', num:nshPsalmNum, role:'name',
+      title:'תהילים ' + gem(nshPsalmNum), sub: PSALM_SUB[nshPsalmNum] || '' });
+    return out;
+  }
+
+  if (usePre && cfg.prePsalms.length > 0) {
+    cfg.prePsalms.forEach(n => out.push({ type:'psalm', num:n, role:'pre',
+      title:'תהילים ' + gem(n), sub: PSALM_SUB[n]||'' }));
+  }
+  if (cfg.useLetters) {
+    extractLetters(deceased).forEach(l => {
+      const r = PS119[l];
+      out.push({ type:'ps119', letter:l, start:r.s, end:r.e, role:'name',
+        title:'תהילים קיט', sub:'אות ' + l + ' — מהשם' });
+    });
+    NESHAMAH.forEach(l => {
+      const r = PS119[l];
+      out.push({ type:'ps119', letter:l, start:r.s, end:r.e, role:'neshamah',
+        title:'תהילים קיט', sub:'אות ' + l + ' — נשמה' });
+    });
+  }
+  return out;
+}
+
+/* ── Mode switching ── */
+function setMode(m) {
+  appMode = m;
+  const cfg = MODE_CFG[m];
+
+  // נקה שם ושדות קשורים בכל מעבר מצב
+  document.getElementById('nameInp').value = '';
+  document.getElementById('motherInp') && (document.getElementById('motherInp').value = '');
+  gender = 'm';
+  updateGenBtn();
+  onNameInput(); // עדכן מצב כפתורים
+
+  // Mode buttons
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('on', 'green'));
+  const activeBtn = document.getElementById('m_' + m);
+  activeBtn.classList.add('on');
+  if (m === 'ref') activeBtn.classList.add('green');
+
+  // Topbar + hero
+  const _mEn = _rLang() === 'en';
+  document.getElementById('setupTitle').textContent = _mEn ? cfg.en_topbar : cfg.topbar;
+  document.getElementById('heroIcon').textContent = cfg.icon;
+  document.getElementById('heroTitle').textContent = _mEn ? cfg.en_title : cfg.title;
+  document.getElementById('heroSub').innerHTML = _mEn ? cfg.en_sub : cfg.sub;
+
+  // Name label + gender buttons
+  document.getElementById('nameLbl').textContent = _mEn ? cfg.en_nameLbl : cfg.nameLbl;
+  document.getElementById('gm').textContent = _mEn ? cfg.en_genM : cfg.genM;
+  document.getElementById('gf').textContent = _mEn ? cfg.en_genF : cfg.genF;
+
+  // Pre-psalm toggle card
+  const hasPrePsalms = cfg.prePsalms.length > 0;
+  document.getElementById('preCard').style.display = hasPrePsalms ? '' : 'none';
+  if (hasPrePsalms) {
+    document.getElementById('preTitle').textContent = cfg.preTitle;
+    document.getElementById('preSub').textContent = cfg.preSub;
+    document.getElementById('preChips').innerHTML =
+      cfg.prePsalms.map(n => `<span class="psalm-chip">${gem(n)}</span>`).join('');
+    usePre = true;
+    document.getElementById('preCard').classList.add('on');
+    document.getElementById('preSw').classList.add('on');
+  }
+
+  // Mother's name field (ref only)
+  document.getElementById('motherWrap').style.display = cfg.showMother ? '' : 'none';
+
+  // Share-before-reading button (ref + nsh modes)
+  const showShare = (m === 'ref' || m === 'nsh');
+  document.getElementById('shareSetupBtn').style.display = showShare ? '' : 'none';
+  document.getElementById('shareSetupNote').style.display = showShare ? '' : 'none';
+
+  // Free reading button (ref mode only)
+  document.getElementById('freeReadBtn').style.display  = m === 'ref' ? '' : 'none';
+  document.getElementById('freeReadNote').style.display = m === 'ref' ? '' : 'none';
+
+  // NSH sub-mode selector
+  document.getElementById('nshOptions').style.display = m === 'nsh' ? '' : 'none';
+  if (m === 'nsh') {
+    // Reset to letters sub-mode on each entry
+    nshSubMode = 'letters'; nshPsalmNum = 0;
+    document.getElementById('nsh_letters').classList.add('on');
+    document.getElementById('nsh_psalm').classList.remove('on');
+    document.getElementById('nshPsalmWrap').style.display = 'none';
+    document.getElementById('nshPsalmInp').value = '';
+    document.querySelectorAll('#nshQuickPsalms .psalm-chip').forEach(c => c.classList.remove('sel'));
+  }
+
+  // Generate button text
+  document.getElementById('genBtn').textContent = m === 'ref'
+    ? (_mEn ? '💙 Generate Healing Prayer' : '💙 יצר תפילה לרפואה')
+    : (_mEn ? '📖 Generate Reading Order'  : '📖 יצר סדר קריאה');
+
+  updateGenBtn();
+  renderPreview();
+}
+
+/* ── Font size toggle ── */
+function cycleFontSize() {
+  fontSize = (fontSize + 1) % 3;
+  document.getElementById('fontBtn').textContent = ['א', 'אא', 'אאא'][fontSize];
+  const va = document.getElementById('versesArea');
+  va.classList.remove('fs1', 'fs2');
+  if (fontSize === 1) va.classList.add('fs1');
+  if (fontSize === 2) va.classList.add('fs2');
+}
+
+/* ── Sefaria fetch ── */
+
+// Flatten whatever structure Sefaria returns into a flat array of verse strings
+function flattenHe(he) {
+  if (!Array.isArray(he)) return [];
+  // Nested array (e.g. Psalm 119 full chapter returns sections as sub-arrays)
+  if (he.length > 0 && Array.isArray(he[0])) he = he.flat(2);
+  return he.map(x => String(x).replace(/<[^>]+>/g, ''));
+}
+
+// Fetch and cache the full Psalm 119 (176 verses) once, then slice per section.
+// This is the only reliable way — asking Sefaria for a range like 119.73-80
+// can return the full chapter regardless of the requested range.
+async function getPs119Full() {
+  const KEY = 'yzk_119_full';
+  const c = S.get(KEY);
+  if (c && c.ts > Date.now() - 7*864e5) return c.v;
+
+  const resp = await fetch('https://www.sefaria.org/api/texts/Psalms.119?lang=he');
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  const v = flattenHe(data.he);
+  if (v.length < 170) throw new Error('קיט קצר מדי: ' + v.length); // sanity check
+  S.set(KEY, { v, ts: Date.now() });
+  return v;
+}
+
+async function fetchVerses(sec) {
+  if (sec.type === 'psalm') {
+    /* ── Full psalm ── */
+    const key = 'yzk_ps' + sec.num;
+    const c = S.get(key);
+    if (c && c.ts > Date.now() - 7*864e5) return c.v;
+
+    const resp = await fetch(`https://www.sefaria.org/api/texts/Psalms.${sec.num}?lang=he`);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const v = flattenHe(data.he);
+    S.set(key, { v, ts: Date.now() });
+    return v;
+
+  } else {
+    /* ── Psalm 119 section: always slice fresh from full-chapter cache ──
+       No per-letter cache — avoids stale data from old code versions.     */
+    const full = await getPs119Full();          // cached after first fetch
+    return full.slice(sec.start - 1, sec.end); // e.g. Yod: slice(72,80) = verses 73-80
+  }
+}
+
+/* ── Navigation ── */
+function showScreen(n) {
+  ['s0','s1','s2'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('active', i===n);
+  });
+}
+
+function generate() {
+  deceased = document.getElementById('nameInp').value.trim();
+  if (!deceased) return;
+  sections = buildSections();
+  cur = 0;
+  document.getElementById('rTitle').textContent = _rLang()==='en' ? MODE_CFG[appMode].en_topbar : MODE_CFG[appMode].topbar;
+  showScreen(1);
+  if (MODE_CFG[appMode].useLetters) getPs119Full().catch(() => {});
+  loadSection(0);
+}
+
+function goSetup() { showScreen(0); }
+
+function goReading() {
+  showScreen(1);
+  loadSection(sections.length - 1);
+}
+
+function nav(dir) {
+  const next = cur + dir;
+  if (next < 0) { showScreen(0); return; }
+  if (next >= sections.length) { showPrayers(); return; }
+  cur = next;
+  loadSection(cur);
+  // Prefetch next
+  if (cur + 1 < sections.length) fetchVerses(sections[cur+1]).catch(()=>{});
+}
+
+/* ── Load & render section ── */
+async function loadSection(idx) {
+  const sec = sections[idx];
+  const total = sections.length;
+
+  // Topbar
+  document.getElementById('rTitle').textContent = sec.title;
+  document.getElementById('rCounter').textContent = (idx+1) + ' / ' + total;
+
+  // Progress
+  const pct = Math.round((idx / total) * 100);
+  document.getElementById('pFill').style.width = pct + '%';
+
+  // Role labels
+  const roleColor = { pre:'var(--primary)', name:'var(--purple)', neshamah:'var(--green)' }[sec.role];
+  const _lsEn = _rLang() === 'en';
+  const roleLabel = _lsEn
+    ? { pre:'Psalms before name', name:'By name letters', neshamah:'Neshamah letters' }[sec.role]
+    : { pre:'פרקים לפני השם',    name:'לפי אותיות השם', neshamah:'אותיות נשמה' }[sec.role];
+  document.getElementById('pSubLeft').textContent = sec.sub;
+  document.getElementById('pSubRight').textContent = roleLabel;
+
+  // Prev button
+  document.getElementById('prevBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = idx === total-1
+    ? (_lsEn ? 'To Prayers ✨' : 'לתפילות ✨')
+    : (_lsEn ? 'Next ←' : 'הבא ←');
+
+  // Section meta (letter display or psalm header)
+  let metaHtml = `<div class="section-tag-row">
+    <span class="role-tag" style="background:${roleColor}18;color:${roleColor}">${roleLabel}</span>
+  </div>`;
+  if (sec.type === 'ps119') {
+    metaHtml += `<div class="letter-hero" style="color:${roleColor};opacity:.18;">${sec.letter}</div>`;
+    metaHtml += `<div class="section-heading">תהילים קי״ט — ${sec.letter}׳</div>`;
+    metaHtml += `<div class="section-sub-line">פסוקים ${gem(sec.start)}–${gem(sec.end)}</div>`;
+  } else {
+    metaHtml += `<div class="section-heading" style="padding-top:12px;">תהילים ${gem(sec.num)}</div>`;
+    if (PSALM_SUB[sec.num]) metaHtml += `<div class="section-sub-line">${PSALM_SUB[sec.num]}</div>`;
+  }
+  document.getElementById('sectionMeta').innerHTML = metaHtml;
+
+  // Show loading
+  document.getElementById('versesArea').innerHTML =
+    `<div class="loading-state"><span class="spin">⌛</span><div>טוען פסוקים...</div></div>`;
+
+  // Scroll to top
+  document.getElementById('versesArea').scrollTop = 0;
+  document.getElementById('s1').querySelector('.verses-area') &&
+    (document.getElementById('s1').scrollTop = 0);
+
+  try {
+    const verses = await fetchVerses(sec);
+    renderVerses(sec, verses, roleColor);
+  } catch(e) {
+    document.getElementById('versesArea').innerHTML =
+      `<div class="error-state">
+        <div style="font-size:32px">⚠️</div>
+        <div>שגיאה בטעינה</div>
+        <div style="font-size:12px">בדוק חיבור לאינטרנט</div>
+        <button class="retry-btn" onclick="loadSection(${idx})">נסה שוב</button>
+      </div>`;
+  }
+}
+
+function renderVerses(sec, verses, color) {
+  let html = '<div style="padding-bottom:8px;">';
+  verses.forEach((v, i) => {
+    const vNum = sec.type === 'ps119' ? sec.start + i : i + 1;
+    html += `<div class="verse-row">
+      <div class="verse-num" style="color:${color};opacity:.5;">${gem(vNum)}</div>
+      <div class="verse-text">${v}</div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('versesArea').innerHTML = html;
+}
+
+/* ── Prayers ── */
+function showPrayers() {
+  showScreen(2);
+  const sub = {
+    azk: 'נשמת ' + deceased + ' תנצב"ה',
+    nsh: 'לעילוי נשמת ' + deceased,
+    ref: 'לרפואת ' + deceased
+  }[appMode];
+  document.getElementById('doneSub').textContent = sub;
+  const icon = appMode === 'ref' ? '💙' : '✨';
+  document.querySelector('.done-icon').textContent = icon;
+  buildPrayers();
+}
+
+function buildPrayers() {
+  if (appMode === 'ref') { buildHealingPrayers(); return; }
+
+  const f = gender === 'f';
+  const name = deceased;
+
+  const PRAYERS = [
+    {
+      id: 'ashkava',
+      icon: '🕊️',
+      title: 'תפילת האשכבה',
+      sub: 'לעילוי הנשמה',
+      text: `יְהִי רָצוֹן מִלְּפָנֶיךָ ה׳ אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, שֶׁתְּהֵא נִשְׁמַת <b>${name}</b> צְרוּרָה בִּצְרוֹר הַחַיִּים עִם נִשְׁמוֹת אַבְרָהָם יִצְחָק וְיַעֲקֹב, שָׂרָה רִבְקָה רָחֵל וְלֵאָה, וְעִם שְׁאָר הַצַּדִּיקִים וְהַצִּדְקָנִיּוֹת שֶׁבְּגַן עֵדֶן.
+
+וְ${f?'תָּנוּחַ':'יָנוּחַ'} בְּשָׁלוֹם עַל ${f?'מִשְׁכָּבָהּ':'מִשְׁכָּבוֹ'}, וְנֹאמַר אָמֵן.`
+    },
+    {
+      id: 'elmaleh',
+      icon: '✡️',
+      title: 'אֵל מָלֵא רַחֲמִים',
+      sub: 'תפילת אזכרת נשמות',
+      text: `אֵל מָלֵא רַחֲמִים שׁוֹכֵן בַּמְּרוֹמִים, הַמְצֵא מְנוּחָה נְכוֹנָה תַּחַת כַּנְפֵי הַשְּׁכִינָה בְּמַעֲלוֹת קְדוֹשִׁים וּטְהוֹרִים כְּזֹהַר הָרָקִיעַ מְזַהִירִים, לְנִשְׁמַת <b>${name}</b> שֶׁ${f?'הָלְכָה לְעוֹלָמָהּ':'הָלַךְ לְעוֹלָמוֹ'}, בַּעֲבוּר שֶׁנּוֹדְבִים צְדָקָה בְּעַד הַזְכָּרַת ${f?'נִשְׁמָתָהּ':'נִשְׁמָתוֹ'}.
+
+לָכֵן בַּעַל הָרַחֲמִים ${f?'יַסְתִּירֶנָּה':'יַסְתִּירֵהוּ'} בְּסֵתֶר כְּנָפָיו לְעוֹלָמִים, וְיִצְרֹר בִּצְרוֹר הַחַיִּים אֶת ${f?'נִשְׁמָתָהּ':'נִשְׁמָתוֹ'}, ה׳ הוּא ${f?'נַחֲלָתָהּ':'נַחֲלָתוֹ'}, וְ${f?'תָּנוּחַ':'יָנוּחַ'} בְּשָׁלוֹם עַל ${f?'מִשְׁכָּבָהּ':'מִשְׁכָּבוֹ'}, וְנֹאמַר אָמֵן.`
+    },
+    {
+      id: 'kaddish',
+      icon: '🙏',
+      title: 'קַדִּישׁ יָתוֹם',
+      sub: 'נאמר על ידי האבלים',
+      text: `יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא. <span class="congregation">[קהל: אָמֵן]</span>
+בְּעָלְמָא דִּי בְרָא כִרְעוּתֵהּ, וְיַמְלִיךְ מַלְכוּתֵהּ, וְיַצְמַח פֻּרְקָנֵהּ, וִיקָרֵב מְשִׁיחֵהּ. <span class="congregation">[קהל: אָמֵן]</span>
+בְּחַיֵּיכוֹן וּבְיוֹמֵיכוֹן וּבְחַיֵּי דְכָל בֵּית יִשְׂרָאֵל, בַּעֲגָלָא וּבִזְמַן קָרִיב וְאִמְרוּ אָמֵן. <span class="congregation">[קהל: אָמֵן]</span>
+
+יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא.
+יִתְבָּרַךְ וְיִשְׁתַּבַּח וְיִתְפָּאַר וְיִתְרוֹמַם וְיִתְנַשֵּׂא וְיִתְהַדָּר וְיִתְעַלֶּה וְיִתְהַלָּל שְׁמֵהּ דְּקֻדְשָׁא בְּרִיךְ הוּא. <span class="congregation">[קהל: בְּרִיךְ הוּא]</span>
+לְעֵלָּא לְעֵלָּא מִן כָּל בִּרְכָתָא וְשִׁירָתָא תֻּשְׁבְּחָתָא וְנֶחֱמָתָא דַּאֲמִירָן בְּעָלְמָא וְאִמְרוּ אָמֵן. <span class="congregation">[קהל: אָמֵן]</span>
+
+יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא וְחַיִּים עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן. <span class="congregation">[קהל: אָמֵן]</span>
+עוֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן. <span class="congregation">[קהל: אָמֵן]</span>`
+    },
+    {
+      id: 'tziduk',
+      icon: '⚖️',
+      title: 'צִידּוּק הַדִּין',
+      sub: 'קבלת דין שמים באהבה',
+      text: `הַצּוּר תָּמִים פָּעֳלוֹ כִּי כָל דְּרָכָיו מִשְׁפָּט, אֵל אֱמוּנָה וְאֵין עָוֶל, צַדִּיק וְיָשָׁר הוּא.
+
+הַצּוּר תָּמִים בְּכָל פֹּעַל, מִי יֹאמַר לוֹ מַה תִּפְעַל, הַמֵּמִית וּמְחַיֶּה, מוֹרִיד שְׁאוֹל וַיָּעַל.
+
+הַצּוּר תָּמִים בְּכָל מַעֲשֶׂה, מִי יֹאמַר לוֹ מַה תַּעֲשֶׂה, הַמֵּמִית וּמְחַיֶּה וּמוֹרִיד שְׁאוֹל וַיָּעַל.
+
+ה׳ נָתַן וַה׳ לָקָח, יְהִי שֵׁם ה׳ מְבֹרָךְ.
+
+וְהוּא הָרַחוּם יְכַפֵּר עָוֹן וְלֹא יַשְׁחִית, וְהִרְבָּה לְהָשִׁיב אַפּוֹ וְלֹא יָעִיר כָּל חֲמָתוֹ.`
+    },
+    {
+      id: 'cemetery',
+      icon: '🪦',
+      title: 'ברכות בית הקברות',
+      sub: 'בכניסה וביציאה',
+      note: 'הברכה נאמרת אם לא ביקרת בבית עלמין זה במשך 30 יום',
+      text: `<b>בכניסה לבית הקברות:</b>
+בָּרוּךְ אַתָּה ה׳ אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר יָצַר אֶתְכֶם בַּדִּין, וְזָן אֶתְכֶם בַּדִּין, וְכִלְכֵּל אֶתְכֶם בַּדִּין, וְהֵמִית אֶתְכֶם בַּדִּין, וְיוֹדֵעַ מִסְפַּר כֻּלְּכֶם, וְהוּא עָתִיד לְהַחֲיוֹתְכֶם וּלְקַיֵּם אֶתְכֶם בַּדִּין, בָּרוּךְ אַתָּה ה׳ מְחַיֵּה הַמֵּתִים.
+
+<b>ביציאה מבית הקברות:</b>
+נוֹטְלִים יָדַיִם שָׁלוֹשׁ פְּעָמִים לְסֵרוּגִין בְּלֹא בְּרָכָה.
+לאחר מכן אומרים:
+"בִּלַּע הַמָּוֶת לָנֶצַח, וּמָחָה ה׳ אֱלֹהִים דִּמְעָה מֵעַל כָּל פָּנִים"
+(ישעיהו כה:ח)`
+    }
+  ];
+
+  document.getElementById('prayersList').innerHTML = PRAYERS.map(p => prayerCardHtml(p)).join('');
+}
+
+function buildHealingPrayers() {
+  const f = gender === 'f';
+  const name = deceased;
+  const motherName = document.getElementById('motherInp').value.trim();
+  const benBat = f ? 'בת' : 'בן';
+  const motherSuffix = motherName ? ` ${benBat} ${motherName}` : '';
+
+  // Gender-sensitive forms: f=female, m=male
+  const miSheberach = `מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב, שָׂרָה רִבְקָה רָחֵל וְלֵאָה, הוּא יְבָרֵךְ וִירַפֵּא אֶת הַחוֹלֶה <b>${name}${motherSuffix}</b>.
+
+הַקָּדוֹשׁ בָּרוּךְ הוּא יִמָּלֵא רַחֲמִים עָלָ${f?'יהָ':'יו'} לְהַחֲלִימָ${f?'הּ':'הּ'} וּלְרַפְּאוֹת${f?'ָהּ':'וֹ'}, לְהַחֲזִיקָ${f?'הּ':'הּ'} וּלְהַחֲיוֹת${f?'ָהּ':'וֹ'}, וְיִשְׁלַח לָ${f?'הּ':'הּ'} מְהֵרָה רְפוּאָה שְׁלֵמָה מִן הַשָּׁמַיִם, רְפוּאַת הַנֶּפֶשׁ וּרְפוּאַת הַגּוּף, בְּתוֹךְ שְׁאָר חוֹלֵי יִשְׂרָאֵל, שַׁבָּת הִיא מִלִּזְעֹק וּרְפוּאָה קְרוֹבָה לָבוֹא, הַשְׁתָּא בַּעֲגָלָא וּבִזְמַן קָרִיב, וְנֹאמַר אָמֵן.`;
+
+  const HEALING_PRAYERS = [
+    { id:'misheberach', icon:'🙏', title:'מי שבירך לחולה', sub:'תפילה לרפואה שלמה', text: miSheberach },
+    {
+      id:'refuah_psalm',
+      icon:'📖',
+      title:'תפילת הרפואה',
+      sub:'יְהִי רָצוֹן — קצרה',
+      text:`יְהִי רָצוֹן מִלְּפָנֶיךָ ה׳ אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, שֶׁתִּשְׁלַח מְהֵרָה רְפוּאָה שְׁלֵמָה מִן הַשָּׁמַיִם, רְפוּאַת הַנֶּפֶשׁ וּרְפוּאַת הַגּוּף לַחוֹלֶה <b>${name}${motherSuffix}</b>, בְּתוֹךְ שְׁאָר חוֹלֵי יִשְׂרָאֵל. וְנֹאמַר אָמֵן.`
+    }
+  ];
+
+  const _bhEn = _rLang() === 'en';
+  document.getElementById('prayersList').innerHTML =
+    `<div style="padding:0 14px 10px;">
+       <button class="share-request-btn" onclick="shareSetupRequest()">${_bhEn ? '💬 Share Psalm Reading Request' : '💬 שתף בקשה לקריאת תהילים'}</button>
+     </div>` +
+    HEALING_PRAYERS.map(p => prayerCardHtml(p)).join('');
+}
+
+function prayerCardHtml(p) {
+  return `<div class="prayer-card" id="pc_${p.id}">
+    <div class="prayer-head" onclick="togglePrayer('${p.id}')">
+      <div class="ph-left">
+        <div class="ph-icon">${p.icon}</div>
+        <div>
+          <div class="ph-name">${p.title}</div>
+          <div class="ph-sub">${p.sub}</div>
+        </div>
+      </div>
+      <div class="ph-check"><span class="ph-check-v">✓</span></div>
+    </div>
+    <div class="prayer-body">
+      ${p.note ? `<div class="note-line">ℹ️ ${p.note}</div>` : ''}
+      <div class="prayer-text">${p.text}</div>
+      <button class="mark-done-btn" onclick="markPrayer('${p.id}')">✓ סיימתי</button>
+    </div>
+  </div>`;
+}
+
+const APP_URL = 'https://tehilon.vercel.app';
+
+function shareSetupRequest() {
+  const f = gender === 'f';
+  const name = document.getElementById('nameInp').value.trim() || deceased;
+  if (!name) return;
+
+  let text;
+  if (appMode === 'ref') {
+    const motherName = document.getElementById('motherInp').value.trim();
+    const benBat = f ? 'בת' : 'בן';
+    const fullName = motherName ? `${name} ${benBat} ${motherName}` : name;
+    const psalmNums = MODE_CFG.ref.prePsalms.map(n => gem(n)).join(', ');
+    text =
+`🙏 בקשה לקריאת תהילים לרפואה שלמה
+
+נא לקרוא תהילים לרפואת *${fullName}* 💙
+
+פרקים מומלצים: ${psalmNums}
+
+לקריאה נוחה בחינם באפליקציית *תהילהון*: ${APP_URL}`;
+
+  } else if (appMode === 'nsh') {
+    text =
+`✡️ בקשה לקריאת תהילים לעילוי נשמה
+
+נא לקרוא תהילים לעילוי נשמת *${name}* 🕯️
+
+לקריאה נוחה בחינם באפליקציית *תהילהון*: ${APP_URL}`;
+  } else {
+    return;
+  }
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+// backward-compat alias (called from prayers screen in ref mode)
+function shareHealingRequest() { shareSetupRequest(); }
+
+function togglePrayer(id) {
+  const card = document.getElementById('pc_' + id);
+  const wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.prayer-card').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) card.classList.add('open');
+}
+
+function markPrayer(id) {
+  const card = document.getElementById('pc_' + id);
+  card.classList.add('done');
+  card.classList.remove('open');
+}
+</script>
+<script src="bottomnav.js?v=2.2.0"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}
+  setMode('ref'); // אתחל hero + כפתורים בשפה הנכונה לאחר טעינת i18n
+});
+</script>
+</body>
+</html>

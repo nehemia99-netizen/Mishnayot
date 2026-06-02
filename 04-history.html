@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תהילהון — היסטוריה</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;flex-shrink:0;}
+.topbar-center{flex:1;text-align:center;font-size:17px;font-weight:700;color:var(--text);}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;}
+
+/* ── Tabs ── */
+.tabbar{display:flex;border-bottom:.5px solid var(--border);background:var(--card);flex-shrink:0;position:sticky;top:52px;z-index:19;}
+.tab{flex:1;padding:11px 8px;font-size:14px;color:var(--text-muted);text-align:center;cursor:pointer;border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;-webkit-tap-highlight-color:transparent;font-weight:500;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700;}
+.tab-content{display:none;flex:1;flex-direction:column;overflow-y:auto;padding-bottom:24px;}
+.tab-content.active{display:flex;}
+
+/* ── Summary row ── */
+.summary-row{display:flex;gap:8px;padding:14px 16px 10px;}
+.sum-card{flex:1;background:var(--surface);border-radius:14px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;gap:4px;}
+.sum-num{font-size:22px;font-weight:700;color:var(--text);}
+.sum-lbl{font-size:10px;color:var(--text-muted);line-height:1.3;}
+
+/* ── Section title ── */
+.section-title{font-size:11px;font-weight:700;color:var(--text-muted);padding:10px 16px 4px;letter-spacing:.6px;text-transform:uppercase;}
+
+/* ── Reading list ── */
+.read-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:.5px solid var(--border);}
+.read-item:last-child{border-bottom:none;}
+.read-left{display:flex;align-items:center;gap:10px;}
+.read-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.read-chap{font-size:15px;font-weight:600;color:var(--text);}
+.read-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.read-right{text-align:left;flex-shrink:0;}
+.read-dur{font-size:13px;font-weight:600;color:var(--primary);}
+.read-clock{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+/* ── Empty state ── */
+.empty-state{padding:48px 20px;text-align:center;color:var(--text-muted);font-size:14px;line-height:1.8;}
+.empty-icon{font-size:44px;margin-bottom:12px;display:block;}
+
+/* ── Delete button ── */
+.delete-wrap{padding:16px;}
+.delete-btn{width:100%;padding:13px;border-radius:14px;background:transparent;border:1.5px solid #E53935;color:#E53935;font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;font-family:system-ui,sans-serif;}
+.delete-btn:active{background:#FFF0F0;}
+
+/* ── Period selector ── */
+.period-sel{display:flex;gap:6px;padding:12px 16px;border-bottom:.5px solid var(--border);overflow-x:auto;flex-shrink:0;}
+.period-btn{flex-shrink:0;padding:6px 16px;border-radius:20px;border:.5px solid var(--border);background:var(--card);font-size:12px;color:var(--text-muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;font-family:system-ui,sans-serif;}
+.period-btn.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary);font-weight:600;}
+
+/* ── Stats grid ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px;}
+.stat-card{background:var(--surface);border-radius:14px;padding:16px 12px;display:flex;flex-direction:column;gap:5px;}
+.stat-num{font-size:24px;font-weight:700;color:var(--text);}
+.stat-lbl{font-size:11px;color:var(--text-muted);}
+.stat-card.wide{grid-column:span 2;}
+
+/* ── Medals ── */
+.medals-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;}
+.medals-title{font-size:16px;font-weight:700;color:var(--text);}
+.medals-sub{font-size:11px;color:var(--text-muted);}
+.medals-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px;}
+.medal-card{background:var(--surface);border-radius:16px;padding:18px 10px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;transition:transform .1s;cursor:default;position:relative;border:1.5px solid transparent;}
+.medal-card.earned{cursor:pointer;}
+.medal-card.earned:active{transform:scale(.96);}
+.medal-icon{font-size:40px;line-height:1;filter:grayscale(1) opacity(.28);transition:filter .2s;}
+.medal-card.earned .medal-icon{filter:none;}
+.medal-name{font-size:14px;font-weight:700;color:var(--text-muted);}
+.medal-card.earned .medal-name{color:var(--text);}
+.medal-req{font-size:10px;color:var(--text-muted);margin-top:-2px;}
+.medal-count{font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;margin-top:2px;}
+.medal-new{position:absolute;top:8px;left:8px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;color:#fff;}
+
+/* ── Certificate overlay ── */
+.cert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.cert-paper{max-width:340px;width:100%;border-radius:6px;position:relative;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.45);animation:certIn .3s ease;}
+@keyframes certIn{from{transform:scale(.88) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.cert-inner{padding:28px 22px 20px;}
+.cert-top{text-align:center;margin-bottom:14px;}
+.cert-emoji{font-size:60px;line-height:1;display:block;margin-bottom:10px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.18));}
+.cert-label{font-size:10px;letter-spacing:3px;opacity:.55;text-transform:uppercase;margin-bottom:3px;}
+.cert-heading{font-size:21px;font-weight:800;margin-bottom:3px;}
+.cert-sub{font-size:12px;opacity:.55;}
+.cert-rule{height:1.5px;margin:14px 0;opacity:.2;border-radius:1px;}
+.cert-body{text-align:center;margin-bottom:14px;}
+.cert-text{font-size:13px;line-height:1.75;opacity:.7;margin-bottom:14px;}
+.cert-quote-wrap{background:rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;margin-bottom:6px;}
+.cert-quote{font-size:15px;font-weight:700;line-height:1.6;font-family:'David Libre','FrankRuehl','Times New Roman',serif;}
+.cert-ref{font-size:11px;opacity:.5;margin-top:4px;}
+.cert-date{font-size:10px;opacity:.4;text-align:center;margin-top:10px;}
+.cert-ornament{text-align:center;font-size:16px;letter-spacing:6px;opacity:.25;margin:8px 0;}
+.cert-btns{display:flex;gap:8px;padding:0 22px 22px;}
+.cert-btn-close{flex:1;padding:12px;border-radius:12px;border:1.5px solid rgba(0,0,0,.12);background:transparent;font-size:14px;cursor:pointer;font-family:system-ui,sans-serif;}
+.cert-btn-share{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;color:#fff;}
+.cert-btn-share:disabled{opacity:.6;cursor:default;}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:200;white-space:nowrap;pointer-events:none;}
+html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
+.toast.show{opacity:1;}
+
+/* === Challenges page (2.0.3) === */
+.challenges-page{padding:16px;}
+.challenges-page-header{margin-bottom:14px;}
+.challenges-page-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.challenges-page-sub{font-size:12px;color:var(--text-muted);}
+.ch-section-label{font-size:11px;font-weight:700;color:var(--text-muted);padding:14px 0 6px;letter-spacing:.6px;text-transform:uppercase;}
+.ch-card{display:flex;align-items:center;gap:11px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.ch-card.completed{border-color:#3B8C14;background:#F4FBEB;}
+html.dark .ch-card.completed{background:#1A2810;border-color:#5DBF35;}
+.ch-card.claimed{opacity:.55;}
+.ch-icon{font-size:24px;flex-shrink:0;}
+.ch-info{flex:1;min-width:0;}
+.ch-title{font-size:13px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;gap:6px;}
+.ch-period{font-size:10px;color:var(--text-muted);background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:2px 7px;flex-shrink:0;}
+.ch-bar-wrap{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px;}
+.ch-bar{height:100%;background:var(--primary);border-radius:3px;transition:width .6s ease;}
+.ch-card.completed .ch-bar{background:#3B8C14;}
+.ch-meta{font-size:11px;color:var(--text-muted);margin-top:3px;display:flex;justify-content:space-between;}
+.ch-claim{padding:6px 14px;border-radius:14px;border:none;background:#3B8C14;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.ch-claim:active{transform:scale(.95);}
+.ch-reward-pill{font-size:11px;font-weight:600;color:#C07A00;background:#FFF3D0;border-radius:8px;padding:3px 8px;white-space:nowrap;flex-shrink:0;}
+html.dark .ch-reward-pill{background:#352510;color:#F5C842;}
+.challenges-history-title{font-size:13px;font-weight:600;color:var(--text);margin:18px 0 8px;}
+.ch-history-item{font-size:12px;color:var(--text-muted);padding:8px 10px;border-bottom:.5px solid var(--border);display:flex;justify-content:space-between;}
+.ch-history-empty{font-size:12px;color:var(--text-muted);text-align:center;padding:20px;}
+.ch-group-link{display:block;text-align:center;padding:11px;border-radius:12px;background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:13px;font-weight:600;text-decoration:none;margin-top:10px;}
+.legend-box{margin-top:18px;padding:14px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);}
+.legend-box h4{font-size:13px;color:var(--text);margin-bottom:8px;}
+.legend-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;color:var(--text-sec);border-top:.5px solid var(--border);}
+.legend-row:first-of-type{border-top:none;}
+.legend-pts{color:#C07A00;font-weight:700;white-space:nowrap;}
+
+
+/* === Theme Badges grid (2.0.4) === */
+.badges-section-title{font-size:13px;font-weight:700;color:var(--text);margin:14px 0 8px;display:flex;align-items:center;gap:6px;}
+.badges-summary{font-size:11px;color:var(--text-muted);background:var(--surface);border-radius:8px;padding:2px 8px;font-weight:600;}
+.badges-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.badge-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:11px 9px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-height:110px;justify-content:center;}
+.badge-card.earned{background:#FFFBE5;border-color:#C8A800;}
+html.dark .badge-card.earned{background:#3A2E0A;border-color:#F5C842;}
+.badge-icon{font-size:28px;line-height:1;filter:grayscale(1) opacity(.35);transition:filter .2s;}
+.badge-card.earned .badge-icon{filter:none;}
+.badge-title{font-size:11.5px;font-weight:700;color:var(--text-muted);line-height:1.25;}
+.badge-card.earned .badge-title{color:var(--text);}
+.badge-desc{font-size:9.5px;color:var(--text-muted);line-height:1.3;}
+.badge-reward{font-size:10px;font-weight:700;color:#C07A00;margin-top:2px;}
+.badge-group-label{font-size:11px;font-weight:600;color:var(--text-muted);padding:14px 0 4px;letter-spacing:.4px;}
+
+
+/* === Level card + chapter map (2.0.6) === */
+.level-card{margin:14px 16px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#185FA5,#1048A0);color:#fff;text-align:center;}
+html.dark .level-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);}
+.level-emoji{font-size:38px;line-height:1;margin-bottom:6px;}
+.level-name{font-size:18px;font-weight:800;margin-bottom:2px;}
+.level-sub{font-size:12px;opacity:.85;}
+.level-progress{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);}
+.level-progress-text{font-size:11px;opacity:.85;margin-bottom:4px;}
+.level-bar-wrap{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;}
+.level-bar{height:100%;background:#FFD060;border-radius:3px;transition:width .6s ease;}
+.level-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);}
+/* ── Streak calendar ── */
+.streak-cal-wrap{margin:12px 16px 4px;}
+.streak-cal-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.streak-cal-title span{font-size:11px;font-weight:400;color:var(--text-muted);}
+.streak-cal-grid{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;}
+.sc-cell{height:36px;border-radius:6px;background:var(--surface);border:.5px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;}
+.sc-cell.sc1{background:#C8E6C9;border-color:#4CAF50;}
+.sc-cell.sc2{background:#66BB6A;border-color:#2E7D32;}
+.sc-cell.sc3{background:#2E7D32;border-color:#1B5E20;}
+.sc-cell.sc4{background:#1B5E20;border-color:#003300;}
+html.dark .sc-cell{background:#1A1A2E;border-color:#333;}
+html.dark .sc-cell.sc1{background:#1B3A1F;border-color:#2E7D32;}
+html.dark .sc-cell.sc2{background:#1F5C24;border-color:#388E3C;}
+html.dark .sc-cell.sc3{background:#2A7A30;border-color:#4CAF50;}
+html.dark .sc-cell.sc4{background:#3DAA45;border-color:#81C784;}
+.streak-cal-legend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:10px;color:var(--text-muted);justify-content:flex-end;}
+.sc-leg{width:11px;height:11px;border-radius:2px;border:.5px solid var(--border);}
+.sc-cell.shabbat{background:#DDEEFF;border-color:#4A90D9;}
+html.dark .sc-cell.shabbat{background:#0D2340;border-color:#4A90D9;}
+.sc-cell.shabbat.sc1{background:#B8D8F8;border-color:#1565C0;}
+.sc-cell.shabbat.sc2{background:#82B8F0;border-color:#0D47A1;}
+.sc-cell.shabbat.sc3{background:#4090D0;border-color:#01337A;}
+.sc-cell.shabbat.sc4{background:#1565C0;border-color:#003070;}
+.lstat{text-align:center;}
+.lstat-num{font-size:18px;font-weight:800;}
+.lstat-lbl{font-size:9.5px;opacity:.8;}
+
+/* Chapter map */
+.chap-map-section{margin:14px 16px 8px;}
+.chap-map-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.chap-map-title{font-size:14px;font-weight:700;color:var(--text);}
+.chap-map-count{font-size:11px;color:var(--text-muted);}
+.chap-map-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:10px;color:var(--text-muted);}
+.cml{display:flex;align-items:center;gap:4px;}
+.cml-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.chap-map-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;}
+.cm-cell{aspect-ratio:1;border-radius:3px;border:.5px solid var(--border);background:var(--surface);font-size:8.5px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:none;}
+.cm-cell.read{background:#EBF5E5;border-color:#3B8C14;color:#3B8C14;font-weight:700;}
+.cm-cell.mem{background:#F4EEFF;border-color:#7B2FF7;color:#7B2FF7;}
+.cm-cell.fav{background:#FFE7E7;border-color:#C04040;color:#C04040;}
+html.dark .cm-cell.read{background:#1A2810;}
+html.dark .cm-cell.mem{background:#1C1230;}
+html.dark .cm-cell.fav{background:#2A1010;}
+
+/* 5 books */
+.books-section{margin:8px 16px;padding:12px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);}
+.books-section-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.book-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border);}
+.book-row:last-child{border-bottom:none;}
+.book-dot-sm{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.book-name-sm{font-size:12px;color:var(--text);min-width:62px;}
+.book-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.book-bar{height:100%;border-radius:3px;transition:width .6s ease;}
+.book-count-sm{font-size:11px;color:var(--text-muted);min-width:54px;text-align:left;}
+
+</style>
+<script src="utils.js?v=2.2.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="i18n.js?v=2.2.31" defer></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="01-dashboard.html" class="back-btn" data-i18n="hist.back">← בית</a>
+    <div class="topbar-center" data-i18n="hist.title">היסטוריה</div>
+    <div style="width:58px;"></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabbar">
+    <div class="tab active" id="tabBtn0" onclick="switchTab(0)" data-i18n="hist.today">📅 היום</div>
+    <div class="tab" id="tabBtn3" onclick="switchTab(3)" data-i18n="hist.yesterday">📆 אתמול</div>
+    <div class="tab" id="tabBtn1" onclick="switchTab(1)" data-i18n="hist.achievements">🏆 הישגים</div>
+    <div class="tab" id="tabBtn2" onclick="switchTab(2)" data-i18n="hist.challenges">🎯 אתגרים</div>
+  </div>
+
+  <!-- ── Tab 0: Today ── -->
+  <div class="tab-content active" id="tab0">
+
+    <div class="summary-row">
+      <div class="sum-card">
+        <div class="sum-num" id="todayChaps">0</div>
+        <div class="sum-lbl" data-i18n="hist.chaps_today">פרקים<br>נקראו</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="todayTime">0:00</div>
+        <div class="sum-lbl" data-i18n="hist.reading_time">זמן<br>קריאה</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="todayScore" style="color:#C07A00;">+0</div>
+        <div class="sum-lbl" data-i18n="hist.points">✡<br>מעלות</div>
+      </div>
+    </div>
+
+    <div class="section-title" data-i18n="hist.chaps_today_title">פרקים שנקראו היום</div>
+    <div id="todayList"></div>
+
+    <div class="delete-wrap" id="deleteWrap" style="display:none;">
+      <button class="delete-btn" onclick="confirmDelete()" data-i18n="hist.delete_today">🗑 מחק נתוני קריאה של היום</button>
+    </div>
+
+    <!-- 7 ימים אחרונים (2.0.7) -->
+    <div class="section-title" style="margin-top:14px;" data-i18n="hist.last_7_days">7 הימים האחרונים</div>
+    <div id="weekList" style="padding-bottom:16px;"></div>
+
+
+    <div class="section-title" style="margin-top:18px;" data-i18n="hist.period_summary">סיכום תקופה</div>
+    <div class="period-sel">
+      <button class="period-btn active" id="pToday" onclick="setPeriod('today')" data-i18n="hist.period_today">היום</button>
+      <button class="period-btn" id="pWeek"  onclick="setPeriod('week')" data-i18n="hist.period_week">7 ימים</button>
+      <button class="period-btn" id="pMonth" onclick="setPeriod('month')" data-i18n="hist.period_month">30 יום</button>
+      <button class="period-btn" id="pAll"   onclick="setPeriod('all')" data-i18n="hist.period_all">הכל</button>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+
+  <!-- ── Tab 3: Yesterday ── -->
+  <div class="tab-content" id="tab3">
+    <div id="yesterdayContent" style="padding:4px 0;"></div>
+  </div>
+
+  <!-- ── Tab 1: Achievements ── -->
+  <div class="tab-content" id="tab1">
+
+    <!-- Level card -->
+    <div class="level-card" id="levelCard">
+      <div class="level-emoji" id="lvlEmoji">🌱</div>
+      <div class="level-name" id="lvlName">תלמיד</div>
+      <div class="level-sub" id="lvlSub">0 מעלות</div>
+      <div class="level-progress">
+        <div class="level-progress-text" id="lvlProgText">עד הרמה הבאה</div>
+        <div class="level-bar-wrap"><div class="level-bar" id="lvlBar" style="width:0%"></div></div>
+      </div>
+      <div class="level-stats">
+        <div class="lstat">
+          <div class="lstat-num" id="lvlChaps">0</div>
+          <div class="lstat-lbl" data-i18n="hist.chaps_today">פרקים נקראו</div>
+        </div>
+        <div class="lstat">
+          <div class="lstat-num" id="lvlStreak">0🔥</div>
+          <div class="lstat-lbl" data-i18n="hist.lstat_streak">רצף ימים</div>
+        </div>
+        <div class="lstat">
+          <div class="lstat-num" id="lvlMem">0★</div>
+          <div class="lstat-lbl" data-i18n="hist.lstat_mem">בעל פה</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak Calendar -->
+    <div class="streak-cal-wrap" id="streakCalWrap">
+      <div class="streak-cal-title"><span data-i18n="hist.streak_cal_title">🔥 רצף קריאה — 28 ימים</span> <span id="streakCalSub"></span></div>
+      <div class="streak-cal-grid" id="streakCalGrid"></div>
+      <div id="streakPopup" style="display:none;margin-top:8px;padding:7px 12px;background:var(--card);border:.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--text);text-align:center;transition:opacity .2s;"></div>
+      <div class="streak-cal-legend">
+        <div class="sc-leg" style="background:var(--surface);border:.5px solid var(--border);"></div><span data-i18n="hist.cal_none">לא נקרא</span>
+        <div class="sc-leg" style="background:#C8E6C9;border-color:#4CAF50;"></div>
+        <div class="sc-leg" style="background:#66BB6A;border-color:#2E7D32;"></div>
+        <div class="sc-leg" style="background:#2E7D32;border-color:#1B5E20;"></div>
+        <div class="sc-leg" style="background:#1B5E20;border-color:#003300;"></div><span data-i18n="hist.cal_many">הרבה</span>
+        <span style="margin-right:6px;">|</span>
+        <div class="sc-leg" style="background:#DDEEFF;border-color:#4A90D9;"></div><span data-i18n="hist.cal_shabbat">שישי/שבת</span>
+      </div>
+    </div>
+
+    <!-- Chapter map -->
+    <div class="chap-map-section">
+      <div class="chap-map-header">
+        <div class="chap-map-title" data-i18n="hist.chapters_map">📖 מפת הפרקים שלי</div>
+        <div class="chap-map-count"><span id="chapMapCount">0</span>/150 פרקים נקראו</div>
+      </div>
+      <div class="chap-map-legend">
+        <span class="cml"><i class="cml-dot" style="background:#EBF5E5;border:1px solid #3B8C14;"></i><span data-i18n="hist.legend_read">נקרא</span></span>
+        <span class="cml"><i class="cml-dot" style="background:#F4EEFF;border:1px solid #7B2FF7;"></i><span data-i18n="hist.legend_mem">למדתי בע״פ</span></span>
+        <span class="cml"><i class="cml-dot" style="background:#FFE7E7;border:1px solid #C04040;"></i><span data-i18n="hist.legend_fav">מועדף</span></span>
+        <span class="cml"><i class="cml-dot" style="background:var(--surface);border:.5px solid var(--border);"></i><span data-i18n="hist.legend_none">טרם</span></span>
+      </div>
+      <div class="chap-map-grid" id="chapMapGrid"></div>
+    </div>
+
+    <!-- 5 books -->
+    <div class="books-section">
+      <div class="books-section-title" data-i18n="hist.books_5">5 ספרי תהילים</div>
+      <div id="booksProgress"></div>
+    </div>
+
+
+    <div class="medals-header">
+      <div class="medals-title" data-i18n="hist.medals">🏅 המדליות שלי</div>
+      <div class="medals-sub" id="medalsSub"></div>
+    </div>
+    <div class="medals-grid" id="medalsGrid"></div>
+
+  </div>
+
+  <!-- === Tab 2: Challenges (2.0.3) === -->
+  <div class="tab-content" id="tab2">
+    <div class="challenges-page">
+      <div class="challenges-page-header">
+        <div class="challenges-page-title" data-i18n="hist.challenges_title">🎯 האתגרים שלך</div>
+        <div class="challenges-page-sub" data-i18n="hist.challenges_intro">איסוף מעלות באמצעות אתגרים יומיים, שבועיים וחודשיים</div>
+      </div>
+      <div id="allChallengesList"></div>
+
+      <div class="badges-section-title">
+        🏅 <span data-i18n="hist.badges_themed">הישגים נושאיים</span>
+        <span class="badges-summary" id="badgesSummary">0 / 0</span>
+      </div>
+      <div id="badgesContainer"></div>
+
+      <div class="ch-section-label" data-i18n="hist.group_challenge">👥 אתגר קבוצתי</div>
+      <div id="groupChallengeBox">
+        <div class="ch-card">
+          <div class="ch-icon">🎯</div>
+          <div class="ch-info">
+            <div class="ch-title"><span data-i18n="hist.group_card">אתגר משותף עם הקבוצה</span></div>
+            <div class="ch-meta"><span data-i18n="hist.group_intro">צרו אתגר משותף — כל חבר לוקח נתח</span></div>
+          </div>
+        </div>
+        <a href="08-group.html?open=current" class="ch-group-link" data-i18n="hist.open_group">פתח את עמוד הקבוצה ›</a>
+      </div>
+
+      <div class="legend-box">
+        <h4 data-i18n="hist.legend_box_title">📊 מקרא — איך צוברים מעלות?</h4>
+        <div class="legend-row"><span>📖 קריאת פרק שלם (בונוס)</span><span class="legend-pts">5</span></div>
+        <div class="legend-row"><span>⏱️ כל 10 שניות קריאה</span><span class="legend-pts">1</span></div>
+        <div class="legend-row"><span>⭐ סימון פרק כ"למדתי בע״פ"</span><span class="legend-pts">10</span></div>
+        <div class="legend-row"><span>📚 סיום ספר שלם (אחד מ-5)</span><span class="legend-pts">100</span></div>
+        <div class="legend-row"><span>🌟 כל ה-150 פרקים</span><span class="legend-pts">500</span></div>
+        <div class="legend-row"><span>📅 סיום פרקי היום (לפי לוח עברי)</span><span class="legend-pts">50</span></div>
+        <div class="legend-row"><span>🏆 השלמת אתגר</span><span class="legend-pts">5-200</span></div>
+        <div class="legend-row"><span>🥉 מדליית ארד (5 דקות ביום)</span><span class="legend-pts">10</span></div>
+        <div class="legend-row"><span>🥈 מדליית כסף (15 דקות)</span><span class="legend-pts">20</span></div>
+        <div class="legend-row"><span>🥇 מדליית זהב (30 דקות)</span><span class="legend-pts">35</span></div>
+        <div class="legend-row"><span>💎 מדליית פלטינה (45 דקות)</span><span class="legend-pts">50</span></div>
+        <div class="legend-row"><span>🎯 10 מדליות מאותו סוג (×4)</span><span class="legend-pts">100</span></div>
+        <div class="legend-row"><span>🧠 שינון: 5/10/15/20/25 פרקים</span><span class="legend-pts">80/200/300/400/500</span></div>
+        <div class="legend-row"><span>🧠 שינון: כל 5 פרקים נוספים</span><span class="legend-pts">+100</span></div>
+      </div>
+
+      <div class="challenges-history-title" data-i18n="hist.history_challenges">היסטוריית אתגרים</div>
+      <div id="challengesHistoryList"></div>
+    </div>
+  </div>
+
+</div><!-- /.app -->
+
+<!-- Certificate overlay -->
+<div class="cert-overlay" id="certOverlay" onclick="onCertBgClick(event)" style="display:none">
+  <div class="cert-paper" id="certPaper"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="gamification.js?v=2.2.31"></script>
+<script>
+/* ── Storage ── */
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classList.add('dark');
+
+/* ── Medal definitions ── */
+const MEDALS = [
+  {
+    level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minMin:5, bonus:10,
+    color:'#CD7F32', bg:'#FFF8F0', textColor:'#7A4A00',
+    achievement:'קראת 5 דקות תהילים ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
+    achievementEn:'You read Tehillim for 5 minutes in one day! Every small step in Torah is the beginning of a great journey.',
+    quote:'כִּי אִם בְּתוֹרַת ה׳ חֶפְצוֹ\nוּבְתוֹרָתוֹ יֶהְגֶּה יוֹמָם וָלָיְלָה',
+    ref:'תהילים א׳:ב׳'
+  },
+  {
+    level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minMin:15, bonus:20,
+    color:'#909098', bg:'#F8F8FF', textColor:'#404055',
+    achievement:'קראת 15 דקות תהילים! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
+    achievementEn:'You read Tehillim for 15 minutes! Your devotion brings blessing to your soul and to all of Israel.',
+    quote:'שָׂשׂ אָנֹכִי עַל אִמְרָתֶךָ\nכְּמוֹצֵא שָׁלָל רָב',
+    ref:'תהילים קי״ט:קס״ב'
+  },
+  {
+    level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minMin:30, bonus:35,
+    color:'#C8A800', bg:'#FFFBF0', textColor:'#6A5500',
+    achievement:'קראת 30 דקות! חצי שעה של תהילים — הישג מרשים. אתה בנתיב של גדולי ישראל.',
+    achievementEn:'You read for 30 minutes! Half an hour of Tehillim — an impressive achievement. You walk in the path of the greats.',
+    quote:'וַאֲנִי קִרְבַת אֱלֹהִים לִי טוֹב\nשַׁתִּי בַּה׳ אֲדֹנָי מַחְסִי',
+    ref:'תהילים ע״ג:כ״ח'
+  },
+  {
+    level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minMin:45, bonus:50,
+    color:'#5090C8', bg:'#F0F8FF', textColor:'#1A3F6A',
+    achievement:'קראת 45 דקות! הישג יוצא מהכלל. רצונך בתורת ה׳ הוא אוצר אמיתי שאין כמוהו.',
+    achievementEn:'You read for 45 minutes! An extraordinary achievement. Your desire for Torah is a true treasure beyond compare.',
+    quote:'טוֹב לִי תוֹרַת פִּיךָ\nמֵאַלְפֵי זָהָב וָכָסֶף',
+    ref:'תהילים קי״ט:ע״ב'
+  }
+];
+
+/* ── Helpers ── */
+const _today = localDateStr();
+
+function fmtSecs(s) {
+  const m = Math.floor(s/60);
+  const sec = Math.round(s % 60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+function fmtMins(m) {
+  const h = Math.floor(m/60), min = Math.round(m%60);
+  if (h > 0) return h + 'ש׳ ' + (min>0?min+'ד׳':'');
+  return min + ' דק׳';
+}
+function fmtClock(ts) {
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function fmtDateHe(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('he-IL', {day:'numeric', month:'long', year:'numeric'});
+}
+
+// ── Hebcal API: cache תאריכים עבריים ──
+const _hebDateCache = {};
+
+// מביא תאריכים עבריים עבור רשימת dateStr מ-Hebcal API (במקביל)
+// מחזיר Promise שמסתיים כשכל התאריכים נטענו ב-cache
+async function _fetchHebDates(dateStrs) {
+  const toFetch = dateStrs.filter(d => d && !_hebDateCache[d]);
+  if (!toFetch.length) return;
+  await Promise.all(toFetch.map(async function(dateStr) {
+    try {
+      const [y, m, d] = dateStr.split('-');
+      const url = 'https://www.hebcal.com/converter?cfg=json&g2h=1'
+        + '&gy=' + y + '&gm=' + (+m) + '&gd=' + (+d);
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const data = await res.json();
+      // data.hebrew = 'י"ב סיון תשפ"ו'
+      _hebDateCache[dateStr] = data.hebrew || '';
+    } catch(e) { _hebDateCache[dateStr] = ''; }
+  }));
+}
+function toGem(n) {
+  const sp={15:'ט"ו',16:'ט"ז',115:'קט"ו',116:'קט"ז'};
+  if(sp[n])return sp[n];
+  const h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'];
+  const t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'];
+  const m=['','ק','ר','ש','ת'];
+  let r='',x=n;
+  if(x>=100){r+=m[Math.floor(x/100)];x%=100;}
+  if(x>=10){r+=t[Math.floor(x/10)];x%=10;}
+  r+=h[x];
+  return r.length===1?r+'׳':r.slice(0,-1)+'"'+r.slice(-1);
+}
+
+/* ── Tab switch ── */
+window.switchTab = function switchTab(i) {
+  [0,1,2,3].forEach(j => {
+    const tb = document.getElementById('tabBtn'+j);
+    const tc = document.getElementById('tab'+j);
+    if (tb) tb.classList.toggle('active', j===i);
+    if (tc) tc.classList.toggle('active', j===i);
+  });
+  try { if (i === 0) renderAchievements(); } catch(e) { console.warn('tab0',e); }
+  try { if (i === 1) renderAchievementsTab(); } catch(e) { console.warn('tab1',e); }
+  try { if (i === 2) renderChallengesPage(); } catch(e) { console.warn('tab2',e); }
+  try { if (i === 3) renderYesterday(); } catch(e) { console.warn('tab3',e); }
+}
+
+/* === רמת תלמיד + מפת פרקים + 5 ספרים (2.0.6) === */
+function renderAchievementsTab() {
+  if (typeof Gamification === 'undefined') return;
+  // וודא שספירת בעל פה מסונכרנת
+  if (Gamification.syncMemorizedFromMems) {
+    try { Gamification.syncMemorizedFromMems(); } catch(e) {}
+  }
+  const stats = Gamification.getStats();
+  // 2.7.19: Math.max של שני מקורות — gamification.total + סכום sc.daily
+  // (מונע אי-עקביות בין כרטיס הרמה לסה"כ בטאב "הכל")
+  let _effectiveTotal = stats.total || 0;
+  try {
+    const _sc3 = S.get('tehillim_score') || {};
+    let _scSum = 0;
+    Object.values(_sc3.daily || {}).forEach(v => { _scSum += (+v || 0); });
+    _effectiveTotal = Math.round(Math.max(_effectiveTotal, _scSum));
+  } catch(e) {}
+  // === Level card ===
+  const levelObj = (Gamification.levelOf && _effectiveTotal !== (stats.total||0))
+    ? Gamification.levelOf(_effectiveTotal)
+    : (stats.level || {});
+  const curr = levelObj.curr || {key:'מתחיל', icon:'🌱', min:0};
+  const next = levelObj.next || null;
+  const total = _effectiveTotal;
+  const _lvlLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  document.getElementById('lvlEmoji').textContent = curr.icon || '🌱';
+  document.getElementById('lvlName').textContent = (_lvlLang === 'en' && curr.en) ? curr.en : (curr.key || 'מתחיל');
+  document.getElementById('lvlSub').textContent = total.toLocaleString() + (_lvlLang === 'en' ? ' Maalot' : ' מעלות');
+  document.getElementById('lvlChaps').textContent = stats.uniqueChapters || 0;
+  document.getElementById('lvlStreak').textContent = (stats.streak || 0) + '🔥';
+  document.getElementById('lvlMem').textContent = (stats.memorized || 0) + '★';
+  // התקדמות לרמה הבאה
+  if (next) {
+    const remain = (levelObj.toNext != null) ? levelObj.toNext : (next.min - total);
+    document.getElementById('lvlProgText').textContent = 'עוד ' + remain.toLocaleString() + ' מעלות לרמת ' + (next.icon||'') + ' ' + next.key;
+    document.getElementById('lvlBar').style.width = (levelObj.pct || 0) + '%';
+  } else {
+    document.getElementById('lvlProgText').textContent = '✨ הגעת לרמה הגבוהה ביותר!';
+    document.getElementById('lvlBar').style.width = '100%';
+  }
+
+  // === Chapter map (150 cells) ===
+  const readings = JSON.parse(localStorage.getItem('tehillim_readings')||'[]');
+  const uniqueRead = new Set(readings.filter(r=>!r.partial).map(r => +r.chap));
+  const favsRaw = (function(){ try{return JSON.parse(localStorage.getItem('tehillim_favs')||'null');}catch(e){return null;}})();
+  let favsSet = new Set();
+  if (Array.isArray(favsRaw)) favsRaw.forEach(n => favsSet.add(+n));
+  else if (favsRaw && favsRaw.chapters) Object.keys(favsRaw.chapters).forEach(n => { if (favsRaw.chapters[n]) favsSet.add(+n); });
+  const memRaw = JSON.parse(localStorage.getItem('tehillim_mem')||'[]');
+  const memSet = new Set(Array.isArray(memRaw) ? memRaw.map(Number) : []);
+
+  let mapHtml = '';
+  for (let n = 1; n <= 150; n++) {
+    const cls = [];
+    if (uniqueRead.has(n)) cls.push('read');
+    if (memSet.has(n)) cls.push('mem');
+    if (favsSet.has(n)) cls.push('fav');
+    mapHtml += '<a class="cm-cell ' + cls.join(' ') + '" href="03-reader.html?chap=' + n + '">' + n + '</a>';
+  }
+  document.getElementById('chapMapGrid').innerHTML = mapHtml;
+  document.getElementById('chapMapCount').textContent = uniqueRead.size;
+
+  // === Streak Calendar ===
+  _renderStreakCalendar(readings);
+
+  // === 5 books ===
+  const booksDef = [
+    {name:'ספר א׳', from:1, to:41, color:'#185FA5'},
+    {name:'ספר ב׳', from:42, to:72, color:'#3B8C14'},
+    {name:'ספר ג׳', from:73, to:89, color:'#7B2FF7'},
+    {name:'ספר ד׳', from:90, to:106, color:'#C07A00'},
+    {name:'ספר ה׳', from:107, to:150, color:'#C0392B'}
+  ];
+  let booksHtml = '';
+  booksDef.forEach(b => {
+    let cnt = 0;
+    for (let n = b.from; n <= b.to; n++) if (uniqueRead.has(n)) cnt++;
+    const total = b.to - b.from + 1;
+    const pct = Math.round(cnt / total * 100);
+    booksHtml += '<div class="book-row">' +
+      '<div class="book-dot-sm" style="background:' + b.color + ';"></div>' +
+      '<div class="book-name-sm">' + b.name + '</div>' +
+      '<div class="book-bar-wrap"><div class="book-bar" style="width:' + pct + '%;background:' + b.color + ';"></div></div>' +
+      '<div class="book-count-sm">' + cnt + '/' + total + '</div>' +
+      '</div>';
+  });
+  document.getElementById('booksProgress').innerHTML = booksHtml;
+}
+
+/* === Tab 2: Challenges (2.0.3) === */
+function renderChallengesPage() {
+  if (typeof Gamification === 'undefined') {
+    document.getElementById('allChallengesList').innerHTML =
+      '<div class="ch-history-empty">מערכת המעלות עוד לא נטענה. רענן את הדף.</div>';
+    return;
+  }
+  const list = Gamification.getActiveChallenges();
+  const _chLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  const periodLabels = _chLang === 'en'
+    ? {daily:'Daily', weekly:'Weekly', monthly:'Monthly'}
+    : {daily:'יומי', weekly:'שבועי', monthly:'חודשי'};
+  let html = '';
+  list.forEach(c => {
+    const _chTitle = (_chLang === 'en' && c.titleEn) ? c.titleEn : c.title;
+    let claimBtn;
+    if (c.completed && !c.claimed) {
+      claimBtn = '<button class="ch-claim" onclick="claimChallengeOnPage(\'' + c.claimedKey + '\',' + c.reward + ')">' + (_chLang === 'en' ? 'Claim ⭐' : 'קבל ⭐') + '</button>';
+    } else if (c.claimed) {
+      claimBtn = '<span class="ch-reward-pill">✓ ' + (_chLang === 'en' ? 'Claimed' : 'נדרש') + '</span>';
+    } else {
+      claimBtn = '<span class="ch-reward-pill">+' + c.reward + ' ⭐</span>';
+    }
+    html += '<div class="ch-card ' + (c.completed?'completed':'') + ' ' + (c.claimed?'claimed':'') + '">' +
+      '<div class="ch-icon">' + c.icon + '</div>' +
+      '<div class="ch-info">' +
+        '<div class="ch-title"><span>' + _chTitle + '</span><span class="ch-period">' + (periodLabels[c.type]||c.type) + '</span></div>' +
+        '<div class="ch-bar-wrap"><div class="ch-bar" style="width:' + (c.pct||0) + '%"></div></div>' +
+        '<div class="ch-meta"><span>' + (c.current||0) + ' / ' + c.target + '</span><span>' + (c.completed?'✅ ' + (_chLang==='en'?'Completed':'הושלם'):'') + '</span></div>' +
+      '</div>' +
+      claimBtn +
+      '</div>';
+  });
+  document.getElementById('allChallengesList').innerHTML = html;
+
+  // === BADGES (2.0.4) ===
+  renderBadges();
+
+  // היסטוריית אתגרים
+  const data = (Gamification.load && Gamification.load()) || {};
+  const claimed = data.challengesClaimed || {};
+  const entries = Object.entries(claimed).sort((a,b) => (b[1]||'').localeCompare(a[1]||''));
+  if (entries.length === 0) {
+    document.getElementById('challengesHistoryList').innerHTML = '<div class="ch-history-empty">עדיין אין אתגרים שנדרשו.</div>';
+  } else {
+    // בניית מפת id → {title, reward} מכל האתגרים
+    const _challMap = {};
+    try {
+      const _allCh = [...(Gamification.CHALLENGES||{}).daily||[],
+                      ...(Gamification.CHALLENGES||{}).weekly||[],
+                      ...(Gamification.CHALLENGES||{}).monthly||[]];
+      _allCh.forEach(ch => { _challMap[ch.id] = ch; });
+    } catch(e) {}
+    let h = '';
+    for (const [k, d] of entries.slice(0, 20)) {
+      const parts = k.split(':');
+      // claimedKey = type:periodKey:id  (e.g. daily:2026-05-24:d_3chaps)
+      const chId   = parts[parts.length - 1] || '';
+      const chMeta = _challMap[chId];
+      const icon   = chMeta ? (chMeta.icon || '🎯') : '🎯';
+      const title  = chMeta ? chMeta.title : chId;
+      const reward = chMeta ? chMeta.reward : '?';
+      const typeHe = parts[0]==='daily'?'יומי': parts[0]==='weekly'?'שבועי':'חודשי';
+      h += '<div class="ch-history-item">' +
+           '<span>' + icon + ' ' + title + ' <span style="font-size:10px;color:var(--text-muted);">(' + typeHe + ')</span></span>' +
+           '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">' +
+             '<span style="font-size:11px;font-weight:700;color:#C07A00;">+' + reward + ' ⭐</span>' +
+             '<span style="font-size:10px;color:var(--text-muted);">' + (d||'') + '</span>' +
+           '</span></div>';
+    }
+    document.getElementById('challengesHistoryList').innerHTML = h;
+  }
+}
+
+window.claimChallengeOnPage = function(key, reward) {
+  if (typeof Gamification === 'undefined') return;
+  if (typeof Gamification.claimChallenge !== 'function') return;
+  const meta = Gamification.claimChallenge(key, reward);
+  if (meta) renderChallengesPage();
+}
+
+/* === Render BADGES grid (2.0.4) === */
+function renderBadges() {
+  const container = document.getElementById('badgesContainer');
+  const summary = document.getElementById('badgesSummary');
+  if (!container) return;
+  if (typeof Gamification === 'undefined' || !Gamification.getBadgesStatus) {
+    container.innerHTML = '<div class="ch-history-empty">מערכת התגים לא זמינה.</div>';
+    return;
+  }
+  const all = Gamification.getBadgesStatus();
+  // קבוצות לוגיות לסידור
+  const groups = [
+    { label:'📚 ספרי תהילים', filter: b => b.id.startsWith('book_') || b.id === 'all_150' },
+    { label:'⭐ פרקים מיוחדים', filter: b => ['p_119','p_91','p_23','shir_maalot'].indexOf(b.id) !== -1 },
+    { label:'⏰ זמן קריאה', filter: b => b.id.startsWith('time_') },
+    { label:'🔥 רצפים', filter: b => b.id.startsWith('streak_') },
+    { label:'🌅 שעות היום', filter: b => b.id === 'morning_5' || b.id === 'night_5' },
+    { label:'🧠 שינון בעל פה', filter: b => b.id.startsWith('mem_') }
+  ];
+  let html = '';
+  let earnedTotal = 0;
+  groups.forEach(g => {
+    const items = all.filter(g.filter);
+    if (!items.length) return;
+    html += '<div class="badge-group-label">' + g.label + '</div>';
+    html += '<div class="badges-grid">';
+    items.forEach(b => {
+      if (b.earned) earnedTotal++;
+      html += '<div class="badge-card ' + (b.earned?'earned':'') + '" title="' + (b.desc||'').replace(/"/g,'&quot;') + '">' +
+        '<div class="badge-icon">' + b.icon + '</div>' +
+        '<div class="badge-title">' + b.title + '</div>' +
+        '<div class="badge-desc">' + b.desc + '</div>' +
+        '<div class="badge-reward">' + (b.earned ? '✓ הוענק' : '+' + b.reward + ' ⭐') + '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  if (summary) summary.textContent = earnedTotal + ' / ' + all.length;
+}
+
+/* DOMContentLoaded handler — פתיחת טאב לפי anchor */
+window.addEventListener('DOMContentLoaded', function() {
+  try { renderAchievements(); } catch(e) {}
+  if (location.hash === '#achievements') {
+    setTimeout(function(){ window.switchTab(1); }, 150);
+  } else if (location.hash === '#challenges') {
+    setTimeout(function(){ window.switchTab(2); }, 150);
+  }
+});
+
+/* ── TAB 0: Today ── */
+function renderToday() {
+  const db      = S.get('tehillim_readings') || [];
+  const sc      = S.get('tehillim_score')   || {};
+  const todayDb = db.filter(r => r.date === _today);
+
+  // Unique completed chapters
+  const doneCh  = new Set(todayDb.filter(r => !r.partial).map(r => r.chap));
+  const totalSecs = todayDb.reduce((a,r) => a + (r.secs||0), 0);
+  // 2.7.19: Math.max של שני מקורות — sc.today + gamification.byDay[today]
+  let pts = (sc.todayDate === _today) ? (sc.today || 0) : 0;
+  try {
+    if (typeof Gamification !== 'undefined' && Gamification.load) {
+      const _gd = Gamification.load();
+      const _gToday = +(_gd && _gd['ma\'alot'] && _gd['ma\'alot'].byDay && _gd['ma\'alot'].byDay[_today] || 0);
+      pts = Math.round(Math.max(pts, _gToday));
+    }
+  } catch(e) {}
+
+  document.getElementById('todayChaps').textContent = doneCh.size;
+  document.getElementById('todayTime').textContent  = fmtSecs(totalSecs);
+  document.getElementById('todayScore').textContent = '+' + pts;
+
+  if (todayDb.length === 0) {
+    document.getElementById('todayList').innerHTML =
+      '<div class="empty-state"><span class="empty-icon">📖</span>לא קראת עדיין היום<br><small style="font-size:12px;color:var(--text-muted)">פתח פרק ותתחיל!</small></div>';
+    document.getElementById('deleteWrap').style.display = 'none';
+    renderWeekHistory();
+    return;
+  }
+
+  // Group records by chapter
+  const chapMap = {};
+  todayDb.forEach(r => {
+    const k = r.chap;
+    if (!chapMap[k]) chapMap[k] = { chap:k, secs:0, ts:0, done:false };
+    chapMap[k].secs += (r.secs||0);
+    if ((r.ts||0) > chapMap[k].ts) chapMap[k].ts = r.ts||0;
+    if (!r.partial) chapMap[k].done = true;
+  });
+
+  const items = Object.values(chapMap).sort((a,b) => b.ts - a.ts);
+
+  // Color dots per book
+  const bookColor = n =>
+    n<=41?'#185FA5': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+
+  let html = '';
+  items.forEach(item => {
+    const col = item.done ? bookColor(item.chap) : 'var(--text-muted)';
+    html +=
+      '<a class="read-item" href="03-reader.html?chap=' + item.chap + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
+        '<div class="read-left">' +
+          '<div class="read-dot" style="background:' + col + '"></div>' +
+          '<div>' +
+            '<div class="read-chap" style="color:' + col + '">פרק ' + toGem(item.chap) +
+              (item.done ? ' <span style="color:var(--green);font-size:12px;">✓</span>' : ' <span style="font-size:11px;color:var(--text-muted);">חלקי</span>') +
+            '</div>' +
+            '<div class="read-sub">פרק ' + item.chap + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="read-right">' +
+          '<div class="read-dur">' + fmtSecs(item.secs) + '</div>' +
+          '<div class="read-clock">' + (item.ts ? fmtClock(item.ts) : '—') + '</div>' +
+        '</div>' +
+      '</a>';
+  });
+
+  document.getElementById('todayList').innerHTML = html;
+  document.getElementById('deleteWrap').style.display = 'block';
+  renderWeekHistory();
+}
+
+/* === היסטוריית 7 ימים אחרונים (2.0.7) === */
+async function renderWeekHistory() {
+  const db = S.get('tehillim_readings') || [];
+  if (!db.length) {
+    document.getElementById('weekList').innerHTML = '<div class="empty-state" style="padding:20px;font-size:13px;">אין עדיין היסטוריה.</div>';
+    return;
+  }
+  // קבץ לפי תאריך - 7 ימים אחרונים (חוץ מהיום)
+  const buckets = {};
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = localDateStr(d);
+    buckets[key] = { chaps: new Set(), secs: 0 };
+  }
+  db.forEach(r => {
+    if (!r.partial && buckets[r.date]) {
+      buckets[r.date].chaps.add(+r.chap);
+      buckets[r.date].secs += (r.secs||0);
+    } else if (r.date && buckets[r.date]) {
+      buckets[r.date].secs += (r.secs||0);
+    }
+  });
+  // סדר לפי תאריך יורד
+  const sortedDates = Object.keys(buckets).sort((a,b) => b.localeCompare(a));
+  // טען תאריכים עבריים ב-Hebcal API לפני בניית HTML
+  try { await _fetchHebDates(sortedDates); } catch(e) {}
+  let html = '';
+  const dayNames = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  sortedDates.forEach(date => {
+    const b = buckets[date];
+    if (!b.chaps.size && !b.secs) return;
+    const d = new Date(date);
+    const dayName = dayNames[d.getDay()];
+    const dateStr = d.toLocaleDateString('he-IL', {day:'numeric',month:'short'});
+    const hebStr = _hebDateCache[date] || '';
+    html += '<a class="read-item" href="03-reader.html" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
+      '<div class="read-left">' +
+        '<div class="read-dot" style="background:var(--primary)"></div>' +
+        '<div>' +
+          '<div class="read-chap">יום ' + dayName + ' · ' + dateStr + (hebStr ? '<span style="color:var(--text-muted);font-size:12px;"> | ' + hebStr + '</span>' : '') + '</div>' +
+          '<div class="read-sub">' + b.chaps.size + ' פרקים</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="read-right">' +
+        '<div class="read-dur">' + fmtSecs(b.secs) + '</div>' +
+      '</div>' +
+    '</a>';
+  });
+  if (!html) {
+    document.getElementById('weekList').innerHTML = '<div class="empty-state" style="padding:20px;font-size:13px;">לא נקראו פרקים ב-7 הימים האחרונים.</div>';
+    return;
+  }
+  document.getElementById('weekList').innerHTML = html;
+}
+
+/* === טאב אתמול === */
+function getLastActiveDate() {
+  // מחזיר את התאריך האחרון שבו היתה פעילות (לא כולל היום)
+  const db = S.get('tehillim_readings') || [];
+  const dates = [...new Set(db.map(r => r.date))]
+    .filter(d => d < _today)
+    .sort((a,b) => b.localeCompare(a));
+  return dates[0] || null;
+}
+
+function renderYesterday() {
+  const container = document.getElementById('yesterdayContent');
+  if (!container) return;
+
+  const targetDate = getLastActiveDate();
+  if (!targetDate) {
+    container.innerHTML = '<div class="empty-state" style="padding:40px 20px;text-align:center;">' +
+      '<span class="empty-icon">📖</span><br>אין עדיין היסטוריית קריאה</div>';
+    return;
+  }
+
+  const db = S.get('tehillim_readings') || [];
+  const sc = S.get('tehillim_score')   || {};
+  const dayRecs = db.filter(r => r.date === targetDate);
+
+  // נתונים
+  const doneCh    = new Set(dayRecs.filter(r => !r.partial).map(r => r.chap));
+  const totalSecs = dayRecs.reduce((a,r) => a + (r.secs||0), 0);
+
+  // מעלות: מ-gamification.byDay אם קיים, אחרת מ-tehillim_score.daily
+  let pts = 0;
+  try {
+    if (typeof Gamification !== 'undefined' && Gamification.load) {
+      const gdata = Gamification.load();
+      const byDay = (gdata && gdata['ma\'alot'] && gdata['ma\'alot'].byDay) || {};
+      pts = byDay[targetDate] || (sc.daily && sc.daily[targetDate]) || 0;
+    } else {
+      pts = (sc.daily && sc.daily[targetDate]) || 0;
+    }
+  } catch(e) { pts = (sc.daily && sc.daily[targetDate]) || 0; }
+  pts = Math.round(pts);
+
+  // אתגרים שנתבעו באותו יום
+  let claimedThatDay = [];
+  try {
+    if (typeof Gamification !== 'undefined' && Gamification.load) {
+      const gdata = Gamification.load();
+      const claimed = gdata.challengesClaimed || {};
+      claimedThatDay = Object.entries(claimed)
+        .filter(([,d]) => d === targetDate)
+        .map(([k]) => {
+          const parts = k.split(':');
+          const chId = parts[parts.length - 1] || '';
+          const allCh = [...(Gamification.CHALLENGES||{}).daily||[],
+                         ...(Gamification.CHALLENGES||{}).weekly||[],
+                         ...(Gamification.CHALLENGES||{}).monthly||[]];
+          const meta = allCh.find(c => c.id === chId);
+          return { key:k, title: meta ? meta.title : chId, icon: meta ? (meta.icon||'🎯') : '🎯', reward: meta ? meta.reward : '?' };
+        });
+    }
+  } catch(e) {}
+
+  // כותרת תאריך
+  const d = new Date(targetDate + 'T12:00:00');
+  const dayNames = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  const isYesterday = targetDate === (() => { const y=new Date(); y.setDate(y.getDate()-1); return localDateStr(y); })();
+  const dateLabel = isYesterday
+    ? 'אתמול · ' + d.toLocaleDateString('he-IL',{day:'numeric',month:'long'})
+    : 'יום ' + dayNames[d.getDay()] + ' · ' + d.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+
+  // כרטיסי סיכום
+  let html = '<div style="padding:12px 16px 0;">';
+  html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">📆 ' + dateLabel + '</div>';
+
+  // 4 כרטיסי נתונים
+  html += '<div class="summary-row" style="margin-bottom:14px;">' +
+    '<div class="sum-card"><div class="sum-num">' + doneCh.size + '</div><div class="sum-lbl">פרקים<br>נקראו</div></div>' +
+    '<div class="sum-card"><div class="sum-num">' + fmtSecs(totalSecs) + '</div><div class="sum-lbl">זמן<br>קריאה</div></div>' +
+    '<div class="sum-card"><div class="sum-num" style="color:#C07A00;">+' + pts + '</div><div class="sum-lbl">✡<br>מעלות</div></div>' +
+    '<div class="sum-card"><div class="sum-num">' + claimedThatDay.length + '</div><div class="sum-lbl">🎯<br>אתגרים</div></div>' +
+  '</div>';
+
+  // גרף שעות — קריאות לפי שעה ביום
+  html += '<div style="background:var(--surface);border-radius:16px;padding:14px 16px;margin-bottom:14px;">';
+  html += '<div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;">📊 קריאות לפי שעה</div>';
+  html += '<div style="position:relative;height:90px;"><canvas id="yesterdayChart"></canvas></div>';
+  html += '</div>';
+
+  // רשימת פרקים
+  if (doneCh.size > 0) {
+    html += '<div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">פרקים שנקראו</div>';
+    const bookColor = n => n<=41?'#185FA5': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+    const chapMap = {};
+    dayRecs.forEach(r => {
+      if (!chapMap[r.chap]) chapMap[r.chap] = { secs:0, done:false };
+      chapMap[r.chap].secs += (r.secs||0);
+      if (!r.partial) chapMap[r.chap].done = true;
+    });
+    Object.entries(chapMap).sort((a,b)=>+a[0]-+b[0]).forEach(([chap, info]) => {
+      const col = info.done ? bookColor(+chap) : 'var(--text-muted)';
+      html += '<a class="read-item" href="03-reader.html?chap=' + chap + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
+        '<div class="read-left">' +
+          '<div class="read-dot" style="background:' + col + '"></div>' +
+          '<div>' +
+            '<div class="read-chap" style="color:' + col + '">פרק ' + toGem(+chap) +
+              (info.done ? ' <span style="color:var(--green);font-size:12px;">✓</span>' : ' <span style="font-size:11px;color:var(--text-muted);">חלקי</span>') +
+            '</div>' +
+            '<div class="read-sub">פרק ' + chap + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="read-right"><div class="read-dur">' + fmtSecs(info.secs) + '</div></div>' +
+      '</a>';
+    });
+  }
+
+  // אתגרים שנתבעו
+  if (claimedThatDay.length > 0) {
+    html += '<div style="font-size:13px;font-weight:600;color:var(--text-muted);margin:12px 0 6px;">אתגרים שהושלמו</div>';
+    claimedThatDay.forEach(ch => {
+      const icon   = ch.icon  || '🎯';
+      const title  = ch.title || (ch.key || ch);
+      const reward = ch.reward || '?';
+      html += '<div class="ch-history-item" style="border-radius:10px;margin-bottom:6px;padding:10px 12px;">' +
+        '<span>' + icon + ' ' + title + '</span>' +
+        '<span style="font-size:11px;font-weight:700;color:#C07A00;">+' + reward + ' ⭐</span>' +
+      '</div>';
+    });
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  // בנה גרף שעות אחרי שה-HTML נוסף ל-DOM
+  setTimeout(function() {
+    const canvas = document.getElementById('yesterdayChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    // בנה מערך של 24 שעות
+    const hourCounts = new Array(24).fill(0);
+    dayRecs.forEach(function(r) {
+      if (r.ts) {
+        const h = new Date(r.ts).getHours();
+        hourCounts[h]++;
+      } else if (r.time) {
+        const h = parseInt((r.time||'').split(':')[0]) || 0;
+        hourCounts[h]++;
+      }
+    });
+
+    // הצג רק שעות 5–24 (ללא שעות ריקות בהתחלה)
+    const firstActive = hourCounts.findIndex(function(v){ return v > 0; });
+    const lastActive = hourCounts.reduceRight(function(acc, v, i){ return acc === -1 && v > 0 ? i : acc; }, -1);
+    const start = Math.max(0, (firstActive === -1 ? 6 : firstActive) - 1);
+    const end   = Math.min(23, (lastActive  === -1 ? 22 : lastActive)  + 1);
+
+    const labels = [];
+    const data   = [];
+    for (let h = start; h <= end; h++) {
+      labels.push(h + ':00');
+      data.push(hourCounts[h]);
+    }
+
+    const dark = document.documentElement.classList.contains('dark');
+    const lineColor = dark ? '#7EB8F7' : '#1a5fa8';
+    const fillColor = dark ? 'rgba(126,184,247,0.15)' : 'rgba(26,95,168,0.12)';
+    if (canvas._chartInst) canvas._chartInst.destroy();
+    canvas._chartInst = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          borderColor: lineColor,
+          backgroundColor: fillColor,
+          borderWidth: 2.5,
+          pointRadius: 2,
+          pointBackgroundColor: lineColor,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: {
+          rtl: true,
+          callbacks: { label: function(c){ return c.raw + ' פרקים'; } }
+        }},
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 9 }, color: dark ? '#777' : '#999' } },
+          y: { display: false, beginAtZero: true }
+        }
+      }
+    });
+  }, 50);
+}
+
+window.confirmDelete = function() {
+  if (!confirm('למחוק את רשימת הפרקים של היום?\nגרפי הזמן לא יושפעו.')) return;
+  const db = S.get('tehillim_readings') || [];
+  S.set('tehillim_readings', db.filter(r => r.date !== _today));
+  renderToday();
+  showToast('🗑 נתוני הקריאה של היום נמחקו');
+}
+
+/* ── TAB 1: Achievements ── */
+let currentPeriod = 'today';
+
+window.setPeriod = function(p) {
+  currentPeriod = p;
+  ['Today','Week','Month','All'].forEach(n => {
+    const id = 'p' + n;
+    const lp = n.toLowerCase();
+    document.getElementById(id).classList.toggle('active', lp === p);
+  });
+  renderAchievements();
+}
+
+function dateRange(period) {
+  const d = _today;
+  if (period === 'today') return { from:d, to:d };
+  const now = new Date();
+  if (period === 'week')  { const w=new Date(now); w.setDate(w.getDate()-6); return { from:localDateStr(w), to:d }; }
+  if (period === 'month') { const m=new Date(now); m.setDate(m.getDate()-29); return { from:localDateStr(m), to:d }; }
+  return { from:'2000-01-01', to:'2099-12-31' };
+}
+
+function _renderStreakCalendar(readings) {
+  const grid = document.getElementById('streakCalGrid');
+  const sub  = document.getElementById('streakCalSub');
+  if (!grid) return;
+
+  // בנה map: date→count
+  const dayMap = {};
+  (readings || []).forEach(r => {
+    if (r.partial) return;
+    dayMap[r.date] = (dayMap[r.date] || 0) + 1;
+  });
+
+  // 28 ימים = 4 שבועות
+  const today = new Date();
+  const cells = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = localDateStr(d);
+    cells.push({ key, count: dayMap[key] || 0, day: d.getDay() });
+  }
+
+  let html = '';
+  let activeDays = 0;
+  cells.forEach(c => {
+    const lvl = c.count === 0 ? '' : c.count <= 2 ? 'sc1' : c.count <= 5 ? 'sc2' : c.count <= 9 ? 'sc3' : 'sc4';
+    const isToday = c.key === localDateStr(today);
+    const border = isToday ? ';outline:2px solid var(--primary);outline-offset:1px;' : '';
+    const isShabbat = c.day === 5 || c.day === 6;
+    const shabbatCls = isShabbat ? ' shabbat' : '';
+    const dayLabel = ['א','ב','ג','ד','ה','ו','ש'][c.day];
+    const _stLang2 = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+    const title = dayLabel + ' ' + c.key.slice(5).replace('-', '/') + (c.count ? ': ' + c.count + (_stLang2 === 'en' ? ' chapters' : ' פרקים') : (isShabbat ? (_stLang2 === 'en' ? ' (Shabbat/Friday)' : ' (שבת/שישי)') : (_stLang2 === 'en' ? ': not read' : ': לא נקרא')));
+    // הצג מספר יום קטן בתוך התא
+    const _cellClick = "_streakPopup('" + title + "')";
+    const _dayNum = parseInt(c.key.slice(8));
+    // צבע המספר — בהיר על רקע כהה, כהה על רקע בהיר
+    const _numColor = (lvl === 'sc3' || lvl === 'sc4') ? 'rgba(255,255,255,.8)' : (isShabbat && !lvl) ? '#4A90D9' : 'var(--text-muted)';
+    html += '<div class="sc-cell ' + lvl + shabbatCls + '" onclick="' + _cellClick + '" style="color:' + _numColor + ';' + border + '">' + _dayNum + '</div>';
+    if (c.count > 0) activeDays++;
+  });
+
+  grid.innerHTML = html;
+  const _calLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  if (sub) sub.textContent = _calLang === 'en' ? activeDays + ' active days' : activeDays + ' ימים פעילים';
+}
+
+function _streakPopup(text) {
+  const el = document.getElementById('streakPopup');
+  if (!el) return;
+  // פרס: "ו 15/6: 3 פרקים" או "ש 16/6 — שבת"
+  const isGood = text.includes('פרקים');
+  el.textContent = text;
+  el.style.color = isGood ? 'var(--green,#3B8C14)' : 'var(--text-muted)';
+  el.style.display = 'block';
+  clearTimeout(window._streakPopupTimer);
+  window._streakPopupTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+function renderAchievements() {
+  const { from, to } = dateRange(currentPeriod);
+  const db      = S.get('tehillim_readings') || [];
+  const sc      = S.get('tehillim_score')   || {};
+  const rd      = S.get('tehillim_reading') || {};
+  const mem     = S.get('tehillim_mem')     || [];
+  const visits  = S.get('tehillim_visits')  || { count:0 };
+
+  const recs    = db.filter(r => r.date >= from && r.date <= to);
+  const doneCh  = new Set(recs.filter(r=>!r.partial).map(r=>r.chap));
+  const totalSec = recs.reduce((a,r) => a+(r.secs||0), 0);
+
+  // Score for period - בחירת מקסימום משני המקורות (tehillim_score + Gamification)
+  let pts = 0;
+  let gamPts = 0;
+  // מקור 1: tehillim_score.daily (מתעדכן רציף ע"י 03-reader)
+  if (currentPeriod === 'today') {
+    pts = sc.todayDate === _today ? (sc.today||0) : 0;
+    // אם אין ביום אבל יש ב-daily map
+    if (!pts && sc.daily && sc.daily[_today]) pts = sc.daily[_today];
+  } else {
+    Object.entries(sc.daily||{})
+      .filter(([d]) => d>=from && d<=to)
+      .forEach(([,v]) => pts += v);
+  }
+  // מקור 2: Gamification (מתעדכן בסיום פרק) - לקחת total אם הכל, אחרת byDay
+  try {
+    if (typeof Gamification !== 'undefined' && Gamification.load) {
+      const data = Gamification.load();
+      const ma = data && data['ma\'alot'];
+      if (currentPeriod === 'all' && ma) {
+        gamPts = +(ma.total || 0);
+      } else if (ma && ma.byDay) {
+        Object.entries(ma.byDay)
+          .filter(([d]) => d>=from && d<=to)
+          .forEach(([,v]) => gamPts += +v);
+      }
+    }
+  } catch(e) {}
+  // בחירת המקסימום
+  pts = Math.round(Math.max(pts, gamPts));
+
+  // Reading minutes for period
+  let mins = 0;
+  Object.entries(rd.dailyMinutes||{})
+    .filter(([d]) => d>=from && d<=to)
+    .forEach(([,v]) => mins += v);
+
+  const statsData = [
+    { num: doneCh.size,         lbl: '📖 פרקים נקראו'           },
+    { num: '+' + pts,           lbl: '⭐ מעלות',    color:'#C07A00' },
+    { num: fmtMins(mins),       lbl: '⏱ זמן קריאה'               },
+    { num: mem.length,          lbl: '🧠 פרקים בע"פ'             },
+    { num: doneCh.size * 150 > 0 ? Math.round(doneCh.size / 150 * 100) + '%' : '0%',
+                                lbl: '📊 מכסת תהילים', wide:false  },
+    { num: visits.count || 0,  lbl: '📱 כניסות לאפליקציה', wide:true },
+  ];
+
+  document.getElementById('statsGrid').innerHTML = statsData.map(s =>
+    '<div class="stat-card' + (s.wide?' wide':'') + '">' +
+    '<div class="stat-num"' + (s.color?' style="color:'+s.color+'"':'') + '>' + s.num + '</div>' +
+    '<div class="stat-lbl">' + s.lbl + '</div>' +
+    '</div>'
+  ).join('');
+
+  renderMedals();
+}
+
+function renderMedals() {
+  const earned = S.get('tehillim_medals_earned') || [];
+
+  // Aggregate per level
+  const byLevel = {};
+  earned.forEach(e => {
+    if (!byLevel[e.level]) byLevel[e.level] = { count:0, firstDate:e.date, firstTs:e.ts };
+    byLevel[e.level].count++;
+    if (e.ts < byLevel[e.level].firstTs) {
+      byLevel[e.level].firstDate = e.date;
+      byLevel[e.level].firstTs   = e.ts;
+    }
+  });
+
+  const total = earned.length;
+  document.getElementById('medalsSub').textContent = total > 0 ? total + ' מדליות בסך הכל' : '';
+
+  const _mLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  const _mLabel = m => (_mLang === 'en' && m.en) ? m.en : m.label;
+  const _mReq   = m => _mLang === 'en' ? m.minMin + '+ min/day' : m.minMin + '+ דק׳ ביום';
+  const _mTimes = n => _mLang === 'en' ? '× ' + n + 'x' : '× ' + n + ' פעמים';
+  let html = '';
+  MEDALS.forEach(m => {
+    const ld      = byLevel[m.level];
+    const isEarned = !!ld;
+    const cardStyle = isEarned
+      ? 'border-color:' + m.color + '44;background:' + m.bg + ';'
+      : '';
+
+    html +=
+      '<div class="medal-card' + (isEarned?' earned':'') + '"' +
+        ' style="' + cardStyle + '"' +
+        (isEarned?' onclick="showCert(\'' + m.level + '\')"':'') + '>' +
+      '<div class="medal-icon">' + m.emoji + '</div>' +
+      '<div class="medal-name" style="' + (isEarned?'color:'+m.textColor:'') + '">' + _mLabel(m) + '</div>' +
+      '<div class="medal-req">' + _mReq(m) + '</div>' +
+      '<div style="font-size:10px;color:' + (isEarned?m.color:'var(--text-muted)') + ';font-weight:600;margin-top:1px;">+' + m.bonus + ' ⭐</div>' +
+      (isEarned
+        ? '<div class="medal-count" style="background:' + m.color + '22;color:' + m.color + '">' + _mTimes(ld.count) + '</div>'
+        : '<div style="font-size:20px;opacity:.2;margin-top:2px;">🔒</div>') +
+      '</div>';
+  });
+
+  document.getElementById('medalsGrid').innerHTML = html;
+}
+
+/* ── Certificate ── */
+window.showCert = function(level) {
+  const m = MEDALS.find(x => x.level === level);
+  if (!m) return;
+
+  const earned   = S.get('tehillim_medals_earned') || [];
+  const records  = earned.filter(e => e.level === level).sort((a,b) => a.ts - b.ts);
+  const first    = records[0];
+  const dateStr  = first ? fmtDateHe(first.date) : '';
+  const isDark   = document.documentElement.classList.contains('dark');
+
+  const paper = document.getElementById('certPaper');
+  paper.style.background = m.bg;
+  paper.style.border     = '3px double ' + m.color;
+  paper.style.color      = m.textColor;
+
+  const _cLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  const _cLabel = (_cLang === 'en' && m.en) ? m.en : m.label;
+  paper.innerHTML =
+    '<div class="cert-inner">' +
+      '<div class="cert-top">' +
+        '<span class="cert-emoji">' + m.emoji + '</span>' +
+        '<div class="cert-label">' + (_cLang === 'en' ? 'Certificate of Honor' : 'תעודת הוקרה') + '</div>' +
+        '<div class="cert-heading" style="color:' + m.color + '">' + (_cLang === 'en' ? _cLabel + ' Medal' : 'מדליית ' + m.label) + '</div>' +
+        '<div class="cert-sub">' + m.minMin + (_cLang === 'en' ? ' minutes of reading in one day' : ' דקות קריאה ביום אחד') + '</div>' +
+      '</div>' +
+
+      '<div class="cert-rule" style="background:' + m.color + '"></div>' +
+
+      '<div class="cert-ornament">✦ ✦ ✦</div>' +
+
+      '<div class="cert-body">' +
+        '<div class="cert-text">' + (_cLang === 'en' && m.achievementEn ? m.achievementEn : m.achievement) + '</div>' +
+        '<div class="cert-quote-wrap" style="background:' + m.color + '18">' +
+          '<div class="cert-quote" style="color:' + m.textColor + '">"' + m.quote.replace('\n','<br>') + '"</div>' +
+          '<div class="cert-ref">(' + m.ref + ')</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="cert-ornament">✦ ✦ ✦</div>' +
+
+      '<div style="text-align:center;margin:10px 0 4px;">' +
+        '<div style="display:inline-block;background:' + m.color + '22;border:1.5px solid ' + m.color + '55;border-radius:12px;padding:8px 20px;">' +
+          '<div style="font-size:11px;opacity:.6;margin-bottom:2px;">' + (_cLang === 'en' ? 'Bonus' : 'בונוס') + '</div>' +
+          '<div style="font-size:20px;font-weight:800;color:' + m.color + '">+' + m.bonus + ' ⭐ ' + (_cLang === 'en' ? 'Maalot' : 'מעלות') + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      (dateStr ? '<div class="cert-date">' + (_cLang === 'en' ? 'First awarded: ' : 'הוענק לראשונה ב') + dateStr + '</div>' : '') +
+    '</div>' +
+
+    '<div class="cert-btns">' +
+      '<button class="cert-btn-close" style="color:' + m.textColor + '" onclick="closeCert()">' + (_cLang === 'en' ? 'Close' : 'סגור') + '</button>' +
+      '<button class="cert-btn-share" style="background:' + m.color + '" id="certShareBtn" onclick="shareCert(\'' + level + '\')">📤 ' + (_cLang === 'en' ? 'Share' : 'שתף') + '</button>' +
+    '</div>';
+
+  document.getElementById('certOverlay').style.display = 'flex';
+}
+
+window.onCertBgClick = function(e) {
+  if (e.target === document.getElementById('certOverlay')) closeCert();
+}
+window.closeCert = function() {
+  document.getElementById('certOverlay').style.display = 'none';
+}
+
+const APP_URL = 'https://tehilon.vercel.app'; // כתובת האפליקציה
+
+function buildShareText(level) {
+  const m = MEDALS.find(x => x.level === level);
+  const _sLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+  if (_sLang === 'en') {
+    return m.emoji + ' I earned the ' + (m.en || m.label) + ' Medal for reading Tehillim!\n' +
+           'Bonus: +' + m.bonus + ' Maalot ⭐\n\n' +
+           '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
+           '📲 Join Tehilon: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
+           '— Tehilon 📖';
+  }
+  return m.emoji + ' זכיתי במדליית ' + m.label + ' על קריאת תהילים!\n' +
+         'בונוס: +' + m.bonus + ' מעלות ⭐\n\n' +
+         '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
+         '📲 הצטרף לתהילהון: ' + APP_URL + '\n' +
+         '— תהילהון 📖';
+}
+
+// Mobile = Android / iPhone / iPad (navigator.share on desktop opens OS share sheet, not WhatsApp Web)
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+async function captureImage(paper, bg) {
+  if (typeof html2canvas === 'undefined') return null;
+  try {
+    const canvas = await html2canvas(paper, {
+      scale: 2.5, useCORS: true, backgroundColor: bg, logging: false,
+      onclone: doc => {
+        const c = doc.getElementById('certPaper');
+        if (!c) return;
+        // ① עצור אנימציה — בלעדיה html2canvas מצלם באמצע ה-fade in (opacity נמוך)
+        c.style.animation = 'none';
+        c.style.opacity   = '1';
+        c.style.transform = 'none';
+        c.style.boxShadow = 'none';
+        // ② הסתר כפתורים — לא אמורים להיות בתמונה
+        const btns = c.querySelector('.cert-btns');
+        if (btns) btns.style.display = 'none';
+        // ③ הסר filter מהאימוגי — html2canvas עלול לרנדר אותו שקוף
+        const emoji = c.querySelector('.cert-emoji');
+        if (emoji) emoji.style.filter = 'none';
+      }
+    });
+    return await new Promise(res =>
+      canvas.toBlob(b => res(b || null), 'image/png', 0.95)
+    );
+  } catch(e) { return null; }
+}
+
+window.shareCert = async function(level) {
+  const m         = MEDALS.find(x => x.level === level);
+  const shareText = buildShareText(level);
+  const paper     = document.getElementById('certPaper');
+  const btn       = document.getElementById('certShareBtn');
+
+  if (btn) { btn.textContent = '⏳...'; btn.disabled = true; }
+
+  // המתן לסיום אנימציית הכניסה לפני הצילום
+  await new Promise(r => setTimeout(r, 380));
+
+  try {
+    const blob = await captureImage(paper, m.bg);
+
+    if (IS_MOBILE && navigator.share) {
+      /* ── נייד: גיליון שיתוף נייטיב (וואטסאפ, טלגרם, מייל…) ── */
+      const _stLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+      const _stTitle = _stLang === 'en' ? (m.en||m.label) + ' Medal — Tehilon' : 'מדליית ' + m.label + ' — תהילהון';
+      const shareData = { title: _stTitle, text: shareText };
+      if (blob) {
+        const file = new File([blob], 'מדלית-' + m.label + '.png', { type:'image/png' });
+        if (navigator.canShare && navigator.canShare({ files:[file] })) {
+          shareData.files = [file];
+        }
+      }
+      await navigator.share(shareData);
+
+    } else {
+      /* ── דסקטופ: העתק תמונה ללוח + פתח WhatsApp Web ── */
+      if (blob) {
+        let copied = false;
+        try {
+          // נסה להעתיק תמונה ישירות ללוח הגזירים
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          copied = true;
+        } catch(e) {
+          // clipboard.write נכשל (הרשאות / דפדפן ישן) — נוריד קובץ כ-fallback
+          const url = URL.createObjectURL(blob);
+          const a   = document.createElement('a');
+          a.href = url;
+          a.download = 'מדלית-' + m.label + '.png';
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+        if (copied) {
+          showToast('🖼 התמונה הועתקה — הדבק בוואטסאפ (Ctrl+V)');
+        } else {
+          showToast('💾 התמונה הורדה — צרף אותה בוואטסאפ');
+        }
+        setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(shareText), '_blank'), 800);
+      } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent(shareText), '_blank');
+      }
+    }
+
+  } catch(err) {
+    if (err.name === 'AbortError') return; // ביטול על ידי המשתמש
+    try {
+      await navigator.clipboard.writeText(shareText);
+      showToast('✅ הועתק ללוח');
+    } catch(e2) { showToast('שיתוף נכשל'); }
+  } finally {
+    const _rl = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
+    if (btn) { btn.textContent = '📤 ' + (_rl === 'en' ? 'Share' : 'שתף'); btn.disabled = false; }
+  }
+}
+
+/* ── Toast ── */
+let toastTmr;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ── URL param: open cert directly (?cert=gold) ── */
+const certParam = new URLSearchParams(location.search).get('cert');
+if (certParam) {
+  // Switch to achievements tab first, then open cert
+  switchTab(1);
+  renderAchievements();
+  setTimeout(() => showCert(certParam), 300);
+}
+
+/* ── Init ── */
+renderToday();
+renderAchievements();
+
+// 2.2.21: פתח טאב לפי URL param (?tab=yesterday)
+(function(){
+  const params = new URLSearchParams(location.search);
+  const tabParam = params.get('tab');
+  if (tabParam === 'yesterday') {
+    setTimeout(() => switchTab(3), 50);
+  }
+})();
+</script>
+<script src="bottomnav.js?v=2.2.0"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}
+});
+</script>
+</body>
+</html>

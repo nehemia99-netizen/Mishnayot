@@ -1,0 +1,68 @@
+rules_version = '2';
+// ═══════════════════════════════════════════════════════════
+//  משניון — Firestore Security Rules
+//  עודכן: יוני 2026
+//
+//  Collections בשימוש:
+//    users/{uid}                   — נתוני משתמש (ניקוד, היסטוריה, הגדרות)
+//    leaderboard/{uid}             — לוח מובילים
+//    chapReads/{chapId}            — מונה לימודים לפרק (מזהה כמו "Berakhot.2")
+//    groups/{code}                 — קבוצות
+//    groups/{code}/members/{uid}   — חברי קבוצה
+// ═══════════════════════════════════════════════════════════
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── פונקציות עזר ──────────────────────────────────────
+    // משתמש מחובר (כולל אנונימי)
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    // המשתמש הוא הבעלים של המסמך
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ── users/{uid} ────────────────────────────────────────
+    // רק הבעלים יכול לקרוא ולכתוב את הנתונים שלו
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── leaderboard/{uid} ──────────────────────────────────
+    // כל משתמש מחובר יכול לקרוא (לצפות בלוח)
+    // רק הבעלים יכול לכתוב את הרשומה שלו
+    match /leaderboard/{uid} {
+      allow read:  if isSignedIn();
+      allow write: if isOwner(uid);
+    }
+
+    // ── chapReads/{chapNum} ────────────────────────────────
+    // מונה כמה פעמים כל פרק נקרא (גלובלי)
+    // כל משתמש מחובר יכול לקרוא ולעדכן
+    match /chapReads/{chapNum} {
+      allow read:  if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ── groups/{code} ──────────────────────────────────────
+    // כל משתמש מחובר יכול לקרוא קבוצה (להצטרף לפי קוד)
+    // כל משתמש מחובר יכול ליצור קבוצה
+    match /groups/{code} {
+      allow read:  if isSignedIn();
+      allow write: if isSignedIn();
+
+      // חבר קבוצה — כותב רק את הרשומה שלו
+      match /members/{uid} {
+        allow read:  if isSignedIn();
+        allow write: if isOwner(uid);
+      }
+    }
+
+    // ── ברירת מחדל: חסום הכל ────────────────────────────
+    // כל מסמך שלא הוגדר לעיל — נדחה
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

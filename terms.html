@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תהילהון — תנאי שימוש ופרטיות</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);direction:rtl;display:flex;justify-content:center;padding-bottom:32px;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10;}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;font-weight:600;white-space:nowrap;}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text);}
+
+.content{padding:20px 18px 40px;}
+.hero{text-align:center;padding:24px 0 20px;}
+.hero-emoji{font-size:48px;line-height:1;display:block;margin-bottom:10px;}
+.hero-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.hero-sub{font-size:13px;color:var(--text-muted);}
+
+.section{margin-bottom:24px;}
+.section-title{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:10px;padding-bottom:6px;border-bottom:.5px solid var(--border);}
+.section p{font-size:14px;color:var(--text-sec);line-height:1.7;margin-bottom:8px;}
+.section p:last-child{margin-bottom:0;}
+
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+.data-table th{background:var(--primary-light);color:var(--primary);font-weight:700;padding:8px 10px;text-align:right;border:.5px solid var(--border);}
+.data-table td{padding:8px 10px;border:.5px solid var(--border);color:var(--text-sec);vertical-align:top;line-height:1.5;}
+.data-table tr:nth-child(even) td{background:var(--bg);}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-right:4px;}
+.badge-local{background:#EBF5E5;color:#3B8C14;}
+.badge-cloud{background:var(--primary-light);color:var(--primary);}
+.badge-none{background:#F5F5F3;color:#999;}
+
+.disclaimer-box{background:#FFF8E6;border:1px solid #E8C840;border-radius:12px;padding:14px 16px;margin-top:8px;}
+html.dark .disclaimer-box{background:#1E1800;border-color:#7A6000;}
+.disclaimer-box p{font-size:13px;color:#7A5800;line-height:1.6;margin:0;}
+html.dark .disclaimer-box p{color:#C8A820;}
+
+.footer-note{text-align:center;font-size:12px;color:var(--text-muted);margin-top:28px;line-height:1.7;}
+.footer-note a{color:var(--primary);text-decoration:none;}
+</style>
+<script>
+try{ if(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').darkMode) document.documentElement.classList.add('dark'); }catch(e){}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <a class="back-btn" href="javascript:history.back()">→ חזרה</a>
+    <span class="topbar-title">תנאי שימוש ופרטיות</span>
+  </div>
+
+  <div class="content">
+
+    <div class="hero">
+      <span class="hero-emoji">📜</span>
+      <div class="hero-title">תנאי שימוש ומדיניות פרטיות</div>
+      <div class="hero-sub">תהילהון · עודכן: מאי 2026</div>
+    </div>
+
+    <!-- 1. כללי -->
+    <div class="section">
+      <div class="section-title">1. כללי</div>
+      <p>תהילהון היא אפליקציית אינטרנט חינמית (PWA) לקריאת תהילים, מעקב קריאה, ותפילה אישית וקבוצתית. השימוש באפליקציה מהווה הסכמה לתנאים המפורטים להלן.</p>
+      <p>האפליקציה אינה גובה תשלום, אינה מחייבת הרשמה, ואינה אוספת פרטים מזהים כגון שם מלא, דוא"ל, או מספר טלפון.</p>
+    </div>
+
+    <!-- 2. נתונים ופרטיות -->
+    <div class="section">
+      <div class="section-title">2. איסוף נתונים ופרטיות</div>
+      <p>האפליקציה שומרת שני סוגי נתונים:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>נתון</th>
+            <th>איפה נשמר</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>היסטוריית קריאה, נקודות, הגדרות, מועדפים</td>
+            <td><span class="badge badge-local">מקומי בלבד</span> המכשיר שלך</td>
+          </tr>
+          <tr>
+            <td>שם תצוגה + פרקים שנקראו</td>
+            <td><span class="badge badge-cloud">ענן</span> רק בעת הצטרפות לקבוצה</td>
+          </tr>
+          <tr>
+            <td>ניקוד ולוח מובילים</td>
+            <td><span class="badge badge-cloud">ענן</span> רק בעת שימוש בקהילה</td>
+          </tr>
+          <tr>
+            <td>כתובת IP, מיקום, מזהה מכשיר</td>
+            <td><span class="badge badge-none">לא נאסף</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:12px;">הנתונים המקומיים שמורים ב-localStorage של הדפדפן. מחיקת נתוני הדפדפן תמחק אותם לצמיתות.</p>
+      <p>הנתונים שנשמרים בענן מאוחסנים ב-<strong>Firebase Firestore</strong> של Google. הכניסה לשירות מתבצעת באמצעות אימות אנונימי בלבד — ללא חשבון Google, ללא אימייל וללא סיסמה. לתנאי השירות של Google: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+    </div>
+
+    <!-- 3. תוכן -->
+    <div class="section">
+      <div class="section-title">3. מקורות תוכן</div>
+      <p>טקסט תהילים מסופק על ידי <strong>Sefaria</strong> (<a href="https://www.sefaria.org" target="_blank" rel="noopener">sefaria.org</a>) — פלטפורמה ציבורית לטקסטים יהודיים. הטקסטים הם נחלת הכלל.</p>
+      <p>גופנים נטענים מ-Google Fonts. לא מועברים נתונים אישיים לשירות זה.</p>
+    </div>
+
+    <!-- 4. שימוש מותר -->
+    <div class="section">
+      <div class="section-title">4. שימוש מותר</div>
+      <p>האפליקציה מיועדת לשימוש אישי, משפחתי, ולימודי. אסור להשתמש בה לכל מטרה מסחרית ללא אישור מפורש מהמפתח.</p>
+      <p>המשתמש אחראי לתוכן שהוא מפרסם בתוך קבוצות (שם תצוגה). אסור לפרסם תוכן פוגעני, מסית, או בלתי הולם.</p>
+    </div>
+
+    <!-- 5. כתב ויתור -->
+    <div class="section">
+      <div class="section-title">5. כתב ויתור ואחריות</div>
+      <div class="disclaimer-box">
+        <p>האפליקציה מסופקת <strong>"כפי שהיא" (AS IS)</strong> ללא כל אחריות מפורשת או משתמעת. המפתח אינו אחראי לכל נזק ישיר, עקיף, או תוצאתי הנובע משימוש באפליקציה, לרבות אובדן נתונים, הפסקת שירות, או תקלות טכניות. השימוש הוא על אחריות המשתמש בלבד.</p>
+      </div>
+    </div>
+
+    <!-- 6. שינויים -->
+    <div class="section">
+      <div class="section-title">6. עדכונים לתנאים</div>
+      <p>המפתח רשאי לעדכן תנאים אלה בכל עת. המשך השימוש לאחר פרסום שינויים מהווה הסכמה לתנאים המעודכנים.</p>
+    </div>
+
+    <div class="footer-note">
+      תהילהון · פותח באהבה לעם ישראל 🇮🇱<br>
+      לפניות: <a href="mailto:nehemia99@gmail.com">nehemia99@gmail.com</a>
+    </div>
+
+  </div>
+</div>
+<script src="bottomnav.js?v=2.2.0"></script>
+</body>
+</html>

@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>משניון — קורא</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--verse-bg:#FAFAF8;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--verse-bg:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;direction:rtl;}
+.app{max-width:430px;width:100%;background:var(--card);height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column;}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;flex-shrink:0;}
+.topbar-center{flex:1;text-align:center;}
+.chap-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;}
+.chap-ref{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;}
+.topbar-actions{display:flex;gap:8px;flex-shrink:0;}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+#aaBtn{font-size:13px;font-weight:700;font-family:system-ui,sans-serif;letter-spacing:-.5px;}
+.icon-btn.active{background:var(--primary-light);border-color:var(--primary);}
+.icon-btn.mem-active{background:#F0EAFF;border-color:#5B2DA0;}
+html.dark .icon-btn.mem-active{background:#1E1435;border-color:#9B6FE0;}
+#memBtn{color:#5B2DA0;font-size:21px;}
+html.dark #memBtn{color:#9B6FE0;}
+
+/* Nav bar */
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:5px 16px;border-bottom:.5px solid var(--border);background:var(--surface);}
+.nav-btn{width:34px;height:34px;border-radius:10px;border:.5px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text);-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+.nav-center{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.chap-num-display{font-size:13px;font-weight:600;color:var(--text);text-align:center;}
+.mode-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--primary-light);color:var(--primary);font-weight:500;}
+
+/* Controls — סגור כברירת מחדל, נפתח עם Aa */
+.controls{display:none;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:.5px solid var(--border);}
+.controls.open{display:flex;}
+.font-btns{display:flex;gap:4px;}
+.font-controls{display:flex;align-items:center;gap:6px;}
+.font-step-btn{width:30px;height:30px;border-radius:8px;border:.5px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .15s;font-family:system-ui,sans-serif;}
+.font-step-btn:active{background:var(--primary-light);}
+.font-size-val{font-size:12px;color:var(--text-muted);min-width:28px;text-align:center;}
+.scroll-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-sec);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.toggle-sw{width:34px;height:20px;border-radius:10px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0;}
+.toggle-sw.on{background:var(--primary);}
+.toggle-sw::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;right:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle-sw.on::after{transform:translateX(-14px);}
+
+/* Text area */
+.text-area{flex:1;overflow-y:auto;padding:16px;background:var(--verse-bg);}
+.loading-msg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text-muted);}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.verse{display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;}
+.verse-num{font-size:11px;color:var(--text-muted);min-width:18px;text-align:center;margin-top:4px;flex-shrink:0;}
+.verse-content{flex:1;display:flex;flex-direction:column;}
+.verse-text{line-height:1.75;color:var(--text);font-family:'David Libre','FrankRuehl','Times New Roman',serif;text-align:right;}
+.verse-text{font-size:18px;} /* גודל ברירת מחדל — ידרס ב-inline style */
+.error-msg{padding:30px 20px;text-align:center;color:var(--text-muted);font-size:14px;line-height:1.6;}
+.retry-btn{margin-top:12px;display:inline-block;padding:8px 22px;background:var(--primary-light);color:var(--primary);border:.5px solid var(--primary);border-radius:20px;cursor:pointer;font-size:13px;}
+
+/* Bottom bar */
+.bottombar{border-top:.5px solid var(--border);padding:10px 16px calc(18px + env(safe-area-inset-bottom, 0px));background:var(--card);flex-shrink:0;}
+.idle-warning{font-size:11px;color:#C07A00;display:none;text-align:center;margin-bottom:8px;padding:5px;background:rgba(192,122,0,.08);border-radius:8px;}
+/* Scroll progress */
+.read-progress-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;}
+.read-progress-bar{height:100%;width:0%;background:var(--primary);border-radius:2px;transition:width .15s;}
+.read-progress-bar.full{background:var(--green);}
+.done-btn{width:100%;padding:6px 14px 8px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,opacity .2s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.done-btn:active{opacity:.85;}
+.done-btn.done{background:var(--green);}
+.done-btn.locked{background:transparent;color:var(--text-muted);border:none;cursor:default;pointer-events:none;}
+.done-btn-meta{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;width:100%;}
+.done-btn-meta .meta-timer{color:#1a1a1a;}
+.done-btn-meta .meta-score{color:#c8960c;}
+.done-btn.locked .done-btn-meta .meta-timer{color:var(--text-muted);}
+.done-btn.locked .done-btn-meta .meta-score{color:#c8960c;opacity:.5;}
+.quick-confirm{display:flex;gap:8px;width:100%;}
+.quick-confirm button{flex:1;padding:13px 8px;border-radius:14px;border:none;font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:system-ui,sans-serif;}
+.qc-continue{background:var(--primary);color:#fff;}
+.qc-back{background:var(--surface);color:var(--text);border:.5px solid var(--border)!important;}
+
+/* ── Shinun (memorization) mode ── */
+.shinun-bar{display:none;gap:5px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:nowrap;}
+html.dark .shinun-bar{background:#1C1235;border-bottom-color:#4A3080;}
+.shinun-bar.open{display:flex;}
+.shinun-lvl{flex:1;padding:7px 4px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
+html.dark .shinun-lvl{border-color:#5B3090;color:#9B6FE0;}
+.shinun-lvl.active{background:#7B2FF7;color:#fff;border-color:#7B2FF7;}
+/* Cover block (level 2) */
+.cover-block{display:inline-block;background:#7B2FF7;border-radius:4px;color:transparent;cursor:pointer;user-select:none;padding:0 4px;min-width:40px;transition:all .25s;vertical-align:baseline;}
+.cover-block.revealed{background:transparent;color:var(--text);}
+/* Hint row (level 3) */
+.shinun-hint{font-size:11px;color:#7B2FF7;margin-top:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+html.dark .shinun-hint{color:#9B6FE0;}
+.verse-wrap{cursor:default;}
+.verse-wrap.tappable{cursor:pointer;}
+/* Test mode (level 4) */
+.verse-hidden-label{font-size:13px;color:var(--text-muted);padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.assess-row{display:flex;gap:6px;margin-top:8px;}
+.assess-btn{flex:1;padding:7px 4px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;-webkit-tap-highlight-color:transparent;}
+.assess-yes{background:#EBF5E5;color:#3B8C14;}
+.assess-no{background:#FFF0F0;color:#C04040;}
+/* Shinun score banner */
+.shinun-score-banner{margin:12px 16px 0;padding:12px 16px;border-radius:12px;background:#F5F0FF;border:1px solid #C8B0F0;font-size:13px;color:#7B2FF7;font-weight:600;text-align:center;display:none;}
+html.dark .shinun-score-banner{background:#1C1235;border-color:#5B3090;color:#9B6FE0;}
+
+/* Dedication banner */
+.dedication-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;background:linear-gradient(135deg,#E6F1FB,#D4E9FF);border-bottom:.5px solid #B5D4F4;flex-shrink:0;}
+html.dark .dedication-banner{background:linear-gradient(135deg,#152436,#0E1A2A);border-bottom-color:#2A5580;}
+.ded-icon{font-size:16px;flex-shrink:0;}
+.ded-text{flex:1;font-size:13px;font-weight:700;color:var(--primary);line-height:1.3;}
+.ded-sub{font-size:10px;font-weight:400;color:var(--primary);opacity:.75;display:block;margin-top:1px;}
+.ded-close{width:26px;height:26px;border-radius:50%;border:.5px solid var(--primary);background:transparent;cursor:pointer;font-size:13px;color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.65;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.ded-close:active{opacity:1;}
+
+/* Commentary */
+.commentary-bar{display:flex;gap:6px;padding:7px 16px;background:var(--surface);border-bottom:.5px solid var(--border);}
+.comm-type-btn{flex:1;padding:6px 10px;border-radius:20px;border:.5px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;color:var(--text-sec);font-family:system-ui,sans-serif;transition:background .15s;}
+.comm-type-btn.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary);font-weight:600;}
+.verse-commentary{margin-top:8px;padding:9px 11px;background:var(--primary-light);border-radius:8px;border-right:3px solid var(--primary);font-size:13.5px;line-height:1.7;color:var(--text-sec);font-family:system-ui,sans-serif;}
+.comm-source{font-size:10px;color:var(--primary);font-weight:700;margin-bottom:4px;display:block;}
+.comm-loading{font-size:12px;color:var(--text-muted);font-style:italic;margin-top:8px;text-align:center;padding:6px;}
+
+/* Medal popup */
+.medal-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;display:flex;align-items:flex-end;justify-content:center;}
+.medal-popup{background:var(--card);width:100%;max-width:430px;border-radius:24px 24px 0 0;padding:28px 24px calc(36px + 62px + env(safe-area-inset-bottom, 0px));text-align:center;animation:medalSlideUp .4s cubic-bezier(.16,1,.3,1);}
+@keyframes medalSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.medal-popup-emoji{font-size:64px;line-height:1;display:block;margin-bottom:12px;animation:medalBounce .6s .35s both;}
+@keyframes medalBounce{0%{transform:scale(0.5)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.medal-popup-title{font-size:12px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.medal-popup-name{font-size:24px;font-weight:800;margin-bottom:6px;}
+.medal-popup-desc{font-size:13px;color:var(--text-sec);margin-bottom:20px;line-height:1.6;}
+.medal-popup-btns{display:flex;gap:10px;}
+.medal-popup-cert{flex:1;padding:13px;border-radius:14px;border:none;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:system-ui,sans-serif;}
+.medal-popup-close{flex:1;padding:13px;border-radius:14px;border:.5px solid var(--border);background:var(--surface);font-size:14px;font-weight:600;color:var(--text-sec);cursor:pointer;font-family:system-ui,sans-serif;}
+
+/* Verse bookmark button */
+.verse-bk-btn{width:34px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:16px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;opacity:.2;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s,transform .15s;font-family:system-ui,sans-serif;color:var(--text);}
+.verse-bk-btn.saved{opacity:1;color:#C07A00;}
+.verse-bk-btn.saved.pop{animation:bkPop .3s ease;}
+@keyframes bkPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
+
+/* Toast */
+.toast{position:fixed;bottom:57px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:100;white-space:nowrap;pointer-events:none;}
+html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
+.toast.show{opacity:1;}
+
+/* Chapter select modal overlay */
+.chap-picker{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
+.chap-picker-inner{background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:16px;max-height:60vh;display:flex;flex-direction:column;}
+.chap-picker-title{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-bottom:12px;}
+.chap-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;overflow-y:auto;flex:1;}
+.chap-cell{padding:8px 4px;border-radius:8px;border:.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);text-align:center;-webkit-tap-highlight-color:transparent;}
+.chap-cell.active-chap{background:var(--primary);color:#fff;border-color:var(--primary);}
+.chap-cell.fav-chap{border-color:#E53935;color:#E53935;}
+.chap-cell.mem-chap{border-color:var(--green);color:var(--green);}
+.picker-close{margin-top:12px;padding:11px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);width:100%;cursor:pointer;font-size:14px;color:var(--text-sec);}
+</style>
+<script src="i18n.js?v=2.2.31" defer></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="01-dashboard.html" class="back-btn" data-i18n="read.back">← בית</a>
+    <div class="topbar-center">
+      <div class="chap-title" id="chapTitle">טוען...</div>
+      <div class="chap-ref" id="chapRef"></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="aaBtn" onclick="toggleControls()" title="גודל טקסט וגלילה">Aa</button>
+      <button class="icon-btn" id="commBtn" onclick="toggleCommentary()" title="פירוש" data-i18n-title="read.commentary">📖</button>
+      <button class="icon-btn" id="favBtn" onclick="toggleFav()" title="מועדף" data-i18n-title="read.favorite">🤍</button>
+      <button class="icon-btn" id="memBtn" onclick="toggleMem()" title="שינון" data-i18n-title="read.memorize">☆</button>
+      <button class="icon-btn" id="shinunModeBtn" onclick="toggleShinunMode()" title="מצב שינון" data-i18n-title="read.shinun_mode">🧠</button>
+    </div>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="navbar">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" title="פרק קודם" data-i18n-title="read.prev_chap">▶</button>
+    <div class="nav-center">
+      <div class="chap-num-display" id="chapNumDisp" onclick="openPicker()" style="cursor:pointer;padding:4px 12px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">בחר פרק ▾</div>
+      <div class="mode-badge" id="modeBadge" style="display:none"></div>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)" title="פרק הבא" data-i18n-title="read.next_chap">◀</button>
+  </div>
+
+  <!-- Dedication banner (shown when reading for a sick person) -->
+  <div class="dedication-banner" id="dedicationBanner" style="display:none;">
+    <span class="ded-icon">💙</span>
+    <div class="ded-text">
+      <span id="dedLabel">קורא לרפואת ...</span>
+      <span class="ded-sub" id="dedSub">קריאה זו מוקדשת לרפואה שלמה • פג בחצות</span>
+    </div>
+    <button class="ded-close" onclick="dismissDedication()" title="סיים הקדשה" data-i18n-title="read.end_dedication">✕</button>
+  </div>
+
+  <!-- Controls (נסתר — נפתח עם Aa) -->
+  <div class="controls" id="controlsBar">
+    <div class="font-controls">
+      <button class="font-step-btn" onclick="changeFontSize(-1)">−</button>
+      <span class="font-size-val" id="fontSizeVal">18</span>
+      <button class="font-step-btn" onclick="changeFontSize(+1)">+</button>
+    </div>
+    <div class="scroll-toggle" onclick="toggleAutoScroll()">
+      <span data-i18n="read.auto_scroll">גלילה אוטו׳</span>
+      <div class="toggle-sw" id="scrollSw"></div>
+    </div>
+  </div>
+
+  <!-- Shinun mode level selector -->
+  <div class="shinun-bar" id="shinunBar">
+    <button class="shinun-lvl active" id="slvl1" onclick="setShinunLevel(1)" data-i18n="read.shinun_review">📖<br>חזרה</button>
+    <button class="shinun-lvl"        id="slvl2" onclick="setShinunLevel(2)" data-i18n="read.shinun_hide_ends">🔲<br>הסתר סיומות</button>
+    <button class="shinun-lvl"        id="slvl3" onclick="setShinunLevel(3)" data-i18n="read.shinun_hint">💡<br>רמז ראשון</button>
+    <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
+  </div>
+  <div class="shinun-score-banner" id="shinunBanner"></div>
+
+  <!-- Commentary type selector -->
+  <div class="commentary-bar" id="commBar" style="display:none">
+    <button class="comm-type-btn active" id="commBtnBartenura" onclick="setCommType('bartenura')">ברטנורא</button>
+    <button class="comm-type-btn" id="commBtnTosafot" onclick="setCommType('tosafot')">תוספות יו"ט</button>
+  </div>
+
+  <!-- Text area -->
+  <div class="text-area" id="textArea">
+    <div class="loading-msg" id="loadingMsg">
+      <div class="spinner"></div>
+      <div data-i18n="read.loading">טוען פרק...</div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottombar">
+    <div class="idle-warning" id="idleWarning" data-i18n="read.idle_warning">⏸ הטיימר נעצר — עבור לפרק הבא כדי להמשיך</div>
+    <div class="read-progress-wrap"><div class="read-progress-bar" id="readProgressBar"></div></div>
+    <button class="done-btn locked" id="doneBtn" onclick="markDone()">
+      <span id="doneBtnText">↓ גלול עד סוף הפרק</span>
+      <span class="done-btn-meta"><span class="meta-timer">⏱ <span id="timerNum">0:00</span></span><span class="meta-score">✡ <span id="scoreNum">+0</span></span></span>
+    </button>
+    <div id="simpleDoneBtns" style="display:none;width:100%;gap:10px;">
+      <button onclick="finishAndHome()" data-i18n="read.finish_home" style="flex:1;padding:14px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">סיום 🏠</button>
+      <button onclick="finishAndNext()" data-i18n="read.next_chap_btn" style="flex:1;padding:14px;border-radius:14px;background:var(--green,#2E7D32);border:none;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">פרק הבא ←</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="utils.js?v=2.2.0"></script>
+<script src="corpus.js?v=1.0.0"></script>
+<script src="gamification.js?v=2.2.31"></script>
+<script>
+/* ── Storage ── */
+const S = {
+  get:    k      => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set:    (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+  remove: k      => localStorage.removeItem(k)
+};
+
+/* ── Dark mode ── */
+const cfg = S.get('tehillim_settings') || {};
+if (cfg.darkMode) document.documentElement.classList.add('dark');
+
+// 2.2.14: הסרת טעמים — Unicode U+0591–U+05C7 (cantillation marks)
+let hideCantillation = cfg.hideCantillation !== false; // ברירת מחדל: ללא טעמים
+let showVerseNums   = cfg.verseNums !== false; // ברירת מחדל: מציג מספרי פסוקים
+/* עדכון תווית כפתור סיימתי — לא פוגע בשורת timerNum/scoreNum בתוכו */
+function setDoneBtnLabel(btn, text) {
+  var lbl = document.getElementById('doneBtnText');
+  if (lbl) lbl.textContent = text;
+  else btn.textContent = text;
+}
+
+function stripCantillation(text) {
+  if (!hideCantillation) return text;
+  // מסיר רק טעמים (0591-05AF), לא ניקוד (05B0-05C7)
+  return text.replace(/[֑-֯]/g, '');
+}
+
+/* ── Hebrew gematria ── */
+function toGematria(n) {
+  const specials = {15:'ט"ו', 16:'ט"ז', 115:'קט"ו', 116:'קט"ז'};
+  if (specials[n]) return specials[n];
+  const h = ['','א','ב','ג','ד','ה','ו','ז','ח','ט'];
+  const t = ['','י','כ','ל','מ','נ','ס','ע','פ','צ'];
+  const m = ['','ק','ר','ש','ת'];
+  let r = '', x = n;
+  if (x >= 100) { r += m[Math.floor(x/100)]; x %= 100; }
+  if (x >= 10)  { r += t[Math.floor(x/10)];  x %= 10;  }
+  r += h[x];
+  if (r.length === 1) return r + '׳';
+  return r.slice(0,-1) + '"' + r.slice(-1);
+}
+
+/* ── URL params / state ── */
+const params  = new URLSearchParams(location.search);
+const MODE    = params.get('mode') || 'normal';
+
+// פענוח מזהה פרק "Tractate.Perek" (לדוגמה "Berakhot.2")
+function parseChap(str) {
+  const p = Corpus.parseChapId(str);
+  if (!p) return null;
+  const t = Corpus.getTractate(p.tractate);
+  if (!t || !(p.perek >= 1 && p.perek <= t.length)) return null;
+  return { tractate: p.tractate, perek: p.perek };
+}
+
+// במצב אקראי — העדף פרקים שטרם נלמדו היום
+function pickRandomChap() {
+  const today = localDateStr();
+  const db = S.get('tehillim_readings') || [];
+  const doneToday = new Set((Array.isArray(db) ? db : Object.values(db||{})).filter(r => r.date === today && !r.partial).map(r => r.chap));
+  const all = Corpus.flatChapters();
+  const unread = all.filter(c => !doneToday.has(c.id));
+  const pool = unread.length > 0 ? unread : all;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  return { tractate: pick.tractate, perek: pick.perek };
+}
+
+// מצב נוכחי: מסכת (מחרוזת) + פרק (מספר). המזהה לנתונים הוא Corpus.chapId(curTractate, chapNum).
+let curTractate, chapNum;
+(function initChap() {
+  let p = parseChap(params.get('chap'));
+  if (!p) {
+    if (MODE === 'random')     p = pickRandomChap();
+    else if (MODE === 'cycle') p = parseChap(S.get('mishnah_cycle_pos'));
+    if (!p) p = { tractate: Corpus.tractates[0].id, perek: 1 };
+  }
+  curTractate = p.tractate;
+  chapNum = p.perek;
+})();
+function curId() { return Corpus.chapId(curTractate, chapNum); }
+function curTractateObj() { return Corpus.getTractate(curTractate); }
+
+/* ── Hida session state (mode=hida) ── */
+let _hidaSession   = null;  // { verses: [{letter,from,to},...], idx, name }
+let _hidaVerseFrom = 0;     // פסוק התחלה (1-based) לפילטר
+let _hidaVerseTo   = 0;     // פסוק סיום (1-based) לפילטר
+
+if (MODE === 'hida') {
+  _hidaSession = S.get('tehillim_hida_session');
+  if (_hidaSession && _hidaSession.verses && _hidaSession.verses.length) {
+    const first = _hidaSession.verses[_hidaSession.idx || 0];
+    if (first) { _hidaVerseFrom = first.from; _hidaVerseTo = first.to; }
+  }
+}
+
+/* ── Playlist state (mode=playlist) ── */
+let playlist = null;        // מערך מזהי פרקים: ["Berakhot.1", "Berakhot.2", ...]
+let playlistIdx = 0;
+if (MODE === 'playlist') {
+  const pl = S.get('tehillim_playlist');
+  if (pl && pl.chaps && pl.chaps.length) {
+    playlist = pl.chaps;
+    // אם ה-URL מציין פרק מפורש — מצא את המיקום הנכון ברשימה
+    const urlId = params.get('chap');
+    if (urlId && playlist[0] === urlId) {
+      // התחלה חדשה — תמיד מ-idx 0
+      playlistIdx = 0;
+    } else {
+      playlistIdx = pl.idx || 0;
+    }
+    const pp = parseChap(playlist[playlistIdx]);
+    if (pp) { curTractate = pp.tractate; chapNum = pp.perek; }
+  }
+}
+
+let fontSize   = typeof cfg.fontSize === 'number' ? cfg.fontSize : 18;
+let autoScroll = false;
+let autoScrollRAF = null;
+let autoScrollDelayTimer = null;
+let autoScrollAccum = 0; // מצבר לגלילה חלקה
+
+/* ── Timer state ── */
+let timerSec   = 0;
+let sessionPts = 0;
+let lastActivity = Date.now();
+let IDLE_MS = 3 * 60 * 1000;  // ברירת מחדל: 3 דק חוסר פעילות
+function updateIdleMs() {
+  IDLE_MS = 3 * 60 * 1000;
+}
+let timerInterval = null;
+let idlePaused = false;
+let isDone = false;
+let hasReachedBottom = false;
+let savedTimerSec = 0; // כמה שניות כבר נשמרו ל-tehillim_readings בפרק הנוכחי
+
+/* ── Commentary state ── */
+let commentaryOn   = false;
+let commentaryType = 'bartenura'; // 'bartenura' | 'tosafot'
+let currentCommData = null;      // מערך הפירוש לפרק הנוכחי
+
+/* ── Keys ── */
+const READ_KEY  = 'tehillim_readings';
+const SCORE_KEY = 'tehillim_score';
+const FAV_KEY   = 'tehillim_favs';
+const MEM_KEY   = 'tehillim_mem';
+const SAVED_KEY = 'tehillim_saved_verses';
+
+/* ── Trim readings older than 365 days (runs once on load) ──
+   Prevents localStorage overflow (~5-10 MB limit) and keeps
+   the Firestore sync document well under the 1 MB limit.
+   All features (history, challenges, graphs) need max 30 days. */
+(function trimOldReadings() {
+  try {
+    const db = S.get(READ_KEY);
+    if (!Array.isArray(db) || db.length === 0) return;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 365);
+    const cutoffStr = localDateStr(cutoff); // 'YYYY-MM-DD'
+    const trimmed = db.filter(r => r.date && r.date >= cutoffStr);
+    if (trimmed.length < db.length) {
+      S.set(READ_KEY, trimmed);
+      console.log('[Tehilhon] trimOldReadings: removed', db.length - trimmed.length,
+                  'records older than 365 days. Remaining:', trimmed.length);
+    }
+  } catch(e) { /* silent — never break the reader */ }
+})();
+
+/* ── Sefaria API + cache ── */
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+
+async function fetchChapter(tractateId, perek) {
+  const cKey = 'mishnah_cache_' + Corpus.chapId(tractateId, perek);
+  const cached = S.get(cKey);
+  if (cached && cached.he && (Date.now() - (cached.ts||0) < CACHE_TTL)) return cached;
+  const resp = await fetch(
+    'https://www.sefaria.org/api/texts/' + Corpus.apiRef(tractateId, perek) + '?lang=he&commentary=0&context=0'
+  );
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  const entry = { he: data.he, heRef: data.heRef, ts: Date.now() };
+  S.set(cKey, entry);
+  return entry;
+}
+
+/* ── Commentary API + cache (ברטנורא כברירת מחדל) ── */
+async function fetchCommentary(tractateId, perek, type) {
+  const cKey = 'mishnah_comm_' + type + '_' + Corpus.chapId(tractateId, perek);
+  const cached = S.get(cKey);
+  if (cached && cached.data && (Date.now() - (cached.ts||0) < CACHE_TTL)) return cached.data;
+  const resp = await fetch(
+    'https://www.sefaria.org/api/texts/' + Corpus.commentaryRef(tractateId, perek, type) + '?lang=he&commentary=0&context=0'
+  );
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const json = await resp.json();
+  const data = json.he || [];
+  S.set(cKey, { data, ts: Date.now() });
+  return data;
+}
+
+function commTextForVerse(commData, idx) {
+  if (!commData || idx >= commData.length) return '';
+  const v = commData[idx];
+  if (!v) return '';
+  if (Array.isArray(v)) return v.filter(Boolean).join(' ');
+  return String(v);
+}
+
+/* ── Load & render chapter ── */
+async function loadChapter(tractateId, perek) {
+  isDone = false;
+  curTractate = tractateId;
+  chapNum = perek;
+  if (typeof updateIdleMs === 'function') updateIdleMs();
+  // אפס מצב שינון בעת מעבר פרק
+  if (shinunActive) {
+    shinunLevel = 1;
+    [1,2,3,4].forEach(i => document.getElementById('slvl'+i)?.classList.toggle('active', i===1));
+    document.getElementById('shinunBanner').style.display = 'none';
+    _testResults = {};
+  }
+  const today = localDateStr();
+  const _cid = Corpus.chapId(tractateId, perek);
+  const db = S.get(READ_KEY) || [];
+  const alreadyDone = db.some(r => r.chap === _cid && r.date === today && !r.partial);
+
+  // נקה דיאלוג אישור אם פתוח
+  const qc = document.getElementById('quickConfirm');
+  if (qc) qc.remove();
+  // השהיה בגלילה אוטומטית בעת מעבר לפרק חדש
+  if (autoScroll) startAutoScrollAfterDelay(3);
+  const btn = document.getElementById('doneBtn');
+  btn.style.display = '';
+  if (alreadyDone) {
+    isDone = true;
+    hasReachedBottom = true;
+    // פרק שכבר נקרא — פתוח מיד
+    const _sett = JSON.parse(localStorage.getItem('tehillim_settings') || '{}');
+    if (_sett.simpleMode !== false) {
+      // מוד פשוט — הצג שני כפתורים
+      btn.style.display = 'none';
+      const _sb = document.getElementById('simpleDoneBtns');
+      if (_sb) { _sb.style.display = 'flex'; _sb.style.gap = '10px'; _sb.style.width = '100%'; }
+    } else {
+      btn.classList.remove('locked');
+      btn.classList.add('done');
+      setDoneBtnLabel(btn, _rLang()==='en' ? '← Next chapter' : '← המשך לפרק הבא');
+    }
+    document.getElementById('readProgressBar').style.width = '100%';
+    document.getElementById('readProgressBar').classList.add('full');
+  } else {
+    isDone = false;
+    // נאפס את ה-progress (renderVerses יקרא resetReadProgress לאחר הרינדור)
+    lockDoneBtn();
+    document.getElementById('readProgressBar').style.width = '0%';
+    document.getElementById('readProgressBar').classList.remove('full');
+  }
+
+  const _t = Corpus.getTractate(tractateId);
+  const _tName = (_rLang()==='en') ? tractateId : (_t ? _t.he : tractateId);
+  const _perekWord = _rLang()==='en' ? 'Chapter' : 'פרק';
+  const _len = _t ? _t.length : perek;
+  document.getElementById('chapTitle').textContent = _tName + ' · ' + _perekWord + ' ' + toGematria(perek);
+  document.getElementById('chapNumDisp').textContent = _tName + ' ' + _perekWord + ' ' + toGematria(perek) + ' (' + perek + '/' + _len + ') ▾';
+  document.getElementById('prevBtn').disabled = (!Corpus.prevChapter(tractateId, perek) && MODE === 'normal');
+  document.getElementById('nextBtn').disabled = (!Corpus.nextChapter(tractateId, perek) && MODE === 'normal');
+  updateFavMemButtons();
+
+  const ta = document.getElementById('textArea');
+  ta.innerHTML = '<div class="loading-msg"><div class="spinner"></div><div>' + (_rLang()==='en' ? 'Loading ' : 'טוען ') + _tName + ' ' + _perekWord + ' ' + toGematria(perek) + '...</div></div>';
+
+  try {
+    // טעינת פרק + פירוש במקביל אם פירוש פעיל
+    currentCommData = null;
+    const chapPromise = fetchChapter(tractateId, perek);
+    const commPromise = commentaryOn ? fetchCommentary(tractateId, perek, commentaryType).catch(()=>null) : Promise.resolve(null);
+    const [data, commData] = await Promise.all([chapPromise, commPromise]);
+    currentCommData = commData;
+    const verseCount = data.he ? data.he.length : 0;
+    document.getElementById('chapRef').textContent = verseCount + (_rLang()==='en' ? ' mishnayot' : ' משניות');
+    // הפעל שינון אם פעיל, אחרת קריאה רגילה
+    if (shinunActive && shinunLevel > 1) renderShinunVerses(data.he, shinunLevel);
+    else renderVerses(data.he, commData);
+  } catch(e) {
+    ta.innerHTML = _rLang()==='en'
+      ? '<div class="error-msg">⚠️ Error loading chapter<br>Check internet connection<br><button class="retry-btn" onclick="loadChapter(\'' + tractateId + '\',' + perek + ')">Try again</button></div>'
+      : '<div class="error-msg">⚠️ שגיאה בטעינת הפרק<br>בדוק חיבור לאינטרנט<br><button class="retry-btn" onclick="loadChapter(\'' + tractateId + '\',' + perek + ')">נסה שוב</button></div>';
+  }
+}
+
+function renderVerses(verses, commData) {
+  const ta = document.getElementById('textArea');
+  if (!verses || !verses.length) {
+    ta.innerHTML = '<div class="error-msg">הפרק אינו זמין כעת.</div>';
+    return;
+  }
+
+  // מצב חידא — הצג רק פסוקים from עד to (1-based)
+  let filteredVerses = verses;
+  let verseOffset = 0;  // offset כדי לשמור מספור נכון
+  if (MODE === 'hida' && _hidaVerseFrom > 0 && _hidaVerseTo > 0) {
+    verseOffset = _hidaVerseFrom - 1;
+    filteredVerses = verses.slice(_hidaVerseFrom - 1, _hidaVerseTo);
+    // הצג כותרת האות הנוכחית
+    if (_hidaSession && _hidaSession.verses) {
+      const cur = _hidaSession.verses[_hidaSession.idx || 0];
+      if (cur) {
+        const total = _hidaSession.verses.length;
+        const step  = (_hidaSession.idx || 0) + 1;
+        ta.insertAdjacentHTML('beforebegin',
+          '<div id="hidaBanner" style="background:var(--primary-light);border-bottom:.5px solid var(--border);' +
+          'padding:8px 16px;font-size:13px;color:var(--primary);font-weight:600;text-align:center;">' +
+          'אות <b>' + cur.letter + '</b> — פסוקים ' + cur.from + '–' + cur.to +
+          ' (' + step + '/' + total + ')</div>');
+      }
+    }
+  }
+
+  const commLabel = commentaryType === 'rashi' ? 'רש"י' : 'מצודת דוד';
+  const savedVerses = S.get(SAVED_KEY) || [];
+  // שמור פסוקים מסוננים למיפוי
+  const _versesToRender = filteredVerses;
+  ta.innerHTML = (ta.dataset.hidaBanner || '') + _versesToRender.map((v, i) => {
+    delete ta.dataset.hidaBanner;
+    const realIdx = i + verseOffset;  // אינדקס אמיתי בפרק
+    let commHtml = '';
+    if (commentaryOn && commData) {
+      const ct = commTextForVerse(commData, i);
+      if (ct && ct.trim()) {
+        commHtml = '<div class="verse-commentary"><span class="comm-source">' + commLabel + '</span>' + ct + '</div>';
+      }
+    }
+    const isSaved = savedVerses.some(sv => sv.chap === curId() && sv.verse === realIdx+1);
+    return '<div class="verse">' +
+      (showVerseNums ? '<span class="verse-num">' + toGematria(realIdx+1) + '</span>' : '') +
+      '<div class="verse-content">' +
+      '<span class="verse-text" style="font-size:' + fontSize + 'px">' + stripCantillation(v) + '</span>' +
+      commHtml +
+      '</div>' +
+      '<button class="verse-bk-btn' + (isSaved ? ' saved' : '') + '" ' +
+        'onclick="toggleSaveVerse(' + (realIdx+1) + ',this)" ' +
+        'title="שמור פסוק">🔖</button>' +
+      '</div>';
+  }).join('') +
+  '<div id="bottomSentinel" style="height:2px;width:100%;"></div>';
+  ta.scrollTop = 0;
+  if (!isDone) resetReadProgress(); // 2.2.11: skip reset if chapter already marked done
+}
+
+/* ── Read progress — IntersectionObserver על sentinel ── */
+let bottomObserver = null;
+
+function resetReadProgress() {
+  hasReachedBottom = false;
+  const ta  = document.getElementById('textArea');
+  const bar = document.getElementById('readProgressBar');
+  bar.style.width = '0%';
+  bar.classList.remove('full');
+
+  // נתק observer קודם
+  if (bottomObserver) { bottomObserver.disconnect(); bottomObserver = null; }
+
+  // במצב hida — הפסוקים מעטים, תן ל-DOM להתעדכן ואז בדוק
+  const delay = (MODE === 'hida') ? 150 : 0;
+  setTimeout(function() {
+    const sentinel = document.getElementById('bottomSentinel');
+    if (!sentinel) { unlockDoneBtn(); return; } // fallback
+
+    // אם הפרק קצר (sentinel כבר גלוי) — פתח מיד
+    const taRect  = ta.getBoundingClientRect();
+    const senRect = sentinel.getBoundingClientRect();
+    if (senRect.bottom <= taRect.bottom + 4) {
+      reachedBottom();
+      return;
+    }
+
+    // פרק ארוך — IntersectionObserver יפעל ברגע שה-sentinel גלוי
+    lockDoneBtn();
+    bottomObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) reachedBottom();
+    }, { root: ta, threshold: 0.01, rootMargin: '0px 0px 40px 0px' });
+    bottomObserver.observe(sentinel);
+  }, delay);
+}
+
+function reachedBottom() {
+  if (hasReachedBottom) return;
+  hasReachedBottom = true;
+  if (bottomObserver) { bottomObserver.disconnect(); bottomObserver = null; }
+  const bar = document.getElementById('readProgressBar');
+  bar.style.width = '100%';
+  bar.classList.add('full');
+  unlockDoneBtn();
+  if (!isDone) showToast(_rLang()==='en' ? '✅ End of chapter!' : '✅ הגעת לסוף הפרק!');
+}
+
+function updateReadProgress() {
+  if (isDone || hasReachedBottom) return;
+  // עדכן progress bar בלבד (IntersectionObserver מטפל בפתיחה)
+  const ta = document.getElementById('textArea');
+  const scrollable = ta.scrollHeight - ta.clientHeight;
+  if (scrollable <= 0) return;
+  const pct = Math.min(100, Math.round(ta.scrollTop / scrollable * 100));
+  document.getElementById('readProgressBar').style.width = pct + '%';
+}
+
+function lockDoneBtn() {
+  const btn = document.getElementById('doneBtn');
+  btn.classList.add('locked');
+  btn.classList.remove('done');
+  setDoneBtnLabel(btn, _rLang()==='en' ? '↓ Scroll to end of chapter' : '↓ גלול עד סוף הפרק');
+  btn.style.display = '';
+  // אפס simpleDoneBtns
+  const sb = document.getElementById('simpleDoneBtns');
+  if (sb) sb.style.display = 'none';
+}
+
+function unlockDoneBtn() {
+  const btn = document.getElementById('doneBtn');
+  btn.classList.remove('locked');
+  if (isDone) {
+    btn.classList.add('done');
+    const _isEn = _rLang() === 'en';
+    if (MODE === 'hida') {
+      const sess = _hidaSession;
+      const cur  = sess && sess.verses ? sess.idx || 0 : 0;
+      const tot  = sess && sess.verses ? sess.verses.length : 1;
+      setDoneBtnLabel(btn, cur + 1 < tot
+        ? (_isEn ? '← Next letter (' + (cur+2) + '/' + tot + ')' : '← האות הבאה (' + (cur+2) + '/' + tot + ')')
+        : (_isEn ? '✓ Reading by name complete' : '✓ סיום קריאה לפי שם'));
+    } else {
+      if (MODE === 'playlist') {
+        const _pl = S.get('tehillim_playlist') || {};
+        const _isHida = _pl.source === 'hida';
+        const _hasNext = playlistIdx + 1 < (playlist||[]).length;
+        if (_isHida) {
+          setDoneBtnLabel(btn, _hasNext
+            ? (_isEn ? '← Next letter (' + (playlistIdx+2) + '/' + playlist.length + ')' : '← האות הבאה (' + (playlistIdx+2) + '/' + playlist.length + ')')
+            : (_isEn ? '✓ Reading by name complete' : '✓ סיום קריאה לפי שם'));
+        } else {
+          setDoneBtnLabel(btn, _hasNext
+            ? (_isEn ? '← Next (' + (playlistIdx+2) + '/' + playlist.length + ')' : '← הבא ברשימה (' + (playlistIdx+2) + '/' + playlist.length + ')')
+            : (_isEn ? '✓ Playlist complete' : '✓ סיום הרשימה'));
+        }
+      } else {
+        setDoneBtnLabel(btn, MODE === 'random'
+          ? (_isEn ? '🎲 Next random chapter' : '🎲 פרק אקראי הבא')
+          : (_isEn ? '← Next chapter' : '← המשך לפרק הבא'));
+      }
+    }
+  } else {
+    // בדוק מוד פשוט
+    const _us = JSON.parse(localStorage.getItem('tehillim_settings') || '{}');
+    if (_us.simpleMode !== false) {
+      btn.style.display = 'none';
+      const _sb = document.getElementById('simpleDoneBtns');
+      if (_sb) { _sb.style.display = 'flex'; _sb.style.gap = '10px'; _sb.style.width = '100%'; }
+    } else {
+      setDoneBtnLabel(btn, _rLang()==='en' ? '✓ Done with this chapter' : '✓ סיימתי פרק זה');
+    }
+  }
+}
+
+/* ── Font size ── */
+function toggleCantillation(val) {
+  hideCantillation = val;
+  const s = S.get('tehillim_settings') || {};
+  s.hideCantillation = val;
+  S.set('tehillim_settings', s);
+  // רנדר מחדש עם/בלי טעמים
+  const cached = S.get('mishnah_cache_' + curId());
+  if (cached && cached.he) {
+    if (shinunActive && shinunLevel > 1) renderShinunVerses(cached.he, shinunLevel);
+    else renderVerses(cached.he, commentaryOn ? currentCommData : null);
+  }
+}
+
+function changeFontSize(delta) {
+  fontSize = Math.max(12, Math.min(32, fontSize + delta));
+  applyFontSize();
+  const s = S.get('tehillim_settings') || {};
+  s.fontSize = fontSize;
+  S.set('tehillim_settings', s);
+}
+function applyFontSize() {
+  document.querySelectorAll('.verse-text').forEach(el => { el.style.fontSize = fontSize + 'px'; });
+  document.getElementById('fontSizeVal').textContent = fontSize;
+}
+
+/* ── Auto scroll (requestAnimationFrame — חלק וסנכרן עם המסך) ── */
+// מהירות גלילה — נטענת מ-Settings (1=איטית 2=רגילה 3=מהירה 4=מהירה מאוד)
+const _SCROLL_SPEEDS = [0, 0.2, 0.4, 0.7, 1.2];
+function _getScrollSpeed() {
+  const lvl = ((S.get('tehillim_settings')||{}).scrollSpeed) || 2;
+  return _SCROLL_SPEEDS[Math.min(4, Math.max(1, lvl))] || 0.4;
+}
+
+function scrollFrame() {
+  if (!autoScroll) return;
+  const ta = document.getElementById('textArea');
+  autoScrollAccum += _getScrollSpeed();
+  const steps = Math.floor(autoScrollAccum);
+  if (steps > 0) {
+    ta.scrollTop += steps;
+    autoScrollAccum -= steps;
+  }
+  autoScrollRAF = requestAnimationFrame(scrollFrame);
+}
+
+function stopAutoScrollRAF() {
+  if (autoScrollRAF) { cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
+  clearTimeout(autoScrollDelayTimer);
+  autoScrollAccum = 0;
+}
+
+function startAutoScrollAfterDelay(delaySec) {
+  stopAutoScrollRAF();
+  if (delaySec === 0) {
+    autoScrollRAF = requestAnimationFrame(scrollFrame);
+  } else {
+    autoScrollDelayTimer = setTimeout(() => {
+      if (autoScroll) autoScrollRAF = requestAnimationFrame(scrollFrame);
+    }, delaySec * 1000);
+  }
+}
+
+function toggleAutoScroll() {
+  autoScroll = !autoScroll;
+  document.getElementById('scrollSw').classList.toggle('on', autoScroll);
+  if (autoScroll) {
+    startAutoScrollAfterDelay(0);
+    showToast(_rLang()==='en' ? '▶ Auto-scroll — double-tap to stop' : '▶ גלילה אוטומטית — דאבל קליק לעצירה');
+  } else {
+    stopAutoScrollRAF();
+    showToast(_rLang()==='en' ? '⏸ Scroll stopped' : '⏸ גלילה עצרה');
+  }
+}
+
+/* ── Save partial reading progress (when navigating away mid-chapter) ── */
+function saveReadingProgress() {
+  if (isDone) return;  // finishChapter כבר טיפל בזה
+
+  // כמה שניות לא נשמרו עדיין?
+  const unsaved = timerSec - savedTimerSec;
+  if (unsaved < 5) return;  // קצר מדי
+
+  // נקודה על שאריות ≥10 שניות (fullBlocks ניתנו כבר ב-setInterval)
+  const rem = unsaved % 20;
+  if (rem >= 10) addScore(1);
+
+  // שמור רק את ה-delta — לא את כל הזמן — כדי למנוע ספירה כפולה בדאשבורד
+  const today = localDateStr();
+  const db = S.get(READ_KEY) || [];
+  db.push({ chap: curId(), date: today, secs: unsaved, pts: sessionPts, ts: Date.now(), partial: true });
+  S.set(READ_KEY, db);
+  savedTimerSec = timerSec;  // מסמן עד כמה נשמר
+}
+
+/* ── Navigation ── */
+function navigate(dir) {
+  saveReadingProgress();
+  stopTimer();
+  // חצים זזים לפרק סמוך ברצף — חוצה גבול מסכת
+  let target = dir > 0 ? Corpus.nextChapter(curTractate, chapNum)
+                       : Corpus.prevChapter(curTractate, chapNum);
+  if (!target) {
+    // wrap-around בקצה הקורפוס (סוף עוקצין ↔ תחילת ברכות)
+    const all = Corpus.flatChapters();
+    target = dir > 0 ? all[0] : all[all.length - 1];
+  }
+  curTractate = target.tractate; chapNum = target.perek;
+  if (MODE === 'cycle') saveCyclePos();
+  resetTimer();
+  loadChapter(curTractate, chapNum);
+  startTimer();
+  const u = new URL(location.href);
+  u.searchParams.set('chap', curId());
+  history.replaceState({}, '', u);
+}
+
+function navigateRandom() {
+  saveReadingProgress();
+  stopTimer();
+  const p = pickRandomChap();   // מעדיף פרקים שטרם נלמדו היום
+  curTractate = p.tractate; chapNum = p.perek;
+  resetTimer();
+  loadChapter(curTractate, chapNum);
+  startTimer();
+  const u = new URL(location.href);
+  u.searchParams.set('chap', curId());
+  history.replaceState({}, '', u);
+}
+
+/* ── Chapter picker — פרקי המסכת הנוכחית ── */
+function openPicker() {
+  const favs = getFavs();
+  const mems = getMems();
+  const t = curTractateObj();
+  const overlay = document.createElement('div');
+  overlay.className = 'chap-picker';
+  overlay.id = 'chapPicker';
+  const _pkEn = _rLang() === 'en';
+  const _tName = _pkEn ? curTractate : (t ? t.he : curTractate);
+  overlay.innerHTML = '<div class="chap-picker-inner">' +
+    '<div class="chap-picker-title">' + (_pkEn ? ('Chapter — ' + _tName) : ('בחר פרק — ' + _tName)) + '</div>' +
+    '<div class="chap-grid" id="chapGrid"></div>' +
+    '<a class="picker-close" href="02-selection.html" style="text-decoration:none;display:block;text-align:center;">' + (_pkEn ? 'Other tractate ▾' : 'מסכת אחרת ▾') + '</a>' +
+    '<button class="picker-close" onclick="closePicker()">' + (_pkEn ? 'Close' : 'סגור') + '</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closePicker(); });
+
+  const grid = document.getElementById('chapGrid');
+  let html = '';
+  const len = t ? t.length : 0;
+  for (let i = 1; i <= len; i++) {
+    const id = Corpus.chapId(curTractate, i);
+    let cls = 'chap-cell';
+    if (i === chapNum) cls += ' active-chap';
+    else if (mems.includes(id)) cls += ' mem-chap';
+    else if (favs.includes(id)) cls += ' fav-chap';
+    html += '<div class="' + cls + '" onclick="pickPerek(' + i + ')">' + toGematria(i) + '</div>';
+  }
+  grid.innerHTML = html;
+
+  // Scroll to current
+  const activeCell = grid.querySelector('.active-chap');
+  if (activeCell) activeCell.scrollIntoView({ block: 'center' });
+}
+
+function closePicker() {
+  const p = document.getElementById('chapPicker');
+  if (p) p.remove();
+}
+
+function pickPerek(p) {
+  closePicker();
+  saveReadingProgress();
+  stopTimer();
+  chapNum = p;
+  resetTimer();
+  loadChapter(curTractate, p);
+  startTimer();
+  const u = new URL(location.href);
+  u.searchParams.set('chap', curId());
+  history.replaceState({}, '', u);
+}
+
+/* ── Favorites & Memorized ── */
+function getFavs() { return S.get(FAV_KEY) || []; }
+function getMems() { return S.get(MEM_KEY) || []; }
+
+/* ── Controls bar toggle (Aa button) ── */
+function toggleControls() {
+  const bar = document.getElementById('controlsBar');
+  const btn = document.getElementById('aaBtn');
+  const open = bar.classList.toggle('open');
+  btn.classList.toggle('active', open);
+}
+
+function toggleFav() {
+  let favs = getFavs();
+  const i = favs.indexOf(curId());
+  if (i === -1) favs.push(curId());
+  else favs.splice(i, 1);
+  S.set(FAV_KEY, favs);
+  updateFavMemButtons();
+  showToast(_rLang()==='en' ? (i === -1 ? '❤️ Added to favorites' : '🤍 Removed from favorites') : (i === -1 ? '❤️ נוסף למועדפים' : '🤍 הוסר מהמועדפים'));
+}
+
+function toggleMem() {
+  let mems = getMems();
+  const i = mems.indexOf(curId());
+  if (i === -1) mems.push(curId());
+  else mems.splice(i, 1);
+  S.set(MEM_KEY, mems);
+  updateFavMemButtons();
+  if (i === -1) {
+    addScore(5);
+    if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(5, 'memorization');
+    showToast(_rLang()==='en' ? '★ Added to memorization — +5 points!' : '★ נוסף לשינון — +5 מעלות!');
+  }
+  else showToast(_rLang()==='en' ? '☆ Removed from memorization' : '☆ הוסר מרשימת השינון');
+}
+
+/* ── Save verse ── */
+function toggleSaveVerse(verseNum, btn) {
+  const saved = S.get(SAVED_KEY) || [];
+  const idx   = saved.findIndex(v => v.chap === curId() && v.verse === verseNum);
+  if (idx === -1) {
+    // שמור
+    const cached = S.get('mishnah_cache_' + curId());
+    const text   = (cached && cached.he) ? (cached.he[verseNum - 1] || '') : '';
+    saved.push({
+      chap:  curId(),
+      verse: verseNum,
+      text,
+      chapRef:  (curTractateObj() ? curTractateObj().he : curTractate) + ' ' + toGematria(chapNum),
+      verseRef: toGematria(verseNum),
+      ts: Date.now()
+    });
+    S.set(SAVED_KEY, saved);
+    btn.classList.add('saved');
+    btn.classList.remove('pop');
+    void btn.offsetWidth; // reflow לאנימציה
+    btn.classList.add('pop');
+    showToast(_rLang()==='en' ? '🔖 Verse saved!' : '🔖 הפסוק נשמר!');
+  } else {
+    // הסר
+    saved.splice(idx, 1);
+    S.set(SAVED_KEY, saved);
+    btn.classList.remove('saved');
+    showToast(_rLang()==='en' ? '🔖 Removed from saved verses' : '🔖 הוסר מהפסוקים השמורים');
+  }
+}
+
+function updateFavMemButtons() {
+  const isFav = getFavs().includes(curId());
+  const isMem = getMems().includes(curId());
+  const fb = document.getElementById('favBtn');
+  const mb = document.getElementById('memBtn');
+  fb.textContent = isFav ? '❤️' : '🤍';
+  fb.classList.toggle('active', isFav);
+  mb.textContent = isMem ? '★' : '☆';
+  mb.classList.toggle('mem-active', isMem);
+}
+
+/* ── Scoring ── */
+function addScore(pts) {
+  sessionPts += pts;
+  document.getElementById('scoreNum').textContent = '+' + sessionPts;
+  const sc = S.get(SCORE_KEY) || { total: 0, today: 0, todayDate: '', daily: {} };
+  const today = localDateStr();
+  if (sc.todayDate !== today) { sc.today = 0; sc.todayDate = today; }
+  sc.total   = (sc.total   || 0) + pts;
+  sc.today   = (sc.today   || 0) + pts;
+  if (!sc.daily) sc.daily = {};
+  sc.daily[today] = (sc.daily[today] || 0) + pts;
+  S.set(SCORE_KEY, sc);
+}
+
+/* ── Timer ── */
+function fmt(s) {
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+function resetTimer() {
+  stopTimer();
+  // 2.1.5: אם יש מעלות מהפרק הקודם, נשמור ל-accumulator לפני האיפוס
+  if (sessionPts > 0) {
+    try {
+      const acc = JSON.parse(localStorage.getItem('tehillim_session_acc') || '{"pts":0,"chaps":0,"lastDone":false}');
+      acc.pts = (acc.pts || 0) + sessionPts;
+      acc.chaps = (acc.chaps || 0) + 1;
+      acc.lastDone = !!isDone;
+      acc.ts = Date.now();
+      localStorage.setItem('tehillim_session_acc', JSON.stringify(acc));
+    } catch(e) {}
+  }
+  timerSec = 0;
+  sessionPts = 0;
+  isDone = false;
+  idlePaused = false;
+  savedTimerSec = 0;
+  lastActivity = Date.now();
+  // עדכן IDLE_MS לפי הפרק הנוכחי
+  if (typeof updateIdleMs === 'function') updateIdleMs();
+  document.getElementById('timerNum').textContent = '0:00';
+  document.getElementById('scoreNum').textContent = '+0';
+  document.getElementById('idleWarning').style.display = 'none';
+}
+
+/* החזרת המעלות החזויות: 5 לפרק שלם + 1 לכל 10 שניות (2.0.8) */
+function projectedMaalot() {
+  if (isDone) return sessionPts;
+  // אם הטיימר עוד לא הגיע ל-10 שניות - מציג 0 (לא להראות +5 לפני שהתחיל לקרוא)
+  if ((timerSec||0) < 10) return 0;
+  const tenSecUnits = Math.floor((timerSec||0) / 10);
+  return 5 + tenSecUnits;
+}
+function updateScoreDisplay() {
+  if (isDone) return;
+  document.getElementById('scoreNum').textContent = '+' + projectedMaalot();
+}
+
+function startTimer() {
+  if (timerInterval) return;
+  lastActivity = Date.now();
+  timerInterval = setInterval(() => {
+    updateScoreDisplay();
+    // אם כבר במצב idle — לא מאפשרים חזרה דרך נגיעה במסך, רק במעבר לפרק חדש
+    if (idlePaused) return;
+    const idle = Date.now() - lastActivity;
+    if (idle >= IDLE_MS) {
+      idlePaused = true;
+      document.getElementById('idleWarning').style.display = 'block';
+      return;
+    }
+    timerSec++;
+    document.getElementById('timerNum').textContent = fmt(timerSec);
+    // מגבלת זמן מקסימלית: 3 דק' לפרק רגיל, 11 דק' לקי"ט
+    const MAX_SECS = 180;
+    if (timerSec >= MAX_SECS) {
+      idlePaused = true;
+      document.getElementById('idleWarning').style.display = 'block';
+      return;
+    }
+    if (timerSec % 20 === 0) {
+      addScore(1);
+      saveTime(20);
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (!timerInterval) return;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  const rem = timerSec % 20;
+  if (rem > 0) saveTime(rem);
+}
+
+function saveTime(secs) {
+  const rd = S.get('tehillim_reading') || {};
+  const today = localDateStr();
+  if (!rd.dailyMinutes) rd.dailyMinutes = {};
+  if (!rd.dailyMinutes[today]) rd.dailyMinutes[today] = 0;
+  rd.dailyMinutes[today] = +(rd.dailyMinutes[today] + secs/60).toFixed(3);
+  S.set('tehillim_reading', rd);
+}
+
+/* ── Activity tracking (resets idle) ── */
+['touchstart','mousedown','keydown'].forEach(ev =>
+  document.addEventListener(ev, () => { lastActivity = Date.now(); }, { passive: true })
+);
+document.getElementById('textArea').addEventListener('scroll', () => {
+  lastActivity = Date.now();
+  updateReadProgress();
+});
+
+
+/* ── Double-click / double-tap to toggle auto-scroll ── */
+document.getElementById('textArea').addEventListener('dblclick', () => {
+  toggleAutoScroll();
+});
+// Double-tap support for mobile
+let lastTap = 0;
+document.getElementById('textArea').addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTap < 300) {
+    e.preventDefault();
+    toggleAutoScroll();
+  }
+  lastTap = now;
+}, { passive: false });
+
+/* ── Playlist navigation ── */
+function navigatePlaylist() {
+  if (!playlist) return;
+  playlistIdx++;
+  if (playlistIdx >= playlist.length) {
+    // סיום הרשימה
+    const pl = S.get('tehillim_playlist') || {};
+    const isHida = pl.source === 'hida';
+    showToast(_rLang()==='en' ? (isHida ? '🎉 Name-based reading complete!' : '🎉 All favorite chapters done!') : (isHida ? '🎉 סיום קריאה לפי שם!' : '🎉 סיימת את כל פרקי המועדפים!'));
+    setTimeout(() => { location.href = '02-selection.html'; }, 1800);
+    return;
+  }
+  const pl = S.get('tehillim_playlist') || {};
+  pl.idx = playlistIdx;
+  S.set('tehillim_playlist', pl);
+  const pp = parseChap(playlist[playlistIdx]);
+  if (pp) { curTractate = pp.tractate; chapNum = pp.perek; }
+  resetTimer();
+  loadChapter(curTractate, chapNum);
+  startTimer();
+  updatePlaylistBadge();
+  const u = new URL(location.href);
+  u.searchParams.set('chap', curId());
+  history.replaceState({}, '', u);
+}
+
+/* ── Hida navigation ── */
+function navigateHida() {
+  if (!_hidaSession || !_hidaSession.verses) { navigate(1); return; }
+  const nextIdx = (_hidaSession.idx || 0) + 1;
+  if (nextIdx >= _hidaSession.verses.length) {
+    // סיימנו את כל האותות
+    S.remove && S.remove('tehillim_hida_session');
+    localStorage.removeItem('tehillim_hida_session');
+    showToast(_rLang()==='en' ? '🎉 Reading complete for ' + (_hidaSession.name || '') + '!' : '🎉 סיום קריאה לפי שם ' + (_hidaSession.name || '') + '!');
+    setTimeout(() => { location.href = '02-selection.html'; }, 1500);
+    return;
+  }
+  // עדכן index ועבור לקטע הבא
+  _hidaSession.idx = nextIdx;
+  S.set('tehillim_hida_session', _hidaSession);
+  const next = _hidaSession.verses[nextIdx];
+  _hidaVerseFrom = next.from;
+  _hidaVerseTo   = next.to;
+  // אפס מצב קריאה לאות החדשה
+  isDone = false;
+  hasReachedBottom = false;
+  // מחק באנר קודם אם קיים
+  const old = document.getElementById('hidaBanner');
+  if (old) old.remove();
+  // טען מחדש את הפרק הנוכחי עם הפסוקים החדשים (מצב חידא — לעיצוב מחדש ביזכור)
+  loadChapter(curTractate, chapNum);
+}
+
+/* ── Mark done ── */
+function markDone() {
+  if (isDone) {
+    // מצב חידא — עבור לקטע הבא
+    if (MODE === 'hida') { navigateHida(); return; }
+    if (MODE === 'playlist') navigatePlaylist();
+    else if (MODE === 'random') navigateRandom();
+    else navigate(1);
+    return;
+  }
+
+  // לא הגיע לסוף — גלול שם
+  if (!hasReachedBottom) {
+    const ta = document.getElementById('textArea');
+    ta.scrollTo({ top: ta.scrollHeight, behavior: 'smooth' });
+    showToast(_rLang()==='en' ? '📖 Scroll to end of chapter first' : '📖 גלול עד לסוף הפרק תחילה');
+    return;
+  }
+
+  // מהיר מדי — פחות מ-5 שניות
+  if (timerSec < 5) {
+    showQuickConfirm();
+    return;
+  }
+
+  finishChapter();
+}
+
+function showQuickConfirm() {
+  const btn = document.getElementById('doneBtn');
+  btn.style.display = 'none';
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-confirm';
+  wrap.id = 'quickConfirm';
+  const _qcEn = _rLang() === 'en';
+  wrap.innerHTML =
+    '<button class="qc-back" onclick="dismissConfirm()">' + (_qcEn ? '📖 Back to reading' : '📖 אחזור לקרוא') + '</button>' +
+    '<button class="qc-continue" onclick="skipChapter()">' + (_qcEn ? '← Skip chapter' : '← דלג לפרק הבא') + '</button>';
+  btn.parentNode.insertBefore(wrap, btn);
+  showToast(_rLang()==='en' ? 'Take time to read carefully? 🤔' : 'האם לא תרצה לקרוא את הפרק בעיון? 🤔');
+}
+
+function dismissConfirm() {
+  const c = document.getElementById('quickConfirm');
+  if (c) c.remove();
+  document.getElementById('doneBtn').style.display = '';
+}
+
+// דילוג — המשתמש לחץ "סיימתי" לפני 5 שניות, בחר לעבור הלאה
+// saveReadingProgress לא נקרא כאן כי timerSec < 5 (מוגן בתנאי פנימי)
+function skipChapter() {
+  dismissConfirm();
+  stopTimer();
+  if (MODE === 'random') navigateRandom();
+  else navigate(1);
+}
+
+function finishChapter() {
+  dismissConfirm();
+  isDone = true;
+
+  // === מעלות (2.0.8): 5 + (secs/10) ===
+  let earned = 0;
+  let gamMeta = null;
+  if (typeof Gamification !== 'undefined' && Gamification.onChapterCompleted) {
+    gamMeta = Gamification.onChapterCompleted(curId(), timerSec);
+    earned = gamMeta && gamMeta.pts ? gamMeta.pts : (5 + Math.floor((timerSec||0)/10));
+  } else {
+    earned = 5 + Math.floor((timerSec||0)/10);
+  }
+  // 2.2.13: addScore רק את ה-DELTA בין מה ש-gamification חישב לבין מה שכבר נצבר ב-sessionPts
+  // (כל 20 שניות נצברה כבר נקודה ב-sessionPts דרך ה-timer)
+  const alreadyAccrued = sessionPts; // מה שנצבר ע"י הטיימר עד עכשיו
+  if (earned > alreadyAccrued) {
+    addScore(earned - alreadyAccrued); // רק הדלתא החסרה
+  }
+  // שמור pending toast להצגה בדשבורד הבא
+  try {
+    localStorage.setItem('tehillim_pending_toast', JSON.stringify({
+      pts: sessionPts, // sessionPts אחרי ה-addScore הנ"ל = earned
+      chap: curId(),
+      ts: Date.now()
+    }));
+  } catch(e) {}
+
+  const today = localDateStr();
+  const db = S.get(READ_KEY) || [];
+  const finalSecs = timerSec - savedTimerSec;
+  db.push({ chap: curId(), date: today, secs: finalSecs > 0 ? finalSecs : timerSec, pts: sessionPts, ts: Date.now() });
+  S.set(READ_KEY, db);
+  savedTimerSec = timerSec;
+  stopTimer();
+  const btn = document.getElementById('doneBtn');
+  btn.style.display = '';
+  btn.classList.remove('locked');
+  btn.classList.add('done');
+  setDoneBtnLabel(btn, nextBtnLabel());
+
+  // במוד פשוט — הצג שני כפתורים במקום אחד
+  const settings = JSON.parse(localStorage.getItem('tehillim_settings') || '{}');
+  if (settings.simpleMode !== false) {
+    btn.style.display = 'none';
+    const simpleBtns = document.getElementById('simpleDoneBtns');
+    if (simpleBtns) { simpleBtns.style.display = 'flex'; simpleBtns.style.gap = '10px'; simpleBtns.style.width = '100%'; }
+  }
+
+  // 2.1.5: הטוסט מציג את sessionPts (אותו ערך כמו במונה בפינה)
+  const _isEn = _rLang() === 'en';
+  let toastMsg = _isEn ? '✨ Well done! +' + sessionPts + ' points' : '✨ כל הכבוד! +' + sessionPts + ' מעלות';
+  if (gamMeta && gamMeta.levelUp) {
+    toastMsg += _isEn ? ' · Level up: ' + (gamMeta.levelUp.icon||'') + ' ' + (gamMeta.levelUp.key||'') : ' · עלית לרמת ' + (gamMeta.levelUp.icon||'') + ' ' + (gamMeta.levelUp.key||'');
+  }
+  showToast(toastMsg);
+
+  checkAndShowMedal();
+  if (window._syncGroupStats) window._syncGroupStats();
+  if (window._syncPublicStats) window._syncPublicStats(curId());
+}
+
+/* ── Simple Mode Done Buttons ── */
+window.finishAndHome = function() {
+  // כבר סומן ב-finishChapter, פשוט חזור הביתה
+  window.location.href = '01-dashboard.html';
+};
+
+window.finishAndNext = function() {
+  // כבר סומן ב-finishChapter, עבור לפרק הבא
+  const simpleBtns = document.getElementById('simpleDoneBtns');
+  if (simpleBtns) simpleBtns.style.display = 'none';
+  const btn = document.getElementById('doneBtn');
+  if (btn) btn.style.display = '';
+  if (MODE === 'hida') { navigateHida(); return; }
+  if (MODE === 'playlist') { navigatePlaylist(); return; }
+  if (MODE === 'random') { navigateRandom(); return; }
+  navigate(1);
+};
+
+/* ── Toast ── */
+function _rLang() {
+  try { return (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : (JSON.parse(localStorage.getItem('tehillim_settings')||'{}').lang || 'he'); } catch(e) { return 'he'; }
+}
+
+let toastTmr;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── Next button label helper ── */
+function nextBtnLabel() {
+  const _isEn = _rLang() === 'en';
+  if (MODE === 'playlist' && playlist) {
+    const next = playlistIdx + 1;
+    return next < playlist.length
+      ? (_isEn ? '← Next (' + (next+1) + '/' + playlist.length + ')' : '← הבא ברשימה (' + (next+1) + '/' + playlist.length + ')')
+      : (_isEn ? '✓ Playlist complete' : '✓ סיום רשימת המועדפים');
+  }
+  if (MODE === 'random') return _isEn ? '🎲 Next random chapter' : '🎲 פרק אקראי הבא';
+  return _isEn ? '← Next chapter' : '← המשך לפרק הבא';
+}
+
+/* ── Mode badge ── */
+function initMode() {
+  const mb = document.getElementById('modeBadge');
+  if (MODE === 'random') {
+    mb.textContent = '🎲 מצב אקראי'; mb.style.display = 'block'; mb.style.cursor='pointer'; mb.onclick=navigateRandom;
+  } else if (MODE === 'cycle') {
+    mb.textContent = '🔄 מצב סבב'; mb.style.display = 'block';
+  } else if (MODE === 'playlist') {
+    updatePlaylistBadge();
+  }
+}
+
+function updatePlaylistBadge() {
+  const mb = document.getElementById('modeBadge');
+  if (!playlist) return;
+  mb.textContent = '❤️ ' + (playlistIdx + 1) + ' / ' + playlist.length;
+  mb.style.display = 'block';
+  mb.style.cursor = 'pointer';
+  mb.title = 'חזור לרשימת המועדפים';
+  mb.onclick = () => { location.href = '02-selection.html'; };
+}
+
+/* ── Commentary toggle & type ── */
+async function toggleCommentary() {
+  commentaryOn = !commentaryOn;
+  document.getElementById('commBtn').classList.toggle('active', commentaryOn);
+  document.getElementById('commBar').style.display = commentaryOn ? 'flex' : 'none';
+  if (commentaryOn) {
+    showToast(_rLang()==='en' ? '📖 Commentary on' : '📖 מצב פירוש פועל');
+    // טעינת פירוש לפרק הנוכחי
+    await loadCommentaryForCurrentChapter();
+  } else {
+    showToast(_rLang()==='en' ? '📖 Commentary off' : '📖 פירוש כובה');
+    currentCommData = null;
+    // רינדר מחדש ללא פירוש (הנתונים כבר cached)
+    const cached = S.get('mishnah_cache_' + curId());
+    if (cached && cached.he) renderVerses(cached.he, null);
+  }
+}
+
+async function loadCommentaryForCurrentChapter() {
+  // הצג loading על הפירושים (שמור פסוקים נוכחיים)
+  const ta = document.getElementById('textArea');
+  const loadingDivs = ta.querySelectorAll('.verse-content');
+  loadingDivs.forEach(el => {
+    const existing = el.querySelector('.verse-commentary');
+    if (!existing) {
+      const ld = document.createElement('div');
+      ld.className = 'comm-loading';
+      ld.textContent = _rLang()==='en' ? 'Loading commentary...' : 'טוען פירוש...';
+      el.appendChild(ld);
+    }
+  });
+  try {
+    const commData = await fetchCommentary(curTractate, chapNum, commentaryType);
+    currentCommData = commData;
+    // רינדר מחדש עם פירוש
+    const cached = S.get('mishnah_cache_' + curId());
+    if (cached && cached.he) renderVerses(cached.he, commData);
+  } catch(e) {
+    showToast(_rLang()==='en' ? '⚠️ Error loading commentary' : '⚠️ שגיאה בטעינת הפירוש');
+    // נקה loading
+    ta.querySelectorAll('.comm-loading').forEach(el => el.remove());
+  }
+}
+
+async function setCommType(type) {
+  if (commentaryType === type) return;
+  commentaryType = type;
+  document.getElementById('commBtnBartenura').classList.toggle('active', type === 'bartenura');
+  document.getElementById('commBtnTosafot').classList.toggle('active', type === 'tosafot');
+  currentCommData = null;
+  // רינדר מחדש עם הפרק הנוכחי ופירוש חדש
+  const cached = S.get('mishnah_cache_' + curId());
+  if (cached && cached.he) renderVerses(cached.he, null); // קודם כל נקה
+  await loadCommentaryForCurrentChapter();
+}
+
+/* ══════════════════════════════════════════
+   SHINUN (MEMORIZATION PRACTICE) MODE
+══════════════════════════════════════════ */
+let shinunActive = false;
+let shinunLevel  = 1;
+let _shinunVerses = [];
+let _testResults  = {};
+
+function toggleShinunMode() {
+  shinunActive = !shinunActive;
+  const btn = document.getElementById('shinunModeBtn');
+  const bar = document.getElementById('shinunBar');
+  btn.classList.toggle('active', shinunActive);
+  bar.classList.toggle('open', shinunActive);
+  document.getElementById('shinunBanner').style.display = 'none';
+
+  if (shinunActive) {
+    // Mark chapter for memorization automatically
+    if (!getMems().includes(chapNum)) toggleMem();
+    setShinunLevel(1);
+    showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels await' : '🧠 מצב שינון — 4 שלבים מחכים לך');
+  } else {
+    shinunLevel = 1;
+    // Restore normal view
+    const cached = S.get('mishnah_cache_' + curId());
+    if (cached && cached.he) renderVerses(cached.he, commentaryOn ? currentCommData : null);
+  }
+}
+
+function setShinunLevel(lvl) {
+  shinunLevel = lvl;
+  [1,2,3,4].forEach(i =>
+    document.getElementById('slvl'+i).classList.toggle('active', i===lvl)
+  );
+  document.getElementById('shinunBanner').style.display = 'none';
+  const cached = S.get('mishnah_cache_' + curId());
+  if (cached && cached.he) renderShinunVerses(cached.he, lvl);
+}
+
+function renderShinunVerses(verses, level) {
+  _shinunVerses = verses;
+  _testResults  = {};
+  const ta = document.getElementById('textArea');
+
+  if (level === 1) {
+    renderVerses(verses, null);
+    return;
+  }
+
+  let html = '';
+  verses.forEach((v, i) => {
+    const words = v.split(' ');
+    let inner = '';
+
+    if (level === 2) {
+      // Hide last ~30% of words (min 1, max 4)
+      const hideN = Math.max(1, Math.min(4, Math.round(words.length * 0.3)));
+      const shown  = words.slice(0, words.length - hideN).join(' ');
+      const hidden = words.slice(words.length - hideN).join(' ');
+      inner = `<span class="verse-text" style="font-size:${fontSize}px">` +
+        shown + ' ' +
+        `<span class="cover-block" id="cb${i}" onclick="revealCover(${i},\`${hidden.replace(/`/g,"'")}\`)">${hidden}</span>` +
+        `</span>`;
+
+    } else if (level === 3) {
+      const firstWord = words[0];
+      inner = `<div class="verse-wrap tappable" id="vw${i}" onclick="revealVerse3(${i})">` +
+        `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px">${firstWord} <span style="color:var(--text-muted)">...</span></span>` +
+        `<div class="shinun-hint" id="vh${i}">הקש לגלות ←</div>` +
+        `</div>`;
+
+    } else if (level === 4) {
+      inner = `<div class="verse-wrap tappable" id="vw${i}" onclick="revealVerse4(${i})">` +
+        `<div class="verse-hidden-label" id="vhl${i}">פסוק ${toGematria(i+1)} — הקש לגלות 👆</div>` +
+        `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;">${v}</span>` +
+        `</div>`;
+    }
+
+    html += `<div class="verse">` +
+      (showVerseNums ? `<span class="verse-num">${toGematria(i+1)}</span>` : '') +
+      `<div class="verse-content">${inner}</div>` +
+      `</div>`;
+  });
+
+  html += '<div id="bottomSentinel" style="height:2px;width:100%;"></div>';
+  ta.innerHTML = html;
+  ta.scrollTop = 0;
+  resetReadProgress();
+}
+
+/* Level 2 — reveal covered ending */
+function revealCover(idx, text) {
+  const el = document.getElementById('cb' + idx);
+  if (!el) return;
+  el.classList.add('revealed');
+  el.textContent = text;
+  el.onclick = null;
+}
+
+/* Level 3 — reveal full verse */
+function revealVerse3(idx) {
+  const vt = document.getElementById('vt' + idx);
+  const vh = document.getElementById('vh' + idx);
+  const vw = document.getElementById('vw' + idx);
+  if (!vt || !_shinunVerses[idx]) return;
+  vt.style.fontSize = fontSize + 'px';
+  vt.innerHTML = `<span class="verse-text" style="font-size:${fontSize}px">${_shinunVerses[idx]}</span>`;
+  if (vh) vh.remove();
+  if (vw) vw.classList.remove('tappable');
+  vw.onclick = null;
+}
+
+/* Level 4 — reveal + self-assess */
+function revealVerse4(idx) {
+  const vw  = document.getElementById('vw' + idx);
+  const vt  = document.getElementById('vt' + idx);
+  const vhl = document.getElementById('vhl' + idx);
+  if (!vt || vt.style.display !== 'none') return; // already revealed
+  vhl.style.display = 'none';
+  vt.style.display  = 'block';
+  vw.onclick = null;
+  vw.classList.remove('tappable');
+  // Assess buttons
+  const row = document.createElement('div');
+  row.className = 'assess-row';
+  row.id = 'ar' + idx;
+  row.innerHTML =
+    `<button class="assess-btn assess-yes" onclick="assessVerse(${idx},true)">✓ ידעתי</button>` +
+    `<button class="assess-btn assess-no"  onclick="assessVerse(${idx},false)">✗ לא ידעתי</button>`;
+  vw.parentElement.appendChild(row);
+}
+
+function assessVerse(idx, knew) {
+  _testResults[idx] = knew;
+  const row = document.getElementById('ar' + idx);
+  if (row) {
+    row.innerHTML = knew
+      ? '<div style="color:var(--green);font-size:12px;padding:4px 0;font-weight:600;">✓ מצוין!</div>'
+      : '<div style="color:#C04040;font-size:12px;padding:4px 0;font-weight:600;">↩ חזור על הפסוק</div>';
+  }
+  // All assessed?
+  if (_shinunVerses.length && Object.keys(_testResults).length === _shinunVerses.length) {
+    const knew  = Object.values(_testResults).filter(Boolean).length;
+    const total = _shinunVerses.length;
+    const pct   = Math.round(knew / total * 100);
+    const banner = document.getElementById('shinunBanner');
+    banner.style.display = 'block';
+    banner.innerHTML = pct === 100
+      ? `🎉 מושלם! ידעת את כל ${total} הפסוקים בעל-פה!`
+      : `🎯 ידעת ${knew} מתוך ${total} פסוקים (${pct}%) — כדאי לחזור על השאר`;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* ── Medal system ── */
+const MEDALS_DEF = [
+  { level:'platinum', label:'פלטינה', emoji:'💎', minMin:45, color:'#5090C8', bonus:50 },
+  { level:'gold',     label:'זהב',    emoji:'🥇', minMin:30, color:'#C8A800', bonus:35 },
+  { level:'silver',   label:'כסף',    emoji:'🥈', minMin:15, color:'#909098', bonus:20 },
+  { level:'bronze',   label:'ארד',    emoji:'🥉', minMin: 5, color:'#CD7F32', bonus:10 },
+];
+const MEDAL_RANK = { bronze:1, silver:2, gold:3, platinum:4 };
+
+function checkAndShowMedal() {
+  const rd   = S.get('tehillim_reading') || {};
+  const todayMins = (rd.dailyMinutes || {})[localDateStr()] || 0;
+  const earned = MEDALS_DEF.find(m => todayMins >= m.minMin);
+  if (!earned) return;
+
+  const todayStr = localDateStr();
+  const shown    = S.get('tehillim_medal_shown') || {};
+  const shownRank = (shown.date === todayStr) ? (MEDAL_RANK[shown.level] || 0) : 0;
+  if (MEDAL_RANK[earned.level] <= shownRank) return; // לא הישג חדש
+
+  // שמור שהראינו את המדליה הזו היום
+  S.set('tehillim_medal_shown', { date: todayStr, level: earned.level });
+
+  // הוסף לרשומות המדליות
+  const allEarned = S.get('tehillim_medals_earned') || [];
+  allEarned.push({ level: earned.level, date: todayStr, mins: todayMins, ts: Date.now() });
+  S.set('tehillim_medals_earned', allEarned);
+
+  // הענק מעלות בונוס
+  if (earned.bonus) {
+    addScore(earned.bonus);
+    if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(earned.bonus, 'medal-bonus');
+  }
+
+  // הצג פופ-אפ אחרי רגע קצר
+  setTimeout(() => showMedalPopup(earned), 600);
+}
+
+function showMedalPopup(m) {
+  const overlay = document.createElement('div');
+  overlay.className = 'medal-popup-overlay';
+  overlay.id = 'medalPopup';
+  overlay.innerHTML =
+    '<div class="medal-popup">' +
+      '<span class="medal-popup-emoji">' + m.emoji + '</span>' +
+      '<div class="medal-popup-title">מדליה חדשה!</div>' +
+      '<div class="medal-popup-name" style="color:' + m.color + '">מדליית ' + m.label + '</div>' +
+      '<div class="medal-popup-desc">צברת ' + m.minMin + '+ דקות קריאת תהילים היום 🎉</div>' +
+      '<div class="medal-popup-btns">' +
+        '<button class="medal-popup-close" onclick="closeMedalPopup()">המשך קריאה</button>' +
+        '<button class="medal-popup-cert" style="background:' + m.color + '" onclick="viewMedalCert(\'' + m.level + '\')">צפה בתעודה ✨</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeMedalPopup(); });
+}
+
+function closeMedalPopup() {
+  const p = document.getElementById('medalPopup');
+  if (p) p.remove();
+}
+
+function viewMedalCert(level) {
+  closeMedalPopup();
+  location.href = '04-history.html?cert=' + level;
+}
+
+/* ── Exit session (finish & go back) ── */
+function exitSession() {
+  // 2.1.4: סיום חכם - אם גלל עד הסוף + 20+ שניות, סמן כפרק שלם
+  if (!isDone && timerSec >= 10) {  // 2.2.23: הורד מ-20ל-10 שניות לפרקים קצרים
+    try {
+      const textArea = document.getElementById('textArea');
+      if (textArea) {
+        const scrolledToEnd = textArea.scrollTop + textArea.clientHeight >= textArea.scrollHeight - 50;
+        if (scrolledToEnd) {
+          // מסמן את הפרק כהושלם + מעלות (2.2.3: תוקן — לא היה מעניק מעלות)
+          isDone = true;
+          // מעלות — בדיוק כמו finishChapter()
+          let earned = 0;
+          if (typeof Gamification !== 'undefined' && Gamification.onChapterCompleted) {
+            const gamMeta = Gamification.onChapterCompleted(curId(), timerSec);
+            earned = gamMeta && gamMeta.pts ? gamMeta.pts : (5 + Math.floor((timerSec||0)/10));
+          } else {
+            earned = 5 + Math.floor((timerSec||0)/10);
+          }
+          addScore(earned);
+          // שמור היסטוריה
+          const today = localDateStr();
+          const db = S.get(READ_KEY) || [];
+          const finalSecs = timerSec - savedTimerSec;
+          db.push({ chap: curId(), date: today, secs: finalSecs > 0 ? finalSecs : timerSec, pts: earned, ts: Date.now() });
+          S.set(READ_KEY, db);
+          savedTimerSec = timerSec;
+        }
+      }
+    } catch(e) {}
+  }
+  // שמור pending_toast לפני יציאה - כולל סכימה מהסשן (אם קראת כמה פרקים)
+  try {
+    let totalPts = sessionPts;
+    let chapsCount = sessionPts > 0 ? 1 : 0;
+    let anyDone = !!isDone;
+    // הוסף מה-accumulator (פרקים קודמים בסשן)
+    const accRaw = localStorage.getItem('tehillim_session_acc');
+    if (accRaw) {
+      const acc = JSON.parse(accRaw);
+      totalPts += (acc.pts || 0);
+      chapsCount += (acc.chaps || 0);
+      if (acc.lastDone) anyDone = true;
+    }
+    if (totalPts > 0) {
+      localStorage.setItem('tehillim_pending_toast', JSON.stringify({
+        pts: totalPts,
+        chap: curId(),
+        chaps: chapsCount,
+        ts: Date.now(),
+        partial: !anyDone && chapsCount === 1
+      }));
+    }
+    // נקה את ה-accumulator
+    localStorage.removeItem('tehillim_session_acc');
+  } catch(e) {}
+  saveReadingProgress();
+  stopTimer();
+  if (MODE === 'cycle') saveCyclePos();
+  // חזרה לדף הנכון לפי המצב
+  // חזרה לדף הנכון לפי המקור
+  // אם הגיע מהדשבורד (mode=random, cycle, או referrer=dashboard או from=dashboard) → דשבורד
+  // אם הגיע מבחירה ספציפית (mode=chap או mode=normal ממסך הבחירה) → בחירה
+  const _fromDash = (MODE === 'random' || MODE === 'cycle' ||
+    params.get('from') === 'dashboard' ||
+    (document.referrer && document.referrer.includes('01-dashboard')));
+  location.href = _fromDash ? '01-dashboard.html' : '02-selection.html';
+}
+
+function saveCyclePos() {
+  if (MODE === 'cycle') S.set('mishnah_cycle_pos', curId());
+}
+
+/* ── Visibility / unload ── */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // המשתמש עזב — שמור התקדמות ועצור שעון
+    saveReadingProgress();
+    if (MODE === 'cycle') saveCyclePos();
+    stopTimer();
+  } else {
+    // המשתמש חזר — הפעל מחדש (timerSec ממשיך מהמקום שעצר, savedTimerSec תקף)
+    lastActivity = Date.now();
+    if (!timerInterval && !isDone) startTimer();
+  }
+});
+window.addEventListener('beforeunload', () => {
+  saveReadingProgress();
+  if (MODE === 'cycle') saveCyclePos();
+  stopTimer();
+});
+
+/* ── Dedication banner ── */
+function initDedication() {
+  const ded = S.get('tehillim_dedication');
+  if (!ded || !ded.name) return;
+  const today = localDateStr();
+  if (ded.date !== today) {
+    // פג תוקף — נקה
+    localStorage.removeItem('tehillim_dedication');
+    return;
+  }
+  const banner = document.getElementById('dedicationBanner');
+  document.getElementById('dedLabel').textContent = 'קורא לרפואת ' + ded.name;
+  banner.style.display = 'flex';
+}
+
+function dismissDedication() {
+  document.getElementById('dedicationBanner').style.display = 'none';
+  localStorage.removeItem('tehillim_dedication');
+  showToast(_rLang()==='en' ? '💙 Dedication complete' : '💙 ההקדשה הסתיימה');
+}
+
+/* ── Init ── */
+initMode();
+applyFontSize();
+initDedication();
+loadChapter(curTractate, chapNum);
+startTimer(); // starts immediately, independent of network fetch
+</script>
+
+<!-- ══ Firebase sync — group + leaderboard + chapReads ══ -->
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, setDoc, increment } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const FB_CFG2 = {
+  apiKey:            "AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
+  authDomain:        "mishnayot-71073.firebaseapp.com",
+  projectId:         "mishnayot-71073",
+  storageBucket:     "mishnayot-71073.firebasestorage.app",
+  messagingSenderId: "445059664136",
+  appId:             "1:445059664136:web:fec8a4f338fd326d3b04bd"
+};
+const _fbApp2 = getApps().length ? getApps()[0] : initializeApp(FB_CFG2);
+const _db2    = getFirestore(_fbApp2);
+const _auth2  = getAuth(_fbApp2);
+
+const _S2 = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } } };
+
+function _getUid2() {
+  let uid = _S2.get('tehillim_uid');
+  if (!uid) { uid = 'u_' + Math.random().toString(36).slice(2,9)+Date.now().toString(36); localStorage.setItem('tehillim_uid', JSON.stringify(uid)); }
+  return uid;
+}
+
+// כתוב ל-leaderboard ול-chapReads בסיום פרק
+// ── Firebase writes חסכוניות ──
+// chapReads: מצבור מקומי, שולח ב-batch כל 10 פרקים או ב-beforeunload
+// leaderboard: פעם אחת ביום בלבד
+const _CHAP_READS_KEY = 'tehillim_chapReads_pending';
+const _LEADER_SENT_KEY = 'tehillim_leader_sent_date';
+
+// הוסף לצבר המקומי
+function _queueChapRead(chap) {
+  if (!chap) return;
+  try {
+    const q = JSON.parse(localStorage.getItem(_CHAP_READS_KEY) || '{}');
+    q[String(chap)] = (q[String(chap)] || 0) + 1;
+    localStorage.setItem(_CHAP_READS_KEY, JSON.stringify(q));
+  } catch(e) {}
+}
+
+// שלח את כל הצבר ל-Firebase ואפס
+async function _flushChapReads() {
+  try {
+    const q = JSON.parse(localStorage.getItem(_CHAP_READS_KEY) || '{}');
+    if (!Object.keys(q).length) return;
+    const uid = _getUid2();
+    if (!uid) return;
+    // שלח במקביל
+    await Promise.all(Object.entries(q).map(([ch, cnt]) =>
+      setDoc(doc(_db2, 'chapReads', ch), { count: increment(cnt) }, { merge: true })
+    ));
+    localStorage.removeItem(_CHAP_READS_KEY);
+  } catch(e) { console.warn('flushChapReads:', e); }
+}
+
+// עדכן leaderboard — פעם אחת ביום
+async function _syncLeaderboard() {
+  try {
+    const today = localDateStr();
+    const lastSent = localStorage.getItem(_LEADER_SENT_KEY);
+    if (lastSent === today) return; // כבר שלחנו היום
+    const uid = _getUid2();
+    if (!uid) return;
+    const sc   = _S2.get('tehillim_score') || {};
+    const sett = _S2.get('tehillim_settings') || {};
+    const gUser = _S2.get('tehillim_google_user');
+    let displayName = null;
+    if (sett.leaderboard !== false) {
+      displayName = sett.username || (gUser && gUser.displayName) || 'משתמש אנונימי';
+    }
+    await setDoc(doc(_db2, 'leaderboard', uid), {
+      displayName, score: sc.total || 0, updatedAt: Date.now()
+    }, { merge: true });
+    localStorage.setItem(_LEADER_SENT_KEY, today);
+  } catch(e) { console.warn('syncLeaderboard:', e); }
+}
+
+// ספירת פרקים שנצברו — שלח כל 10
+let _pendingChapCount = 0;
+
+window._syncPublicStats = async function(chap) {
+  // צבור chapRead מקומית
+  _queueChapRead(chap);
+  _pendingChapCount++;
+  // שלח ב-batch כל 10 פרקים
+  if (_pendingChapCount >= 10) {
+    _pendingChapCount = 0;
+    await _flushChapReads();
+  }
+  // leaderboard — פעם ביום
+  await _syncLeaderboard();
+};
+
+// שלח הכל לפני עזיבת הדף
+window.addEventListener('beforeunload', () => { _flushChapReads(); });
+window.addEventListener('pagehide', () => { _flushChapReads(); });
+
+// קרא ל-_syncPublicStats מ-finishChapter (שנמצא ב-scope הראשי)
+// נחכה עד ש-finishChapter יקרא ל-window._syncGroupStats ואז נשלח גם את הציבורי
+const _origSyncGroup = window._syncGroupStats;
+
+const _grp = (() => { try { return JSON.parse(localStorage.getItem('tehillim_group')); } catch(e) { return null; } })();
+if (_grp && _grp.code) {
+  const { initializeApp: _ia, getApps: _ga } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const { getFirestore: _gf, doc: _d, setDoc: _sd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+  const fbApp = _ga().length ? _ga()[0] : _ia(FB_CFG2);
+  const db    = _gf(fbApp);
+
+  const S = {
+    get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
+  };
+
+  function getUid() {
+    let uid = S.get('tehillim_uid');
+    if (!uid) {
+      uid = 'u_' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+      localStorage.setItem('tehillim_uid', JSON.stringify(uid));
+    }
+    return uid;
+  }
+
+  // Attach sync function to window so finishChapter() can call it
+  window._syncGroupStats = async function() {
+    try {
+      const grp   = S.get('tehillim_group');
+      if (!grp || !grp.code) return;
+      const MY_ID = getUid();
+      const today = localDateStr();
+      const yesterday = localDateStr(new Date(Date.now()-86400000));
+      const readings = S.get('tehillim_readings') || [];
+      const sc       = S.get('tehillim_score')    || {};
+      const rd       = S.get('tehillim_reading')  || {};
+      const vis      = S.get('tehillim_visits')   || {};
+      const sett     = S.get('tehillim_settings') || {};
+
+      const todayDone = new Set(readings.filter(r => r.date===today && !r.partial).map(r=>r.chap));
+      const allDone   = [...new Set(readings.filter(r=>!r.partial).map(r=>r.chap))];
+      const todayMins  = ((rd.dailyMinutes||{})[today]||0);
+      const todayScore = (sc.todayDate===today ? sc.today : 0)||0;
+      const trendDelta = ((sc.daily||{})[today]||0) - ((sc.daily||{})[yesterday]||0);
+
+      const stats = {
+        displayName: sett.username || 'אנונימי',
+        todayDate:   today,
+        todayChaps:  todayDone.size,
+        todayMins:   Math.round(todayMins),
+        todayScore,
+        totalScore:  sc.total||0,
+        totalChaps:  allDone.length,
+        trendDelta,
+        visitCount:  vis.count||0,
+        lastActive:  Date.now(),
+        chapsDone:   allDone
+      };
+      await setDoc(doc(db, 'groups', grp.code, 'members', MY_ID), stats, { merge: true });
+    } catch(e) {
+      console.warn('Group sync failed:', e);
+    }
+  };
+}
+</script>
+<script src="bottomnav.js?v=2.2.0"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}
+});
+</script>
+</body>
+</html>

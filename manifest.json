@@ -1,0 +1,42 @@
+{
+  "name": "משניון — לימוד משניות יומי",
+  "short_name": "משניון",
+  "description": "לִמּוד משניות יום-יום, מעקב התקדמות וצבירת מעלות. עם לוח קהילתי, פירוש ברטנורא, פרקים מועדפים, שינון, ולימוד לעילוי נשמה.",
+  "start_url": "./01-dashboard.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEEDE8",
+  "theme_color": "#185FA5",
+  "orientation": "portrait-primary",
+  "lang": "he",
+  "dir": "rtl",
+  "categories": ["lifestyle", "education", "books"],
+  "icons": [
+    { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "למד עכשיו",
+      "short_name": "למד",
+      "description": "פתח את הלימוד",
+      "url": "./02-selection.html",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "פרק אקראי",
+      "short_name": "אקראי",
+      "description": "פרק משנה אקראי",
+      "url": "./03-reader.html?mode=random",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

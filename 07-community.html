@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>תהילהון — קהילה</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#185FA5;--primary-light:#E6F1FB;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--hot-bg:#FAECE7;--hot-color:#993C1D;--purple:#7B2FF7;--purple-light:#F5F0FF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#5AA8E8;--primary-light:#152436;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--hot-bg:#351A1A;--hot-color:#E07755;--purple:#9B6FE0;--purple-light:#1C1235;}
+*{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:17px;font-weight:600;color:var(--text);}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;font-weight:600;}
+
+/* ── Tabs ── */
+.tabbar{display:flex;border-bottom:.5px solid var(--border);}
+.tab{flex:1;padding:11px 8px;font-size:14px;color:var(--text-muted);text-align:center;cursor:pointer;border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;-webkit-tap-highlight-color:transparent;font-weight:500;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── Stats bar ── */
+.stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px;}
+.stat-card{background:var(--surface);border-radius:12px;padding:12px 14px;border:.5px solid var(--border);}
+.stat-num{font-size:22px;font-weight:700;color:var(--primary);}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.stat-live{display:flex;align-items:center;gap:5px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#3B8C14;animation:pulse 1.5s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.divider{height:.5px;background:var(--border);margin:0 16px;}
+.section{padding:12px 16px;}
+.section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;}
+
+/* ── Hot chapters ── */
+.chap-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--border);}
+.chap-row:last-child{border-bottom:none;}
+.chap-rank{font-size:14px;font-weight:700;color:var(--text-muted);width:24px;flex-shrink:0;}
+.chap-name{font-size:14px;color:var(--text);flex:1;}
+.hot-badge{font-size:10px;background:var(--hot-bg);color:var(--hot-color);border-radius:8px;padding:2px 6px;margin-right:6px;}
+.chap-bar-wrap{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:0 10px;}
+.chap-bar{height:100%;background:var(--primary);border-radius:3px;}
+.chap-count{font-size:12px;color:var(--text-sec);min-width:60px;text-align:left;}
+
+/* ── Global leaderboard ── */
+.user-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);}
+.user-row:last-child{border-bottom:none;}
+.rank-num{font-size:14px;font-weight:700;color:var(--text-muted);width:20px;text-align:center;flex-shrink:0;}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;}
+.user-info{flex:1;}
+.user-name{font-size:13px;font-weight:500;color:var(--text);}
+.user-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.user-pts{font-size:13px;font-weight:600;color:var(--primary);}
+
+/* ── Group tab ── */
+.group-hero{padding:24px 16px 16px;text-align:center;}
+.group-hero-icon{font-size:48px;margin-bottom:10px;display:block;}
+.group-hero-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.group-hero-sub{font-size:13px;color:var(--text-sec);line-height:1.6;margin-bottom:18px;}
+.go-group-btn{display:inline-block;padding:11px 28px;border-radius:14px;background:var(--purple);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;text-decoration:none;}
+
+/* Group header card */
+.group-header-card{margin:12px 16px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,#185FA5,#1048A0);color:#fff;}
+html.dark .group-header-card{background:linear-gradient(135deg,#1A3A6A,#0E2A55);}
+.ghc-name{font-size:18px;font-weight:800;margin-bottom:2px;}
+.ghc-meta{font-size:12px;opacity:.75;}
+.ghc-code{display:inline-block;margin-top:8px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:1.5px;}
+
+/* Group stats grid */
+.group-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:12px 16px 0;}
+.gs-card{background:var(--surface);border-radius:12px;padding:11px 8px;text-align:center;border:.5px solid var(--border);}
+.gs-num{font-size:18px;font-weight:700;color:var(--primary);}
+.gs-label{font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.3;}
+
+/* Group member rows */
+.gm-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:.5px solid var(--border);}
+.gm-row:last-child{border-bottom:none;}
+.gm-rank{font-size:17px;width:26px;text-align:center;flex-shrink:0;}
+.gm-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.gm-info{flex:1;}
+.gm-name{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px;}
+.gm-you{font-size:10px;color:var(--primary);background:var(--primary-light);border-radius:8px;padding:1px 7px;}
+.gm-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.gm-right{text-align:left;flex-shrink:0;}
+.gm-score{font-size:14px;font-weight:700;color:#C07A00;}
+.gm-trend{font-size:11px;font-weight:600;margin-top:2px;}
+.trend-up{color:var(--green);}
+.trend-dn{color:#C04040;}
+.trend-eq{color:var(--text-muted);}
+
+/* Mission card */
+.mission-card{margin:12px 16px;padding:14px 16px;border-radius:14px;background:var(--surface);border:.5px solid var(--border);}
+.mission-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.mission-title{font-size:14px;font-weight:700;color:var(--text);}
+.mission-pct{font-size:13px;font-weight:700;color:var(--primary);}
+.mission-sub{font-size:11px;color:var(--text-muted);margin-bottom:9px;}
+.mission-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px;}
+.mission-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#5AA8E8);transition:width .7s cubic-bezier(.16,1,.3,1);}
+.mission-nums{display:flex;justify-content:space-between;font-size:11px;}
+.mission-nums .done{color:var(--primary);font-weight:700;}
+.mission-nums .tot{color:var(--text-muted);}
+
+/* Loading */
+.loading-state{padding:40px 20px;text-align:center;color:var(--text-muted);font-size:13px;}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.section-label{font-size:11px;color:var(--text-muted);padding:12px 16px 5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
+</style>
+<script src="utils.js?v=2.2.0"></script>
+<script src="i18n.js?v=2.2.31" defer></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a href="01-dashboard.html" class="back-btn" data-i18n="read.back">← בית</a>
+    <div class="topbar-title" data-i18n="comm.title">🌍 קהילה</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabbar">
+    <div class="tab active" id="tabBtn0" onclick="switchTab(0)" data-i18n="comm.tab_all">🌍 כלל הקהילה</div>
+    <a   class="tab" href="08-group.html" data-i18n="comm.tab_mine" style="text-decoration:none;">👥 הקבוצות שלי</a>
+  </div>
+
+  <!-- ══ TAB 0: Global community ══ -->
+  <div class="tab-content active" id="tab0">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotalUsers">—</div>
+        <div class="stat-label" data-i18n="comm.users_registered">👥 משתמשים רשומים</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTotalChaps">—</div>
+        <div class="stat-label" data-i18n="comm.chaps_today">📖 פרקים נקראו היום</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTodayChaps">—</div>
+        <div class="stat-label" data-i18n="comm.today_stat">📅 היום</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-title" data-i18n="comm.hot_chaps">🔥 פרקים לוהטים השבוע</div>
+      <div id="hotList"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-title" data-i18n="comm.leaderboard">🏆 לוח המובילים — השבוע</div>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 1: My group ══ -->
+  <div class="tab-content" id="tab1">
+    <!-- No group state -->
+    <div id="groupNone" style="display:none;">
+      <div class="group-hero">
+        <span class="group-hero-icon">👨‍👩‍👧‍👦</span>
+        <div class="group-hero-title" data-i18n="comm.no_group">עדיין אין לך קבוצה</div>
+        <div class="group-hero-sub" data-i18n="comm.no_group_sub_long">צור קבוצה פרטית עם המשפחה<br>וראה את ההישגים שלכם יחד.</div>
+        <a href="08-group.html" class="go-group-btn" data-i18n="comm.no_group_btn">צור או הצטרף לקבוצה ←</a>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="groupLoading" style="display:none;">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        טוען נתוני קבוצה...
+      </div>
+    </div>
+
+    <!-- Group data -->
+    <div id="groupData" style="display:none;">
+      <!-- Header card -->
+      <div class="group-header-card">
+        <div class="ghc-name" id="grpName">...</div>
+        <div class="ghc-meta" id="grpMeta"></div>
+        <div class="ghc-code" id="grpCode"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="group-stats">
+        <div class="gs-card">
+          <div class="gs-num" id="grpTodayChaps">0</div>
+          <div class="gs-label" data-i18n="comm.gs_chaps">📖 פרקים<br>היום</div>
+        </div>
+        <div class="gs-card">
+          <div class="gs-num" id="grpTodayMins">0</div>
+          <div class="gs-label" data-i18n="comm.gs_mins">⏱ דקות<br>היום</div>
+        </div>
+        <div class="gs-card">
+          <div class="gs-num" id="grpTotalScore" style="color:#C07A00;">0</div>
+          <div class="gs-label" data-i18n="comm.gs_score">⭐ סה״כ<br>מעלות</div>
+        </div>
+      </div>
+
+      <!-- Members leaderboard -->
+      <div class="section-label" data-i18n="comm.group_lb">לוח מובילים — הקבוצה</div>
+      <div id="grpMembers"></div>
+
+      <!-- Mission -->
+      <div class="mission-card">
+        <div class="mission-top">
+          <div class="mission-title" data-i18n="comm.mission_title">📖 מבצע משותף</div>
+          <div class="mission-pct" id="grpMissionPct">0%</div>
+        </div>
+        <div class="mission-sub" data-i18n="comm.mission_sub">סיום ספר תהילים יחד</div>
+        <div class="mission-bar-wrap">
+          <div class="mission-bar" id="grpMissionBar" style="width:0%"></div>
+        </div>
+        <div class="mission-nums">
+          <span class="done" id="grpMissionDone">0 פרקים</span>
+          <span class="tot" data-i18n="comm.out_of_150">מתוך 150</span>
+        </div>
+      </div>
+
+      <div style="padding:0 16px 20px;display:flex;flex-direction:column;gap:8px;">
+        <a href="08-group.html?open=current" style="display:block;text-align:center;font-size:13px;color:var(--primary);padding:10px;border:.5px solid var(--primary);background:var(--primary-light);border-radius:12px;text-decoration:none;font-weight:600;">
+          ⚙️ נהל את הקבוצה ←
+        </a>
+        <a href="08-group.html" style="display:block;text-align:center;font-size:13px;color:var(--text-sec);padding:10px;border:.5px solid var(--border);border-radius:12px;text-decoration:none;">
+          ➕ כל הקבוצות שלי / צור קבוצה חדשה
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── Dark mode ── */
+const _s = JSON.parse(localStorage.getItem('tehillim_settings') || '{}');
+if (_s.darkMode) document.documentElement.classList.add('dark');
+
+/* ── Tab switch ── */
+function switchTab(i) {
+  [0,1].forEach(j => {
+    document.getElementById('tabBtn'+j).classList.toggle('active', j===i);
+    document.getElementById('tab'+j).classList.toggle('active', j===i);
+  });
+  if (i === 1) {
+    // module script may not be ready yet — retry until available
+    if (typeof window.loadGroupTab === 'function') {
+      window.loadGroupTab();
+    } else {
+      let tries = 0;
+      const wait = setInterval(() => {
+        if (typeof window.loadGroupTab === 'function') {
+          clearInterval(wait);
+          window.loadGroupTab();
+        } else if (++tries > 40) { // 4 seconds timeout
+          clearInterval(wait);
+          // show error fallback
+          document.getElementById('groupLoading').style.display = 'none';
+          const g = JSON.parse(localStorage.getItem('tehillim_group') || 'null');
+          document.getElementById(g && g.code ? 'groupData' : 'groupNone').style.display = 'block';
+        }
+      }, 100);
+    }
+  }
+}
+
+// Auto-open group tab if URL has ?tab=group (called from challenges page)
+(function() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('tab') === 'group') {
+    // Wait for DOM + module to be ready
+    window.addEventListener('load', () => setTimeout(() => switchTab(1), 200));
+  }
+})();
+
+/* ── Global community — real Firestore data ── */
+function toGem2(n) {
+  const ones=['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל','לא','לב','לג','לד','לה','לו','לז','לח','לט','מ','מא','מב','מג','מד','מה','מו','מז','מח','מט','נ','נא','נב','נג','נד','נה','נו','נז','נח','נט','ס','סא','סב','סג','סד','סה','סו','סז','סח','סט','ע','עא','עב','עג','עד','עה','עו','עז','עח','עט','פ','פא','פב','פג','פד','פה','פו','פז','פח','פט','צ','צא','צב','צג','צד','צה','צו','צז','צח','צט','ק','קא','קב','קג','קד','קה','קו','קז','קח','קט','קי','קיא','קיב','קיג','קיד','קטו','קטז','קיז','קיח','קיט','קכ','קכא','קכב','קכג','קכד','קכה','קכו','קכז','קכח','קכט','קל','קלא','קלב','קלג','קלד','קלה','קלו','קלז','קלח','קלט','קמ','קמא','קמב','קמג','קמד','קמה','קמו','קמז','קמח','קמט','קנ'];
+  return ones[n] || String(n);
+}
+function avatarColor(str) {
+  const colors=['#185FA5','#7A4A00','#6A1B9A','#2E7D32','#880E4F','#1565C0','#F57F17','#00695C','#C62828','#37474F'];
+  let h=0; for(const c of (str||'')) h=(h*31+c.charCodeAt(0))&0xffff;
+  return colors[h % colors.length];
+}
+
+// מצב טעינה
+document.getElementById('hotList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען נתונים...</div>';
+document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען נתונים...</div>';
+
+async function loadCommunityData() {
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getAuth, onAuthStateChanged, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+
+    const FB_CFG = {
+      apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
+      authDomain:"mishnayot-71073.firebaseapp.com",
+      projectId:"mishnayot-71073",
+      storageBucket:"mishnayot-71073.firebasestorage.app",
+      messagingSenderId:"445059664136",
+      appId:"1:445059664136:web:fec8a4f338fd326d3b04bd"
+    };
+    const app  = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    // וודא auth מוכן
+    await new Promise(resolve => {
+      onAuthStateChanged(auth, async user => {
+        if (user) { resolve(user); return; }
+        try { const c = await signInAnonymously(auth); resolve(c.user); } catch(e) { resolve(null); }
+      });
+    });
+
+    // ── סטטיסטיקות כלליות ──
+    try {
+      const today = localDateStr();
+      const allLb = await getDocs(collection(db,'leaderboard'));
+      let totalChaps = 0, todayChaps = 0, userCount = 0;
+      allLb.forEach(d => {
+        const dd = d.data();
+        userCount++;
+        totalChaps += dd.chaps || 0;
+        if (dd.lastDate === today) todayChaps += dd.todayChaps || 0;
+      });
+      const su = document.getElementById('statTotalUsers');
+      const sc = document.getElementById('statTotalChaps');
+      const sd = document.getElementById('statTodayChaps');
+      if (su) su.textContent = userCount.toLocaleString();
+      if (sc) sc.textContent = totalChaps.toLocaleString();
+      if (sd) sd.textContent = todayChaps.toLocaleString();
+    } catch(e2) { /* ignore stat errors */ }
+
+    // ── לוח מובילים ──
+    const lbSnap = await getDocs(query(collection(db,'leaderboard'), orderBy('score','desc'), limit(10)));
+    const ranks = ['🥇','🥈','🥉'];
+    // סנן רק מי שהסכים להופיע (יש displayName)
+    const lbDocs = lbSnap.docs.filter(d => d.data().displayName);
+    if (lbDocs.length === 0) {
+      document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">עדיין אין משתמשים בלוח 🌱<br>היה הראשון!</div>';
+    } else {
+      document.getElementById('leaderboard').innerHTML = lbDocs.map((d,i) => {
+        const u = d.data();
+        const name = u.displayName;
+        const init = name[0] || '?';
+        const bg   = avatarColor(d.id);
+        const medal = i < 3 ? ranks[i] : '';
+        return `<div class="user-row">
+          <span class="rank-num">${i+1}</span>
+          <div class="avatar" style="background:${bg}">${init}</div>
+          <div class="user-info">
+            <div class="user-name">${name} ${medal}</div>
+            <div class="user-sub">מעלות כוללות</div>
+          </div>
+          <span class="user-pts">⭐ ${(u.score||0).toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // ── פרקים חמים ──
+    const crSnap = await getDocs(query(collection(db,'chapReads'), orderBy('count','desc'), limit(5)));
+    if (crSnap.empty) {
+      document.getElementById('hotList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">עדיין אין נתוני קריאה 📖</div>';
+    } else {
+      const chaps = crSnap.docs.map(d => ({ chap: parseInt(d.id), reads: d.data().count || 0 }));
+      const max = chaps[0].reads || 1;
+      document.getElementById('hotList').innerHTML = chaps.map((c,i) => `
+        <a class="chap-row" href="03-reader.html?chap=${c.chap}" style="text-decoration:none;display:flex;align-items:center;">
+          <span class="chap-rank">${i+1}</span>
+          <span class="chap-name">${i<2?'<span class="hot-badge">🔥</span>':''}פרק ${toGem2(c.chap)}</span>
+          <div class="chap-bar-wrap"><div class="chap-bar" style="width:${Math.round(c.reads/max*100)}%"></div></div>
+          <span class="chap-count">${c.reads.toLocaleString()} קריאות</span>
+        </a>`).join('');
+    }
+  } catch(e) {
+    console.error('loadCommunityData error:', e);
+    document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⚠️ שגיאה בטעינת הנתונים</div>';
+    document.getElementById('hotList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⚠️ שגיאה בטעינת הנתונים</div>';
+  }
+}
+
+loadCommunityData();
+</script>
+
+<!-- ══ Firebase — Group tab ══ -->
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, collection, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInAnonymously, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const FB_CFG = {
+  apiKey:            "AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
+  authDomain:        "mishnayot-71073.firebaseapp.com",
+  projectId:         "mishnayot-71073",
+  storageBucket:     "mishnayot-71073.firebasestorage.app",
+  messagingSenderId: "445059664136",
+  appId:             "1:445059664136:web:fec8a4f338fd326d3b04bd"
+};
+const fbApp = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
+const db    = getFirestore(fbApp);
+const auth  = getAuth(fbApp);
+
+// Wait for existing Google session OR sign in anonymously as fallback
+// (same pattern as 08-group.html — request.auth must be non-null for Firestore rules)
+const _authReady = new Promise(resolve => {
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      console.log('[Community] auth ready — uid:', user.uid, 'provider:', user.providerData?.[0]?.providerId || 'anonymous');
+      resolve(user);
+      return;
+    }
+    console.log('[Community] no user found — trying anonymous auth');
+    try {
+      const cred = await signInAnonymously(auth);
+      console.log('[Community] anonymous auth ok — uid:', cred.user.uid);
+      resolve(cred.user);
+    } catch(e) {
+      console.warn('[Community] auth failed:', e.code, e.message);
+      resolve(null);
+    }
+  });
+});
+
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
+};
+function getUid() {
+  let uid = S.get('tehillim_uid');
+  if (!uid) { uid = 'u_' + Math.random().toString(36).slice(2,9)+Date.now().toString(36); localStorage.setItem('tehillim_uid', JSON.stringify(uid)); }
+  return uid;
+}
+const MY_ID = getUid();
+
+const COLORS = ['#185FA5','#3B8C14','#7B2FF7','#C8A800','#C04040','#5090C8','#CD7F32'];
+function avatarBg(name) {
+  let h=0; for(const c of (name||'X')) h=(h*31+c.charCodeAt(0))|0;
+  return COLORS[Math.abs(h)%COLORS.length];
+}
+
+let _unsub = null;
+
+window.loadGroupTab = function() {
+  const g = S.get('tehillim_group');
+  console.log('[Community] loadGroupTab called, group:', g ? g.code : 'none');
+
+  if (!g || !g.code) {
+    document.getElementById('groupLoading').style.display = 'none';
+    document.getElementById('groupNone').style.display = 'block';
+    document.getElementById('groupData').style.display = 'none';
+    return;
+  }
+
+  // Show spinner while waiting for auth + Firestore
+  document.getElementById('groupLoading').style.display = 'block';
+  document.getElementById('groupNone').style.display = 'none';
+  document.getElementById('groupData').style.display = 'none';
+
+  if (_unsub) _unsub();
+
+  _authReady.then((authUser) => {
+    console.log('[Community] starting onSnapshot, authUser:', authUser?.uid || 'null');
+    const membersRef = collection(db, 'groups', g.code, 'members');
+    _unsub = onSnapshot(membersRef,
+      snap => {
+        const members = [];
+        snap.forEach(d => members.push({ id: d.id, ...d.data() }));
+        document.getElementById('groupLoading').style.display = 'none';
+        document.getElementById('groupData').style.display = 'block';
+        renderGroupData(members, g);
+      },
+      err => {
+        console.error('[Community] Firestore error:', err.code, err.message);
+        // show data from localStorage as fallback
+        document.getElementById('groupLoading').style.display = 'none';
+        const cached = S.get('tehillim_group_members');
+        if (cached && cached.length) {
+          renderGroupData(cached, g);
+        } else {
+          document.getElementById('grpMembers').innerHTML =
+            '<div style="padding:20px;text-align:center;color:var(--text-muted)">⚠️ לא ניתן לטעון נתוני קבוצה כעת</div>';
+        }
+      }
+    );
+  });
+};
+
+function _fmtActive(ts) {
+  if (!ts) return '';
+  const diff = Math.floor((Date.now() - ts) / 60000); // דקות
+  if (diff < 2)  return '🟢 מחובר עכשיו';
+  if (diff < 60) return '🟡 לפני ' + diff + ' דק\'';
+  const h = Math.floor(diff/60);
+  if (h < 24)    return '🔵 לפני ' + h + ' שע\'';
+  const d = Math.floor(h/24);
+  if (d === 1)   return '⚪ אתמול';
+  return '⚪ לפני ' + d + ' ימים';
+}
+
+function renderGroupData(members, g) {
+  const today = localDateStr();
+
+  // Sort by today score
+  members.sort((a,b) => {
+    const sd = (b.todayScore||0)-(a.todayScore||0);
+    return sd!==0 ? sd : (b.totalScore||0)-(a.totalScore||0);
+  });
+
+  // Header
+  const _nameEl = document.getElementById('grpName');
+  if (_nameEl) _nameEl.textContent = g.name || g.code || 'הקבוצה שלי';
+  const _codeEl = document.getElementById('grpCode');
+  if (_codeEl) _codeEl.textContent = '📋 ' + (g.code || '');
+  document.getElementById('grpMeta').textContent = members.length + ' חברים';
+  // שמור memberCount ב-tehillim_group לשימוש ברשימת הקבוצות
+  try { const _lg=S.get('tehillim_group')||{}; _lg.memberCount=members.length; S.set('tehillim_group',_lg); } catch(e) {}
+
+  // Aggregate stats
+  const totalTodayChaps = members.reduce((s,m) => s + (m.todayDate===today ? (m.todayChaps||0) : 0), 0);
+  const totalTodayMins  = members.reduce((s,m) => s + (m.todayDate===today ? (m.todayMins||0)  : 0), 0);
+  const totalScore      = members.reduce((s,m) => s + (m.totalScore||0), 0);
+  document.getElementById('grpTodayChaps').textContent = totalTodayChaps;
+  document.getElementById('grpTodayMins').textContent  = totalTodayMins;
+  document.getElementById('grpTotalScore').textContent = totalScore.toLocaleString();
+
+  // Members leaderboard
+  const ranks = ['🥇','🥈','🥉'];
+  let html = '';
+  members.forEach((m, i) => {
+    const isMe      = m.id === MY_ID;
+    const active    = m.todayDate === today;
+    const trend     = m.trendDelta || 0;
+    const trendHtml = trend>0
+      ? `<span class="trend-up">↑ +${trend}</span>`
+      : trend<0
+        ? `<span class="trend-dn">↓ ${trend}</span>`
+        : `<span class="trend-eq">→</span>`;
+    const rank    = i<3 ? ranks[i] : (i+1)+'.';
+    const bg      = avatarBg(m.displayName);
+    const initial = (m.displayName||'?')[0];
+    const activeStr = _fmtActive(m.lastActive);
+    const sub     = active
+      ? `${m.todayChaps||0} פרקים · ${m.todayMins||0} דק׳`
+      : 'לא קרא היום';
+    const subFull = activeStr ? sub + ' · ' + activeStr : sub;
+
+    html += `<div class="gm-row">
+      <div class="gm-rank">${rank}</div>
+      <div class="gm-avatar" style="background:${bg}">${initial}</div>
+      <div class="gm-info">
+        <div class="gm-name">${m.displayName}${isMe?'<span class="gm-you">אני</span>':''}${activeStr?' <span style="font-size:11px;font-weight:400;color:var(--text-muted);">('+activeStr+')</span>':''}</div>
+        <div class="gm-sub">${sub}</div>
+      </div>
+      <div class="gm-right">
+        <div class="gm-score">+${m.todayScore||0} ⭐</div>
+        <div class="gm-trend">${trendHtml}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('grpMembers').innerHTML = html ||
+    '<div style="padding:20px;text-align:center;color:var(--text-muted)">אין חברים עדיין</div>';
+
+  // Mission
+  const allDone = new Set();
+  members.forEach(m => (m.chapsDone||[]).forEach(c => allDone.add(+c)));
+  const done = allDone.size;
+  const pct  = Math.min(100, Math.round(done/150*100));
+  document.getElementById('grpMissionBar').style.width = pct+'%';
+  document.getElementById('grpMissionPct').textContent = pct+'%';
+  document.getElementById('grpMissionDone').textContent = done+' פרקים הושלמו';
+}
+</script>
+<script src="bottomnav.js?v=2.2.0"></script>
+</body>
+</html>
