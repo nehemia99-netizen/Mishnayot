@@ -1135,9 +1135,14 @@ function navigatePlaylist() {
   if (playlistIdx >= playlist.length) {
     // סיום הרשימה
     const pl = S.get('tehillim_playlist') || {};
-    const isHida = pl.source === 'hida';
-    showToast(_rLang()==='en' ? (isHida ? '🎉 Name-based reading complete!' : '🎉 All favorite chapters done!') : (isHida ? '🎉 סיום קריאה לפי שם!' : '🎉 סיימת את כל פרקי המועדפים!'));
-    setTimeout(() => { location.href = '02-selection.html'; }, 1800);
+    const src = pl.source;
+    const msg = src === 'neshama' ? '🕯️ סיימת את הלימוד לעילוי נשמה — תהא נשמתו צרורה בצרור החיים'
+              : src === 'refuah'  ? '💙 סיימת את הלימוד לרפואה שלמה'
+              : src === 'hida'    ? '🎉 סיום לימוד לפי שם!'
+              : '🎉 סיימת את כל המועדפים!';
+    showToast(msg);
+    const _back = (src === 'neshama' || src === 'refuah') ? '05-yizkor.html' : '02-selection.html';
+    setTimeout(() => { location.href = _back; }, 2200);
     return;
   }
   const pl = S.get('tehillim_playlist') || {};
@@ -1839,7 +1844,12 @@ function initDedication() {
     return;
   }
   const banner = document.getElementById('dedicationBanner');
-  document.getElementById('dedLabel').textContent = 'קורא לרפואת ' + ded.name;
+  const isNesh = (ded.type === 'neshama');
+  document.getElementById('dedLabel').textContent = (isNesh ? 'לומד לעילוי נשמת ' : 'לומד לרפואת ') + ded.name;
+  const sub = document.getElementById('dedSub');
+  if (sub) sub.textContent = isNesh ? 'משנה — אותיות נשמה • פג בחצות' : 'לימוד לרפואה שלמה • פג בחצות';
+  const ic = banner.querySelector('.ded-icon');
+  if (ic) ic.textContent = isNesh ? '🕯️' : '💙';
   banner.style.display = 'flex';
 }
 
