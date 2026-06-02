@@ -365,9 +365,20 @@ html.dark .chap-cell.mem{background:#1C1230;}
     if(sub && pos){ var p=Corpus.parseChapId(pos); if(p){ var t=Corpus.getTractate(p.tractate); sub.textContent='ממשיך מ'+(t?t.he:'')+' פרק '+toGem(p.perek); } }
   })();
 
-  // init
+  // init — כל הסדרים סגורים; אם הגענו מלימוד פרק, נפתח את הסדר שלו
   buildOrders();
-  toggleOrder(Corpus.orders[0].id); // פתח את סדר זרעים כברירת מחדל
+  (function autoOpenLast(){
+    try {
+      var last = S.get('mishnah_cycle_pos');
+      if (!last) {
+        var rd = S.get('tehillim_readings') || [];
+        rd = Array.isArray(rd) ? rd : Object.values(rd||{});
+        if (rd.length) last = rd[rd.length-1].chap;
+      }
+      var p = last && Corpus.parseChapId(last);
+      if (p && Corpus.getTractate(p.tractate)) toggleOrder(Corpus.getTractate(p.tractate).order);
+    } catch(e){}
+  })();
 
 })();
 </script>
