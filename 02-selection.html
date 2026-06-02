@@ -213,7 +213,7 @@ html.dark .chap-cell.mem{background:#1C1230;}
   <!-- TAB 0: hierarchical Order → Tractate → Chapter -->
   <div class="tab-content active" id="tab0">
     <div class="quick-row" style="padding:12px 16px 0;display:flex;gap:10px;">
-      <div class="quick-card qc-yomit" onclick="openYomit()" style="flex:1;padding:12px;border:.5px solid var(--primary);border-radius:12px;background:var(--primary-light);cursor:pointer;text-align:center;">
+      <div class="quick-card qc-yomit" onclick="openYomitModal()" style="flex:1;padding:12px;border:.5px solid var(--primary);border-radius:12px;background:var(--primary-light);cursor:pointer;text-align:center;">
         <div class="qc-icon-big" style="font-size:20px;margin-bottom:2px;">📅</div>
         <div class="qc-name" style="font-size:14px;font-weight:700;color:var(--primary);">משנה יומית</div>
         <div class="qc-sub" id="yomitSub" style="font-size:11px;color:var(--primary);margin-top:2px;">טוען…</div>
@@ -251,6 +251,30 @@ html.dark .chap-cell.mem{background:#1C1230;}
     <div class="fav-grid" id="memGrid" style="padding:0 16px 30px;"></div>
   </div>
 
+</div>
+
+<!-- Mishnah Yomit date browser modal -->
+<div id="yomitModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--card);width:100%;max-width:430px;border-radius:18px 18px 0 0;padding:16px 16px calc(28px + env(safe-area-inset-bottom,0px));">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:17px;font-weight:800;color:var(--primary);">📅 משנה יומית</div>
+      <button onclick="closeYomitModal()" style="background:none;border:none;font-size:20px;color:var(--text-muted);cursor:pointer;font-family:inherit;">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+      <button onclick="yomitNav(-1)" style="width:38px;height:38px;border-radius:10px;border:.5px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;font-family:inherit;">▶</button>
+      <div style="text-align:center;flex:1;">
+        <div id="yomitHebDate" style="font-size:17px;font-weight:700;color:var(--text);"></div>
+        <div id="yomitGregDate" style="font-size:11px;color:var(--text-muted);margin-top:2px;"></div>
+      </div>
+      <button onclick="yomitNav(1)" style="width:38px;height:38px;border-radius:10px;border:.5px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;font-family:inherit;">◀</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <select id="yomitMonth" onchange="yomitPick()" style="flex:2;padding:9px;border-radius:10px;border:.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;"></select>
+      <select id="yomitDay" onchange="yomitPick()" style="flex:1;padding:9px;border-radius:10px;border:.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;"></select>
+    </div>
+    <div id="yomitMishna" style="background:var(--primary-light);border:.5px solid var(--primary);border-radius:12px;padding:16px;text-align:center;font-size:16px;font-weight:700;color:var(--primary);margin-bottom:14px;line-height:1.6;"></div>
+    <button onclick="yomitLearn()" style="width:100%;padding:15px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;">📖 ללמוד את המשנה היומית</button>
+  </div>
 </div>
 
 <script src="corpus.js?v=1.0.1"></script>
@@ -370,12 +394,42 @@ html.dark .chap-cell.mem{background:#1C1230;}
     if(sub && pos){ var p=Corpus.parseChapId(pos); if(p){ var t=Corpus.getTractate(p.tractate); sub.textContent='ממשיך מ'+(t?t.he:'')+' פרק '+toGem(p.perek); } }
   })();
 
-  // משנה יומית
-  window.openYomit = function(){
-    if(typeof Corpus==='undefined' || !Corpus.mishnahYomit) return;
-    var y = Corpus.mishnahYomit();
-    location.href = '03-reader.html?chap=' + y.first.chapId;
+  // ── משנה יומית — מודאל בחירת תאריך (חודש + יום עברי) ──
+  var _yDate = new Date();
+  function _yHebDay(d){ return parseInt(new Intl.DateTimeFormat('en-u-ca-hebrew-nu-latn',{day:'numeric'}).format(d),10); }
+  function _yHebMonth(d){ return new Intl.DateTimeFormat('he-u-ca-hebrew',{month:'long'}).format(d); }
+  function _yHebFull(d){ return new Intl.DateTimeFormat('he-u-ca-hebrew',{weekday:'long',day:'numeric',month:'long'}).format(d); }
+  function _yGreg(d){ try{return d.toLocaleDateString('he-IL');}catch(e){return '';} }
+  function _buildYomitMonths(){
+    var sel=document.getElementById('yomitMonth');
+    if(sel && sel.options.length) return;
+    var seen={}, opts=[], base=new Date(); base.setHours(12,0,0,0); base.setDate(base.getDate()-15);
+    for(var i=0;i<365;i++){ var d=new Date(base); d.setDate(base.getDate()+i); var m=_yHebMonth(d); if(!seen[m]){seen[m]=1;opts.push(m);} }
+    if(sel) sel.innerHTML=opts.map(function(m){return '<option value="'+m+'">'+m+'</option>';}).join('');
+    var dsel=document.getElementById('yomitDay'), days='';
+    for(var k=1;k<=30;k++){ days+='<option value="'+k+'">'+toGem(k)+'</option>'; }
+    if(dsel) dsel.innerHTML=days;
+  }
+  function yomitRender(){
+    if(typeof Corpus==='undefined'||!Corpus.mishnahYomit) return;
+    var hd=document.getElementById('yomitHebDate'); if(hd) hd.textContent=_yHebFull(_yDate);
+    var gd=document.getElementById('yomitGregDate'); if(gd) gd.textContent=_yGreg(_yDate);
+    var ms=document.getElementById('yomitMonth'); if(ms) ms.value=_yHebMonth(_yDate);
+    var ds=document.getElementById('yomitDay'); if(ds) ds.value=String(_yHebDay(_yDate));
+    var y=Corpus.mishnahYomit(_yDate), t=Corpus.getTractate(y.first.tractate), tn=t?t.he:y.first.tractate, txt;
+    if(y.sameChap){ txt=tn+' · פרק '+toGem(y.first.perek)+'<br>משניות '+toGem(y.first.mishnah)+'–'+toGem(y.second.mishnah); }
+    else { var t2=Corpus.getTractate(y.second.tractate); txt=tn+' '+toGem(y.first.perek)+':'+toGem(y.first.mishnah)+'<br>עד '+(t2?t2.he:'')+' '+toGem(y.second.perek)+':'+toGem(y.second.mishnah); }
+    var mEl=document.getElementById('yomitMishna'); if(mEl) mEl.innerHTML=txt;
+  }
+  window.openYomitModal=function(){ _yDate=new Date(); _buildYomitMonths(); yomitRender(); var m=document.getElementById('yomitModal'); if(m) m.style.display='flex'; };
+  window.closeYomitModal=function(){ var m=document.getElementById('yomitModal'); if(m) m.style.display='none'; };
+  window.yomitNav=function(dir){ _yDate.setDate(_yDate.getDate()+dir); yomitRender(); };
+  window.yomitPick=function(){
+    var mon=document.getElementById('yomitMonth').value, day=parseInt(document.getElementById('yomitDay').value,10);
+    var base=new Date(); base.setHours(12,0,0,0); base.setDate(base.getDate()-30);
+    for(var i=0;i<400;i++){ var d=new Date(base); d.setDate(base.getDate()+i); if(_yHebMonth(d)===mon && _yHebDay(d)===day){ _yDate=d; yomitRender(); return; } }
   };
+  window.yomitLearn=function(){ var y=Corpus.mishnahYomit(_yDate); location.href='03-reader.html?chap='+y.first.chapId; };
   (function fillYomit(){
     try{
       if(typeof Corpus==='undefined' || !Corpus.mishnahYomit) return;
