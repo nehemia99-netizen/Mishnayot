@@ -28,7 +28,7 @@
      chaptersRead: {        // לכמות פרקים סך הכל
        total: 0,            // סך פרקים שנקראו במלואם (כולל חזרות)
        unique: [],          // פרקים שנקראו לפחות פעם אחת
-       byBook: [0,0,0,0,0]  // לפי 5 הספרים
+       byOrder: [0,0,0,0,0,0]  // לפי 6 סדרי המשנה
      },
      levelKey: 'תלמיד'      // רמה נוכחית (cache)
    }
@@ -83,7 +83,8 @@ function load() {
   data['ma\'alot'] = data['ma\'alot'] || { total:0, weekly:0, weeklyDate:weekKey(), monthly:0, monthlyMonth:monthKey(), byDay:{}, lastUpdate:today() };
   data.streak       = data.streak       || { current:0, longest:0, lastActiveDate:'', freezeRemaining:1 };
   data.memorized    = data.memorized    || { count:0, chapters:[], lastAdded:'' };
-  data.chaptersRead = data.chaptersRead || { total:0, unique:[], byBook:[0,0,0,0,0] };
+  data.chaptersRead = data.chaptersRead || { total:0, unique:[], byOrder:[0,0,0,0,0,0] };
+  if (!data.chaptersRead.byOrder) data.chaptersRead.byOrder = [0,0,0,0,0,0];
   data.levelKey     = data.levelKey     || LEVELS[0].key;
   // Reset שבועי/חודשי אם עברנו
   const wk = weekKey(), mo = monthKey();
@@ -169,23 +170,49 @@ function tickStreak() {
   return data.streak;
 }
 
-/* ─── פרקים שנקראו ─── */
-function bookOf(chap) {
-  if (chap <= 41)  return 0;  // ספר א
-  if (chap <= 72)  return 1;  // ספר ב
-  if (chap <= 89)  return 2;  // ספר ג
-  if (chap <= 106) return 3;  // ספר ד
-  return 4;                   // ספר ה
+/* ─── פרקים שנלמדו (לפי 6 סדרי המשנה) ─── */
+const ORDER_IDS = ['Zeraim','Moed','Nashim','Nezikin','Kodashim','Tahorot'];
+// אינדקס הסדר (0–5) של מזהה פרק "Tractate.Perek"
+function bookOf(chapId) {
+  try {
+    if (typeof Corpus === 'undefined') return -1;
+    const p = Corpus.parseChapId(chapId); if (!p) return -1;
+    const t = Corpus.getTractate(p.tractate); if (!t) return -1;
+    return ORDER_IDS.indexOf(t.order);
+  } catch(e) { return -1; }
 }
-function recordChapterRead(chapNum) {
+function isValidChap(chapId) {
+  if (typeof Corpus === 'undefined') return !!chapId;
+  const p = Corpus.parseChapId(chapId); if (!p) return false;
+  const t = Corpus.getTractate(p.tractate);
+  return !!(t && p.perek >= 1 && p.perek <= t.length);
+}
+// האם הקבוצה מכסה את כל פרקי המסכת / הסדר / המשנה כולה
+function coversTractate(set, tid) {
+  if (typeof Corpus === 'undefined') return false;
+  const t = Corpus.getTractate(tid); if (!t) return false;
+  for (let p = 1; p <= t.length; p++) if (!set.has(Corpus.chapId(tid, p))) return false;
+  return true;
+}
+function coversOrder(set, orderId) {
+  if (typeof Corpus === 'undefined') return false;
+  const o = Corpus.getOrder(orderId); if (!o) return false;
+  return o.tractates.every(tid => coversTractate(set, tid));
+}
+function coversAll(set) {
+  if (typeof Corpus === 'undefined') return false;
+  return Corpus.flatChapters().every(c => set.has(c.id));
+}
+function recordChapterRead(chapId) {
   const data = load();
-  const n = +chapNum;
-  if (!n || n < 1 || n > 150) return null;
+  if (!isValidChap(chapId)) return null;
+  const id = String(chapId);
   data.chaptersRead.total = (data.chaptersRead.total||0) + 1;
   data.chaptersRead.unique = data.chaptersRead.unique || [];
-  if (!data.chaptersRead.unique.includes(n)) data.chaptersRead.unique.push(n);
-  data.chaptersRead.byBook = data.chaptersRead.byBook || [0,0,0,0,0];
-  data.chaptersRead.byBook[bookOf(n)] = (data.chaptersRead.byBook[bookOf(n)]||0) + 1;
+  if (!data.chaptersRead.unique.includes(id)) data.chaptersRead.unique.push(id);
+  data.chaptersRead.byOrder = data.chaptersRead.byOrder || [0,0,0,0,0,0];
+  const oi = bookOf(id);
+  if (oi >= 0) data.chaptersRead.byOrder[oi] = (data.chaptersRead.byOrder[oi]||0) + 1;
   save(data);
   return data.chaptersRead;
 }
@@ -226,36 +253,15 @@ function getDailyChapters() {
 }
 
 /* ─── פעולה משולבת: סיום פרק ─── */
-function onChapterCompleted(chapNum, secs) {
-  // 2.0.8: 5 מעלות לפרק שלם + 1 מעלה לכל 10 שניות
+function onChapterCompleted(chapId, secs) {
+  // 5 מעלות לפרק שלם + 1 מעלה לכל 10 שניות
   const tenSecUnits = Math.floor((secs||0)/10);
   const pts = 5 + tenSecUnits;
   const r = addMaalot(pts, 'completed-chapter');
-  recordChapterRead(chapNum);
+  recordChapterRead(chapId);
   tickStreak();
 
-  // בונוס פרקי היום (50 מעלות) — פעם ביום עברי
-  try {
-    const todayKey = today();
-    const data = load();
-    data.dailyChaptersBonus = data.dailyChaptersBonus || {};
-    if (!data.dailyChaptersBonus[todayKey]) {
-      const dailyChaps = getDailyChapters();
-      const readings = JSON.parse(localStorage.getItem('tehillim_readings')||'[]');
-      const todayRead = new Set(
-        readings.filter(rec => rec.date === todayKey && !rec.partial).map(rec => +rec.chap)
-      );
-      todayRead.add(+chapNum);
-      let allDone = true;
-      for (const c of dailyChaps) if (!todayRead.has(c)) { allDone = false; break; }
-      if (allDone) {
-        data.dailyChaptersBonus[todayKey] = true;
-        save(data);
-        const bonus = addMaalot(50, 'daily-psalms');
-        r.dailyBonus = bonus;
-      }
-    }
-  } catch(e){}
+  // (בונוס "המשנה היומית" יתווסף עם שילוב לוח המשנה היומית)
 
   // בדיקת badges חדשים
   if (typeof checkAndAwardBadges === 'function') {
@@ -285,7 +291,7 @@ function getStats() {
     memorizedChaps: fresh.memorized.chapters||[],
     chaptersRead: fresh.chaptersRead.total||0,
     uniqueChapters: (fresh.chaptersRead.unique||[]).length,
-    byBook: fresh.chaptersRead.byBook||[0,0,0,0,0],
+    byOrder: fresh.chaptersRead.byOrder||[0,0,0,0,0,0],
     level: lvl
   };
 }
@@ -321,7 +327,7 @@ const CHALLENGES = {
     { id:'d_night',   title:'קריאה אחרי 22:00',    titleEn:'Read after 10 PM',             icon:'🌙', reward:12, target:1,  metric:'nightChapters' }
   ],
   weekly: [
-    { id:'w_book_a',  title:'סיים את ספר א׳ (1–41)',  titleEn:'Finish Book I (ch. 1–41)',     icon:'📕', reward:50,  target:41, metric:'weekBookA' },
+    { id:'w_avot',    title:'סיים את מסכת אבות',       titleEn:'Finish Pirkei Avot',           icon:'📜', reward:50,  target:6,  metric:'weekAvot' },
     { id:'w_15chaps', title:'15 פרקים השבוע',          titleEn:'15 chapters this week',        icon:'📚', reward:35,  target:15, metric:'weekChapters' },
     { id:'w_5days',   title:'קרא ב-5 ימים השבוע',     titleEn:'Read on 5 days this week',     icon:'📅', reward:40,  target:5,  metric:'weekActiveDays' },
     { id:'w_60min',   title:'60 דקות קריאה השבוע',    titleEn:'60 minutes of reading this week',icon:'⏰',reward:30, target:60, metric:'weekMinutes' }
@@ -330,10 +336,10 @@ const CHALLENGES = {
     { id:'m_30days',       title:'קרא בכל יום של החודש',           titleEn:'Read every day this month',          icon:'🗓', reward:200, target:28,  metric:'monthActiveDays' },
     { id:'m_100ch',        title:'100 פרקים החודש',                 titleEn:'100 chapters this month',            icon:'💯', reward:120, target:100, metric:'monthChapters' },
     { id:'m_4hours',       title:'4 שעות קריאה החודש',             titleEn:'4 hours of reading this month',      icon:'⌛', reward:100, target:240, metric:'monthMinutes' },
-    { id:'m_book_b',       title:'סיים את ספר ב׳ החודש',           titleEn:'Finish Book II this month',          icon:'📗', reward:80,  target:31,  metric:'monthBookB' },
-    { id:'m_book_c',       title:'סיים את ספר ג׳ החודש',           titleEn:'Finish Book III this month',         icon:'📘', reward:80,  target:17,  metric:'monthBookC' },
+    { id:'m_berakhot',     title:'סיים את מסכת ברכות החודש',       titleEn:'Finish Berakhot this month',         icon:'📗', reward:80,  target:9,   metric:'monthBerakhot' },
+    { id:'m_zeraim',       title:'40 פרקים בסדר זרעים החודש',      titleEn:'40 chapters in Seder Zeraim',        icon:'📘', reward:80,  target:40,  metric:'monthZeraim' },
     { id:'m_15days_row',   title:'15 ימים רצופים החודש',           titleEn:'15-day streak this month',           icon:'🔥', reward:150, target:15,  metric:'currentStreak' },
-    { id:'m_special_chaps',title:'קרא את 5 הפרקים המיוחדים',       titleEn:'Read the 5 special chapters',        icon:'⭐', reward:90,  target:5,   metric:'monthSpecialChaps' },
+    { id:'m_avot_all',     title:'למד את כל 6 פרקי אבות',          titleEn:'Study all 6 chapters of Avot',       icon:'⭐', reward:90,  target:6,   metric:'monthAvotChaps' },
     { id:'m_50min_day',    title:'יום אחד עם 50 דקות',             titleEn:'One day with 50 minutes',            icon:'💪', reward:70,  target:1,   metric:'monthMaxDayMins50' },
     { id:'m_motzashabat',  title:'קריאה במוצאי שבת',               titleEn:'Read on Saturday night',             icon:'✨', reward:35,  target:1,   metric:'monthMotzashabat' },
     { id:'m_rosh_chodesh', title:'קריאה בראש חודש',                 titleEn:'Read on Rosh Chodesh',               icon:'🌙', reward:40,  target:1,   metric:'monthRoshChodesh' }
@@ -381,14 +387,18 @@ function getChallengeMetrics() {
     if (h < 10) morning++;
     if (h >= 22) night++;
   }
-  // ספר א
-  let weekBookA = 0;
-  const seenChapsA = new Set();
-  for (const r of weekR_done) {
-    if (r.chap >= 1 && r.chap <= 41 && !seenChapsA.has(r.chap)) {
-      seenChapsA.add(r.chap); weekBookA++;
-    }
+  // עזרים: ספירת פרקים ייחודיים של מסכת / סדר מתוך רשומות (לפי מזהי Corpus)
+  function uniqInTractate(arr, tid) {
+    const s = new Set();
+    arr.forEach(r => { const p = (typeof Corpus!=='undefined') && Corpus.parseChapId(r.chap); if (p && p.tractate === tid) s.add(r.chap); });
+    return s.size;
   }
+  function uniqInOrder(arr, orderId) {
+    const s = new Set();
+    arr.forEach(r => { const p = (typeof Corpus!=='undefined') && Corpus.parseChapId(r.chap); if (p) { const t = Corpus.getTractate(p.tractate); if (t && t.order === orderId) s.add(r.chap); } });
+    return s.size;
+  }
+  const weekAvot = uniqInTractate(weekR_done, 'PirkeiAvot');
   return {
     todayChapters: new Set(todayR_done.map(r=>r.chap)).size,
     // זמן - מסך כל הרשומות (כולל partial)
@@ -398,30 +408,17 @@ function getChallengeMetrics() {
     weekChapters: weekR_done.length,
     weekActiveDays: new Set(weekR_all.filter(r => r.secs > 0).map(r=>r.date)).size,
     weekMinutes: Math.round(weekR_all.reduce((a,r)=>a+(r.secs||0),0)/60),
-    weekBookA: weekBookA,
+    weekAvot: weekAvot,
     monthChapters: monthR_done.length,
     monthActiveDays: new Set(monthR_all.filter(r => r.secs > 0).map(r=>r.date)).size,
     monthMinutes: Math.round(monthR_all.reduce((a,r)=>a+(r.secs||0),0)/60),
     // 2.1.0: מטריקות חדשות
-    monthBookB: (function(){
-      const s = new Set();
-      monthR_done.forEach(r => { if (r.chap >= 42 && r.chap <= 72) s.add(r.chap); });
-      return s.size;
-    })(),
-    monthBookC: (function(){
-      const s = new Set();
-      monthR_done.forEach(r => { if (r.chap >= 73 && r.chap <= 89) s.add(r.chap); });
-      return s.size;
-    })(),
+    monthBerakhot: uniqInTractate(monthR_done, 'Berakhot'),
+    monthZeraim: uniqInOrder(monthR_done, 'Zeraim'),
     currentStreak: (function(){
       try { return load().streak.current||0; } catch(e){ return 0; }
     })(),
-    monthSpecialChaps: (function(){
-      const specials = [23, 91, 119, 130, 150];
-      const s = new Set();
-      monthR_done.forEach(r => { if (specials.indexOf(+r.chap) !== -1) s.add(+r.chap); });
-      return s.size;
-    })(),
+    monthAvotChaps: uniqInTractate(monthR_done, 'PirkeiAvot'),
     monthMaxDayMins50: (function(){
       // האם יש יום בחודש עם 50+ דקות?
       const byDate = {};
@@ -489,20 +486,17 @@ function claimChallenge(claimedKey, reward) {
    Badges נושאיים — 1.5.0
    ════════════════════════════════════════════════════════════ */
 const BADGES = [
-  // ספרים שלמים — 100 מעלות (2.0.7)
-  { id:'book_a',   icon:'📕', title:'ספר א׳ הושלם',  desc:'קראת את כל פרקים 1–41',   check: ctx => coversRange(ctx.uniqueRead, 1, 41),    reward:100 },
-  { id:'book_b',   icon:'📗', title:'ספר ב׳ הושלם',  desc:'קראת את כל פרקים 42–72',  check: ctx => coversRange(ctx.uniqueRead, 42, 72),   reward:100 },
-  { id:'book_c',   icon:'📘', title:'ספר ג׳ הושלם',  desc:'קראת את כל פרקים 73–89',  check: ctx => coversRange(ctx.uniqueRead, 73, 89),   reward:100 },
-  { id:'book_d',   icon:'📙', title:'ספר ד׳ הושלם',  desc:'קראת את כל פרקים 90–106', check: ctx => coversRange(ctx.uniqueRead, 90, 106),  reward:100 },
-  { id:'book_e',   icon:'📚', title:'ספר ה׳ הושלם',  desc:'קראת את כל פרקים 107–150',check: ctx => coversRange(ctx.uniqueRead, 107, 150), reward:100 },
-  { id:'all_150',  icon:'🌟', title:'כל ה-150 פרקים',desc:'סיימת את כל ספר תהילים!', check: ctx => coversRange(ctx.uniqueRead, 1, 150),   reward:500 },
-  // פרקים מיוחדים
-  { id:'p_119',    icon:'🔠', title:'הא״ב הגדול',    desc:'קראת את פרק קי״ט הארוך',  check: ctx => ctx.uniqueRead.has(119),               reward:50 },
-  { id:'shir_maalot', icon:'🪜', title:'שיר המעלות',   desc:'קראת את כל 15 שירי המעלות (120–134)', check: ctx => coversRange(ctx.uniqueRead, 120, 134), reward:120 },
-  { id:'p_91',     icon:'🛡', title:'יושב בסתר',     desc:'קראת את פרק צ״א',          check: ctx => ctx.uniqueRead.has(91),                reward:25 },
-  { id:'p_23',     icon:'🐑', title:'הרועה הנאמן',   desc:'קראת את פרק כ״ג',          check: ctx => ctx.uniqueRead.has(23),                reward:20 },
-  // תהילים יומי (לפי תאריך) - 2.0.7
-  { id:'daily_psalms', icon:'📅', title:'תהילים יומי',  desc:'סיימת את פרקי התהילים של היום (לפי לוח עברי)', check: ctx => ctx.dailyPsalmsCompleted >= 1, reward:50 },
+  // סדרים שלמים
+  { id:'order_zeraim',   icon:'🌾', title:'סדר זרעים הושלם',  desc:'למדת את כל מסכתות סדר זרעים',  check: ctx => coversOrder(ctx.uniqueRead, 'Zeraim'),   reward:300 },
+  { id:'order_moed',     icon:'🕯️', title:'סדר מועד הושלם',   desc:'למדת את כל מסכתות סדר מועד',   check: ctx => coversOrder(ctx.uniqueRead, 'Moed'),     reward:300 },
+  { id:'order_nashim',   icon:'💍', title:'סדר נשים הושלם',   desc:'למדת את כל מסכתות סדר נשים',   check: ctx => coversOrder(ctx.uniqueRead, 'Nashim'),   reward:300 },
+  { id:'order_nezikin',  icon:'⚖️', title:'סדר נזיקין הושלם', desc:'למדת את כל מסכתות סדר נזיקין', check: ctx => coversOrder(ctx.uniqueRead, 'Nezikin'),  reward:300 },
+  { id:'order_kodashim', icon:'🔥', title:'סדר קדשים הושלם',  desc:'למדת את כל מסכתות סדר קדשים',  check: ctx => coversOrder(ctx.uniqueRead, 'Kodashim'), reward:300 },
+  { id:'order_tahorot',  icon:'💧', title:'סדר טהרות הושלם',  desc:'למדת את כל מסכתות סדר טהרות',  check: ctx => coversOrder(ctx.uniqueRead, 'Tahorot'),  reward:300 },
+  { id:'all_shas', icon:'🌟', title:'כל המשנה',      desc:'סיימת את כל ששה סדרי המשנה!', check: ctx => coversAll(ctx.uniqueRead),                reward:1800 },
+  // מסכתות מיוחדות
+  { id:'avot',     icon:'📜', title:'מסכת אבות',     desc:'סיימת את מסכת אבות',       check: ctx => coversTractate(ctx.uniqueRead, 'PirkeiAvot'), reward:120 },
+  { id:'berakhot', icon:'🙏', title:'מסכת ברכות',    desc:'סיימת את מסכת ברכות',      check: ctx => coversTractate(ctx.uniqueRead, 'Berakhot'),   reward:80 },
   // זמן
   { id:'time_60',   icon:'⏰', title:'שעה ראשונה',   desc:'60 דקות קריאה מצטברות',   check: ctx => ctx.totalMinutes >= 60,    reward:30 },
   { id:'time_600',  icon:'🏅', title:'10 שעות',       desc:'600 דקות קריאה מצטברות',  check: ctx => ctx.totalMinutes >= 600,   reward:80 },
@@ -546,7 +540,7 @@ function getBadgeContext() {
   let readings = [];
   try { readings = JSON.parse(localStorage.getItem('tehillim_readings')||'[]'); } catch(e){}
   const completed = readings.filter(r => !r.partial);
-  const uniqueRead = new Set(completed.map(r => +r.chap));
+  const uniqueRead = new Set(completed.map(r => String(r.chap)));
   const totalMinutes = Math.round(completed.reduce((a,r)=>a+(r.secs||0),0)/60);
   // ספירת מדליות לפי משך קריאה לפרק
   const medalsCount = {bronze:0, silver:0, platinum:0, gold:0};
