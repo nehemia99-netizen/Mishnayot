@@ -1308,7 +1308,7 @@ window.goToDailyChapter = function() {
 // ── הודעת שיתוף סולידית — עם לוגו ──
 async function _shareSolidMsg() {
   const _lang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
-  const _baseUrl = (typeof APP_URL_DASH !== 'undefined' ? APP_URL_DASH : 'https://tehilon.vercel.app');
+  const _baseUrl = (typeof APP_URL_DASH !== 'undefined' ? APP_URL_DASH : 'https://mishnayot-alpha.vercel.app');
   const link = _lang === 'en' ? _baseUrl + '/01-dashboard.html?lang=en' : _baseUrl;
   const msg = _lang === 'en'
     ? '📖 *Tehilon*\n'
@@ -2070,7 +2070,7 @@ function addDashScore(pts){
   S.set('tehillim_score',sc);
 }
 const IS_MOBILE_DASH = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-const APP_URL_DASH = 'https://tehilon.vercel.app';
+const APP_URL_DASH = 'https://mishnayot-alpha.vercel.app';
 
 async function captureGraph() {
   const card = document.getElementById('graphCard');

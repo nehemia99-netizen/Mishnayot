@@ -829,7 +829,7 @@ const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 window.shareInvite=function(){
   const g=S.get('tehillim_group');if(!g)return;
   const isDeployed=location.protocol==='https:';
-  const joinUrl=isDeployed?(location.origin+location.pathname.replace('08-group.html','')+'08-group.html?join='+g.code):('https://tehilon.vercel.app/08-group.html?join='+g.code);
+  const joinUrl=isDeployed?(location.origin+location.pathname.replace('08-group.html','')+'08-group.html?join='+g.code):('https://mishnayot-alpha.vercel.app/08-group.html?join='+g.code);
   const text=`📖 הצטרף לקבוצת התהילים שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח תהילהון ← קבוצות ← הצטרף ← הזן קוד`;
   if(IS_MOBILE&&navigator.share)navigator.share({title:'תהילהון — '+g.name,text}).catch(()=>{});
   else{navigator.clipboard.writeText(text).catch(()=>{});window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');toast('✅ נפתח WhatsApp');}
