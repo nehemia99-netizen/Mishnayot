@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   תהילהון — Onboarding Tour אינטראקטיבי
+   משניון — Onboarding Tour אינטראקטיבי
    נוצר: 1.6.0 (10.5.2026)
    ──────────────────────────────────────────────────────────────
    הסיור הראשון מופיע בכניסה הראשונה לאפליקציה.
@@ -17,11 +17,11 @@ function _getLang() {
 }
 
 const STEPS_HE = [
-  { icon:'📖', title:'ברוך הבא לתהילהון!', body:'האפליקציה שתעזור לך להתמיד בקריאת תהילים — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#185FA5' },
-  { icon:'⭐', title:'מערכת מעלות', body:'כל פרק שתקרא ייתן לך נקודות "מעלות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתקרא יותר — תעלה לרמה הבאה.', bg:'#0C447C' },
-  { icon:'📚', title:'פירוש לתהילים', body:'לחץ על כפתור הפירוש בקורא כדי לקרוא פירוש לכל פסוק — בחר בין מצודת דוד לרש"י. הפירוש מופיע מתחת לכל פסוק ומעמיק את ההבנה.', bg:'#993556' },
+  { icon:'📖', title:'ברוך הבא למשניון!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#185FA5' },
+  { icon:'⭐', title:'מערכת מעלות', body:'כל פרק שתלמד ייתן לך נקודות "מעלות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#0C447C' },
+  { icon:'📚', title:'פירוש למשנה', body:'לחץ על כפתור הפירוש בקורא כדי לקרוא פירוש לכל משנה — ברטנורא ותוספות יום טוב. הפירוש מופיע מתחת לכל משנה ומעמיק את ההבנה.', bg:'#993556' },
   { icon:'🎯', title:'אתגרים יומיים', body:'יש לך 3 אתגרים פעילים בכל זמן: יומי, שבועי, וחודשי. השלם אותם ותקבל בונוס מעלות. אתגר חדש בכל יום חדש.', bg:'#3B6D11' },
-  { icon:'🧠', title:'למידה בעל פה', body:'סמן פרק בכוכב ☆ אחרי שלמדת אותו בעל פה. הכפתור 🧠 יפתח לך כלי לימוד עם 4 רמות הסתרה — מהקלה עד למבחן מלא.', bg:'#7B2FF7' },
+  { icon:'🧠', title:'שינון בעל פה', body:'סמן פרק בכוכב ☆ אחרי ששיננת אותו בעל פה. הכפתור 🧠 יפתח לך כלי לימוד עם 4 רמות הסתרה — מהקלה עד למבחן מלא.', bg:'#7B2FF7' },
   { icon:'👥', title:'קבוצות ואתגרים משותפים', bg:'#6B3AAA', groupSlide:true },
   { icon:'📲', title:'כמה דברים חשובים', bg:'#1A6B3A', infoSlide:true },
   { icon:'🕯️', title:'באיזה מצב להפעיל את האפליקציה?', body:'', bg:'#185FA5', modeSelect:true },
@@ -29,9 +29,9 @@ const STEPS_HE = [
 ];
 
 const STEPS_EN = [
-  { icon:'📖', title:'Welcome to Tehilon!', body:'The app that helps you read Tehillim consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#185FA5' },
-  { icon:'⭐', title:'Spiritual Points', body:'Every chapter earns you "Maalot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you read — the higher you climb.', bg:'#0C447C' },
-  { icon:'📚', title:'Psalm Commentary', body:'Tap the commentary button in the reader to see verse-by-verse explanations. Choose between Metzudat David and Rashi. Commentary appears below each verse.', bg:'#993556' },
+  { icon:'📖', title:'Welcome to Mishnayon!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#185FA5' },
+  { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Maalot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#0C447C' },
+  { icon:'📚', title:'Mishnah Commentary', body:'Tap the commentary button in the reader to see explanations for each Mishnah — Bartenura and Tosafot Yom Tov. Commentary appears below each Mishnah.', bg:'#993556' },
   { icon:'🎯', title:'Daily Challenges', body:'You have 3 active challenges at all times: daily, weekly, and monthly. Complete them for bonus points. A new challenge every new day.', bg:'#3B6D11' },
   { icon:'🧠', title:'Memorization Mode', body:'Mark a chapter with a star ☆ after memorizing it. The 🧠 button opens a learning tool with 4 levels of concealment — from easy to a full test.', bg:'#7B2FF7' },
   { icon:'👥', title:'Groups & Shared Challenges', bg:'#6B3AAA', groupSlide:true },
@@ -96,7 +96,7 @@ function render() {
   document.getElementById('_onb_header').style.background = s.bg;
   const iconEl = document.getElementById('_onb_icon');
   if (s.modeSelect) {
-    iconEl.innerHTML = '<img src="4.jpg" alt="תהילהון" style="width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.25);">';
+    iconEl.innerHTML = '<img src="4.jpg" alt="משניון" style="width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.25);">';
   } else {
     iconEl.textContent = s.icon;
   }
@@ -127,12 +127,12 @@ function render() {
         <button id="_onb_m_simple" style="padding:14px 14px 12px;border-radius:16px;border:2.5px solid #185FA5;background:#EEF4FB;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#185FA5;text-align:right;line-height:1.5;">
           <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">📖</span>${isEn ? 'Simple Reading' : 'קריאה תמימה'}</div>
           <div style="font-size:12px;font-weight:400;color:#555;margin-top:3px;">${isEn ? 'Just open and read, without distractions or settings.' : 'רק לפתוח ולקרוא, בלי הסחות דעת ובלי הגדרות.'}</div>
-          <div style="font-size:11px;font-weight:400;color:#185FA5;margin-top:5px;font-style:italic;line-height:1.4;">"תּוֹרַת יְהוָה תְּמִימָה מְשִׁיבַת נָפֶשׁ"<br><span style="color:#888;">(תהילים י"ט, ח')</span></div>
+          <div style="font-size:11px;font-weight:400;color:#185FA5;margin-top:5px;font-style:italic;line-height:1.4;">"הֲפֹךְ בָּהּ וַהֲפֹךְ בָּהּ דְּכֹלָּא בָהּ"<br><span style="color:#888;">(אבות ה', כ"ב)</span></div>
         </button>
         <button id="_onb_m_full" style="padding:14px 14px 12px;border-radius:16px;border:2px solid #ddd;background:#f9f9f9;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#333;text-align:right;line-height:1.5;">
           <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">🏆</span>${isEn ? 'Challenge Mode' : 'מסלול אתגרי'}</div>
           <div style="font-size:12px;font-weight:400;color:#555;margin-top:3px;">${isEn ? 'Track progress, earn challenges, build a community, and use all the features.' : 'מעקב אחר התקדמות, לצבור אתגרים, להקים קהילה ולהשתמש בכל השכלולים.'}</div>
-          <div style="font-size:11px;font-weight:400;color:#888;margin-top:5px;font-style:italic;line-height:1.4;">"יֵלְכוּ מֵחַיִל אֶל חָיִל"<br><span style="color:#aaa;">(תהילים פ"ד, ח')</span></div>
+          <div style="font-size:11px;font-weight:400;color:#888;margin-top:5px;font-style:italic;line-height:1.4;">"לְפוּם צַעֲרָא אַגְרָא"<br><span style="color:#aaa;">(אבות ה', כ"ג)</span></div>
         </button>`;
       const bodyEl = document.getElementById('_onb_body');
       bodyEl.parentNode.insertBefore(modeEl, bodyEl.nextSibling);
@@ -184,15 +184,15 @@ function render() {
         + '<div style="font-size:20px;margin-bottom:3px;">📱</div>'
         + `<div style="font-size:14px;font-weight:700;color:#1A6B3A;margin-bottom:3px;">${isEn ? 'Add to Home Screen' : 'הוסף אייקון למסך הבית'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
-            ? 'Tehilon is a Web App. To open it easily:<br><b>iPhone:</b> Share → "Add to Home Screen"<br><b>Android:</b> Menu ⋮ → "Add to Home Screen"'
-            : 'תהילהון היא אפליקציית Web. כדי לפתוח בנוחות:<br><b>iPhone:</b> כפתור שיתוף ← "הוסף למסך הבית"<br><b>Android:</b> תפריט ⋮ ← "הוסף למסך הבית"'}</div>`
+            ? 'Mishnayon is a Web App. To open it easily:<br><b>iPhone:</b> Share → "Add to Home Screen"<br><b>Android:</b> Menu ⋮ → "Add to Home Screen"'
+            : 'משניון היא אפליקציית Web. כדי לפתוח בנוחות:<br><b>iPhone:</b> כפתור שיתוף ← "הוסף למסך הבית"<br><b>Android:</b> תפריט ⋮ ← "הוסף למסך הבית"'}</div>`
         + '</div>'
         + '<div style="background:#EEF4FB;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">🔐</div>'
         + `<div style="font-size:14px;font-weight:700;color:#185FA5;margin-bottom:3px;">${isEn ? 'Sign in with Google' : 'הירשם עם Google'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
             ? 'To save your points and chapters — sign in with Google. Free and instant.'
-            : 'כדי שהמעלות והפרקים שקראת <b>יישמרו</b> — חשוב להתחבר עם חשבון Google. בחינם ובשניות.'}</div>`
+            : 'כדי שהמעלות והפרקים שלמדת <b>יישמרו</b> — חשוב להתחבר עם חשבון Google. בחינם ובשניות.'}</div>`
         + '</div>'
         + '<div style="background:#FFF8EE;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">🛠️</div>'
@@ -222,8 +222,8 @@ function render() {
         + '<div style="font-size:20px;margin-bottom:3px;">🏆</div>'
         + `<div style="font-size:14px;font-weight:700;color:#6B3AAA;margin-bottom:3px;">${isEn ? 'Shared Challenges' : 'אתגרים משותפים'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
-            ? 'Create a group with family, friends, or a community. Set a shared goal — how many chapters to read together — and track progress in real time.'
-            : 'צור קבוצה עם משפחה, חברים או קהילה. קבעו יעד משותף — כמה פרקים לקרוא ביחד — ועקבו אחר ההתקדמות בזמן אמת.'}</div>`
+            ? 'Create a group with family, friends, or a community. Set a shared goal — how many chapters to study together — and track progress in real time.'
+            : 'צור קבוצה עם משפחה, חברים או קהילה. קבעו יעד משותף — כמה פרקים ללמוד ביחד — ועקבו אחר ההתקדמות בזמן אמת.'}</div>`
         + '</div>'
         + '<div style="background:#F0EAF9;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">➕</div>'

@@ -17,9 +17,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
+<script src="corpus.js?v=1.0.0"></script>
 <script src="gamification.js?v=2.2.31"></script>
 <script src="notifications.js?v=2.2.31"></script>
-<script src="onboarding.js?v=2.2.82"></script>
+<script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.31"></script>
 <script>
 /* 2.0.1 - status strip + challenges + share */
@@ -230,26 +231,26 @@ async function shareGraph(ev){
   const _sgLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   const _sgUrl = _sgLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _sgLang === 'en'
-    ? '📊 My Tehilon Progress\n' +
+    ? '📊 My Mishnayon Progress\n' +
       '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Maalot\n' +
       '⭐ Total: ' + totalPts.toLocaleString() + ' Maalot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
-      '📖 ' + chapsCount + ' unique psalms read\n\n' + _sgUrl
-    : '📊 ההתקדמות שלי בתהילהון\n' +
+      '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' + _sgUrl
+    : '📊 ההתקדמות שלי במשניון\n' +
               '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' מעלות\n' +
               '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' מעלות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
-              '📖 ' + chapsCount + ' פרקים שונים נקראו\n\n' +
+              '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
               APP_URL_DASH;
   const file=new File([blob],'tehilahon-graph.png',{type:'image/png'});
   // ניסיון שיתוף ישיר (Web Share API Level 2) - תומך בוואטסאפ, טלגרם וכו'
   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({title:'תהילהון',text:msg,files:[file]});return;}
+    try{await navigator.share({title:'משניון',text:msg,files:[file]});return;}
     catch(e){if(e.name==='AbortError')return;}
   }
   // fallback - שיתוף טקסט בלבד דרך WhatsApp Web
   if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
     // במובייל - נסה Web Share API לטקסט בלבד
     if(navigator.share){
-      try{await navigator.share({title:'תהילהון',text:msg});return;}catch(e){}
+      try{await navigator.share({title:'משניון',text:msg});return;}catch(e){}
     }
   }
   // אחרון - הצע לפתוח WhatsApp עם הטקסט + הורד את התמונה
@@ -502,7 +503,7 @@ html.dark .lottery-trigger{opacity:.85;}
 .lres-go{background:var(--primary);color:#fff;margin-left:8px;}
 .lres-close{background:var(--surface);color:var(--text);border:.5px solid var(--border);}
 </style>
-<script src="i18n.js?v=2.2.31" defer></script>
+<script src="i18n.js?v=2.2.84" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -559,7 +560,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.0.0 BETA</div>
+          <div class="app-version">גרסה 1.0.2 BETA</div>
         </div>
       </div>
     </div>
@@ -678,14 +679,14 @@ html.dark .lottery-trigger{opacity:.85;}
     <a href="03-reader.html?mode=cycle" style="width:100%;padding:22px 10px;border-radius:20px;background:var(--primary);color:#fff;font-size:21px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px;text-decoration:none;box-sizing:border-box;">
       <span style="font-size:32px;">📖</span>
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
-        <span data-i18n="home.simple_read_cycle">קרא את ספר תהילים</span>
+        <span data-i18n="home.simple_read_cycle">למד את כל המשנה</span>
         <span style="font-size:13px;font-weight:400;opacity:.85;" id="simpleCycleSub">ממשיך מהמקום שעצרת</span>
       </div>
     </a>
 
     <!-- כפתור 2: קרא פרק היום -->
     <button onclick="window.goToDailyChapter()" style="width:100%;padding:16px 10px;border-radius:18px;background:var(--card);border:2px solid var(--primary);color:var(--primary);font-size:17px;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;border:2px solid var(--primary);">
-      <span style="font-size:24px;">🗓️</span><span data-i18n="home.simple_daily_chap">קרא פרק היום</span>
+      <span style="font-size:24px;">🗓️</span><span data-i18n="home.simple_daily_chap">פרק יומי</span>
     </button>
 
     <!-- שורה: בחר פרק + מועדפים -->
@@ -715,7 +716,7 @@ html.dark .lottery-trigger{opacity:.85;}
 
     <!-- מהו תהילים — למתחילים -->
     <div style="text-align:center;margin-bottom:6px;">
-      <a href="about-tehilim.html" style="font-size:12px;color:var(--text-muted);text-decoration:none;"><span data-i18n="home.what_is">📖 מהו תהילים? הסבר למתחילים</span></a>
+      <a href="about-tehilim.html" style="font-size:12px;color:var(--text-muted);text-decoration:none;"><span data-i18n="home.what_is">📖 מהי המשנה? הסבר למתחילים</span></a>
     </div>
 
     <!-- שתף והגדרות — שורה תחתונה -->
@@ -786,7 +787,7 @@ html.dark .lottery-trigger{opacity:.85;}
 
   <div class="news-section" id="newsSection">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <div class="news-label" id="newsLabel">📈 בורסת תהילים — מה חם עכשיו</div>
+      <div class="news-label" id="newsLabel">📈 בורסת המשנה — מה חם עכשיו</div>
       <button onclick="toggleNewsMode()" id="newsToggleBtn" style="font-size:10px;padding:3px 9px;border-radius:14px;border:.5px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;font-family:inherit;">📜 ציטוט</button>
     </div>
     <div id="newsTicker" class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
@@ -802,7 +803,7 @@ html.dark .lottery-trigger{opacity:.85;}
 
   <div class="footer" id="mainFooter">
     <button class="footer-btn" onclick="shareApp()" data-i18n="home.share">📤 שתף</button>
-    <span class="footer-copy">© 2026 תהילהון</span>
+    <span class="footer-copy">© 2026 משניון</span>
   </div>
 </div>
 
@@ -822,7 +823,7 @@ html.dark .lottery-trigger{opacity:.85;}
     </div>
     <!-- כפתור המשך קריאה אחרי ברכה לפני -->
     <div id="blessingReadBtn" style="display:none;padding:8px 16px 12px;text-align:center;">
-      <button onclick="closeModal('blessingsModal');window.goToDailyChapter();" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 קרא פרק היום ←</button>
+      <button onclick="closeModal('blessingsModal');window.goToDailyChapter();" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 לפרק היומי ←</button>
     </div>
 
     <div class="blessing-item" id="b2">
@@ -1143,8 +1144,8 @@ function _applySimpleMode() {
       : (_bLang === 'en' ? '📖 Come read a chapter today!' : '📖 בוא נקרא פרק היום!');
     if (totalEl) totalEl.textContent = total > 0
       ? (_bLang === 'en'
-          ? 'Total: ' + total.toLocaleString() + ' chapters read' + scoreStr
-          : 'סה״כ ' + total.toLocaleString() + ' פרקים נקראו' + scoreStr)
+          ? 'Total: ' + total.toLocaleString() + ' chapters studied' + scoreStr
+          : 'סה״כ ' + total.toLocaleString() + ' פרקים נלמדו' + scoreStr)
       : (_bLang === 'en' ? 'Every chapter earns spiritual Maalot ⭐' : 'כל פרק = מעלות רוחניות ⭐');
   }
 }
@@ -1300,9 +1301,15 @@ window.switchToFullMode = function() {
 })();
 
 window.goToDailyChapter = function() {
+  // פרק יומי דטרמיניסטי על פני כל הקורפוס (ביניים — עד שילוב לוח "המשנה היומית")
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,1)) / 86400000);
-  const chap = (dayOfYear % 150) + 1;
-  location.href = '03-reader.html?chap=' + chap;
+  if (typeof Corpus !== 'undefined') {
+    const all = Corpus.flatChapters();
+    const pick = all[dayOfYear % all.length];
+    location.href = '03-reader.html?chap=' + pick.id;
+  } else {
+    location.href = '03-reader.html?mode=random';
+  }
 };
 
 // ── הודעת שיתוף סולידית — עם לוגו ──
@@ -1311,20 +1318,20 @@ async function _shareSolidMsg() {
   const _baseUrl = (typeof APP_URL_DASH !== 'undefined' ? APP_URL_DASH : 'https://mishnayot-alpha.vercel.app');
   const link = _lang === 'en' ? _baseUrl + '/01-dashboard.html?lang=en' : _baseUrl;
   const msg = _lang === 'en'
-    ? '📖 *Tehilon*\n'
-      + 'A beautiful & challenging app for reading Tehillim (Psalms) — free.\n'
+    ? '📖 *Mishnayon*\n'
+      + 'A beautiful & challenging app for studying Mishnah — free.\n'
       + 'Earn spiritual merit in this world and the next.\n\n'
       + 'Share to spread the mitzvah 🙏\n'
       + 'Am Yisrael Chai! ✡️\n\n'
       + link
-    : '📖 *תהילהון*\n'
-      + 'אפליקציה משוכללת ומאתגרת לקריאת תהילים בקלות, ובחינם.\n'
+    : '📖 *משניון*\n'
+      + 'אפליקציה משוכללת ומאתגרת ללימוד משניות בקלות, ובחינם.\n'
       + 'לצבירת הון רוחני בעולם הזה ובעולם הבא..\n\n'
       + 'שתפו לזיכוי הרבים 🙏\n'
       + 'עם ישראל חי! ✡️\n\n'
       + link;
   if (navigator.share) {
-    const shareData = { title: 'תהילהון', text: msg };
+    const shareData = { title: 'משניון', text: msg };
     // נסה לצרף לוגו — מוקטן ל-75%
     try {
       const res = await fetch('4.jpg');
@@ -1941,7 +1948,7 @@ function applyNewsMode() {
   if (mode === 'quote') {
     if (tickerEl) tickerEl.style.display = 'none';
     if (quoteEl) quoteEl.style.display = '';
-    if (label) label.textContent = '📜 ציטוטים מתהילים';
+    if (label) label.textContent = '📜 ציטוטים מהמשנה';
     if (btn) btn.textContent = '📈 בורסה';
     // setTimeout: תן לדפדפן לצייר את ה-wrap לפני שהאנימציה מתחילה
     setTimeout(function() {
@@ -1955,7 +1962,7 @@ function applyNewsMode() {
   } else {
     if (tickerEl) tickerEl.style.display = '';
     if (quoteEl) quoteEl.style.display = 'none';
-    if (label) label.textContent = '📈 בורסת תהילים — מה חם עכשיו';
+    if (label) label.textContent = '📈 בורסת המשנה — מה חם עכשיו';
     if (btn) btn.textContent = '📜 ציטוט';
     // עצור את ה-RAF של הציטוטים
     if (typeof _quoteTickerRAF !== 'undefined' && _quoteTickerRAF) {
@@ -2122,16 +2129,16 @@ async function shareApp(){
   const _saLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   const _saUrl = _saLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _saLang === 'en'
-    ? '📖 My Tehilon Progress\n' +
+    ? '📖 My Mishnayon Progress\n' +
       '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Maalot\n' +
       '⭐ Total: ' + totalPts.toLocaleString() + ' Maalot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
-      '📖 ' + chapsCount + ' unique psalms read\n\n' +
-      'Join me on *Tehilon*:\n' + _saUrl
-    : '📖 ההתקדמות שלי בתהילהון\n' +
+      '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' +
+      'Join me on *Mishnayon*:\n' + _saUrl
+    : '📖 ההתקדמות שלי במשניון\n' +
               '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' מעלות\n' +
               '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' מעלות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
-              '📖 ' + chapsCount + ' פרקים שונים נקראו\n\n' +
-              'הצטרף אלי לאפליקציית *תהילהון*:\n' +
+              '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
+              'הצטרף אלי לאפליקציית *משניון*:\n' +
               _saUrl;
 
   addDashScore(3);
@@ -2139,7 +2146,7 @@ async function shareApp(){
   const blob = await captureGraph();
 
   if (IS_MOBILE_DASH && navigator.share) {
-    const shareData = { title:'תהילהון', text: msg };
+    const shareData = { title:'משניון', text: msg };
     if (blob) {
       const file = new File([blob], 'tehilahon-progress.png', { type:'image/png' });
       if (navigator.canShare && navigator.canShare({ files:[file] })) {
@@ -2687,13 +2694,13 @@ function openAbout() {
     m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center;';
     const _aLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
     const _aDesc = _aLang === 'en'
-      ? 'A beautiful, challenging app for reading Tehillim (Psalms) — free. Earn spiritual merit in this world and the next. Share it to spread the good. Built with love for the Torah.'
-      : 'אפליקציה משוכללת ומאתגרת לקריאת תהילים בקלות, ובחינם. לצבירת הון רוחני בעולם הזה ובעולם הבא.. שתפו לזיכוי הרבים. פותחה באהבה לכבוד התורה.';
+      ? 'A beautiful, challenging app for studying Mishnah — free. Earn spiritual merit in this world and the next. Share it to spread the good. Built with love for the Torah.'
+      : 'אפליקציה משוכללת ומאתגרת ללימוד משניות בקלות, ובחינם. לצבירת הון רוחני בעולם הזה ובעולם הבא.. שתפו לזיכוי הרבים. פותחה באהבה לכבוד התורה.';
     const _aClose = _aLang === 'en' ? 'Close' : 'סגור';
     const _aSettings = _aLang === 'en' ? '⚙️ Settings' : '⚙️ הגדרות';
     m.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-width:390px;width:100%;text-align:center;">
       <div style="font-size:52px;margin-bottom:8px;">📖</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;">תהילהון · Tehilon</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;">משניון · Mishnayon</div>
       <div style="font-size:15px;color:var(--text-sec);margin-bottom:18px;line-height:1.6;">${_aDesc}</div>
       ${q ? `<div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:18px;font-family:'David Libre',serif;font-size:16px;color:var(--text);line-height:1.6;">"${q.t}"<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">תהלים ${q.ref}</div></div>` : ''}
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">

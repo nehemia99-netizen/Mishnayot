@@ -34,11 +34,11 @@ const DICT = {
   'home.mode_challenge':     { he: '🏆 מסלול אתגרי',           en: '🏆 Challenge mode' },
   'home.mode_simple_active': { he: '📖 קריאה תמימה',           en: '📖 Simple mode' },
   'home.mode_challenge_active':{ he: '🛠️ מסלול אתגרי',        en: '🛠️ Challenge mode' },
-  'home.what_is':            { he: '📖 מהו תהילים? הסבר למתחילים', en: '📖 What is Tehillim?' },
+  'home.what_is':            { he: '📖 מהי המשנה? הסבר למתחילים', en: '📖 What is the Mishnah?' },
   // מוד תמימה
   'home.mode_simple_small':  { he: '📖 קריאה תמימה',              en: '📖 Simple reading' },
-  'home.simple_read_cycle':  { he: 'קרא את ספר תהילים',          en: 'Read Tehillim' },
-  'home.simple_daily_chap':  { he: 'קרא פרק היום',               en: "Read today's chapter" },
+  'home.simple_read_cycle':  { he: 'למד את כל המשנה',            en: 'Study the Mishnah' },
+  'home.simple_daily_chap':  { he: 'פרק יומי',                   en: 'Daily chapter' },
   'home.blessing_before':    { he: 'ברכה לפני<br>קריאה',         en: 'Blessing<br>before reading' },
   'home.blessing_after':     { he: 'ברכה אחרי<br>קריאה',         en: 'Blessing<br>after reading' },
   // הגדרות — תזכורת
