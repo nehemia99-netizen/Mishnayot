@@ -283,12 +283,16 @@ html.dark .chap-cell.mem{background:#1C1230;}
 
   function perekCells(tid){
     var t=Corpus.getTractate(tid),h='';
+    var mastery=S.get('mishnah_mastery')||{};
+    var MED={1:'🥉',2:'🥈',3:'🥇'};
     for(var p=1;p<=t.length;p++){
       var id=Corpus.chapId(tid,p),cls='chap-cell';
       if(doneToday.has(id))cls+=' done';
       if(favs.has(id))cls+=' fav';
       if(mems.has(id))cls+=' mem';
-      h+='<div class="'+cls+'" onclick="openChap(\''+id+'\')">'+toGem(p)+'</div>';
+      var m=mastery[id];
+      var medal=(m&&m.level&&MED[m.level])?('<span style="position:absolute;top:-5px;left:-3px;font-size:11px;line-height:1;">'+MED[m.level]+'</span>'):'';
+      h+='<div class="'+cls+'" style="position:relative;overflow:visible;" onclick="openChap(\''+id+'\')">'+toGem(p)+medal+'</div>';
     }
     return h;
   }

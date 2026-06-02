@@ -107,6 +107,15 @@ html.dark .shinun-hint{color:#9B6FE0;}
 /* Shinun score banner */
 .shinun-score-banner{margin:12px 16px 0;padding:12px 16px;border-radius:12px;background:#F5F0FF;border:1px solid #C8B0F0;font-size:13px;color:#7B2FF7;font-weight:600;text-align:center;display:none;}
 html.dark .shinun-score-banner{background:#1C1235;border-color:#5B3090;color:#9B6FE0;}
+.shinun-retry-btn{display:inline-block;margin-top:10px;padding:9px 18px;border-radius:20px;border:none;background:#7B2FF7;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.shinun-retry-btn:active{transform:scale(.96);}
+.shinun-mastery{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:700;}
+/* mastery badge on verse number */
+.mastery-pip{font-size:10px;margin-top:2px;}
+/* TTS active + currently-speaking verse highlight */
+.icon-btn.tts-on{background:#7B2FF7;color:#fff;border-color:#7B2FF7;}
+.verse.tts-speaking{background:#F5F0FF;border-radius:8px;}
+html.dark .verse.tts-speaking{background:#241636;}
 
 /* Dedication banner */
 .dedication-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;background:linear-gradient(135deg,#E9F2E9,#DCF0DE);border-bottom:.5px solid #BBD6BB;flex-shrink:0;}
@@ -181,6 +190,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
       <button class="icon-btn" id="favBtn" onclick="toggleFav()" title="מועדף" data-i18n-title="read.favorite">🤍</button>
       <button class="icon-btn" id="memBtn" onclick="toggleMem()" title="שינון" data-i18n-title="read.memorize">☆</button>
       <button class="icon-btn" id="shinunModeBtn" onclick="toggleShinunMode()" title="מצב שינון" data-i18n-title="read.shinun_mode">🧠</button>
+      <button class="icon-btn" id="ttsBtn" onclick="toggleTTS()" title="הקראה קולית">🔊</button>
     </div>
   </div>
 
@@ -1421,6 +1431,58 @@ let shinunActive = false;
 let shinunLevel  = 1;
 let _shinunVerses = [];
 let _testResults  = {};
+let _reviewSet    = null;   // אינדקסי משניות שנבחנים כעת (null = כל הפרק)
+let _passNum      = 0;      // 0 = מעבר ראשון; 1+ = לולאת חזרה
+
+/* ── מעקב שליטה לכל פרק (נשמר ב-localStorage) ── */
+const MASTERY_KEY  = 'mishnah_mastery';
+const MASTERY_INFO = { 1:{t:'ארד',e:'🥉'}, 2:{t:'כסף',e:'🥈'}, 3:{t:'זהב',e:'🥇'} };
+function getMasteryAll(){ return S.get(MASTERY_KEY) || {}; }
+function getMastery(id){ return getMasteryAll()[id] || null; }
+function recordMasteryScore(id, pct, perfectFirstPass){
+  const all = getMasteryAll();
+  const m = all[id] || { perfects:0, tests:0, bestPct:0, level:0 };
+  m.tests   = (m.tests||0) + 1;
+  m.bestPct = Math.max(m.bestPct||0, pct);
+  if (perfectFirstPass) m.perfects = (m.perfects||0) + 1;
+  m.level   = m.perfects>=3 ? 3 : m.perfects>=2 ? 2 : m.perfects>=1 ? 1 : 0;
+  m.lastTest = localDateStr();
+  all[id] = m; S.set(MASTERY_KEY, all);
+  return m;
+}
+
+/* ── הקראה קולית (Text-to-Speech) ── */
+let _ttsOn = false, _ttsIdx = 0;
+function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
+function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
+function _ttsStop(){
+  _ttsOn = false;
+  try { speechSynthesis.cancel(); } catch(e){}
+  document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
+  const b = document.getElementById('ttsBtn'); if(b) b.classList.remove('tts-on');
+}
+function toggleTTS(){
+  if (!_ttsSupported()){ showToast(_rLang()==='en'?'Speech not supported here':'הקראה קולית לא נתמכת במכשיר זה'); return; }
+  if (_ttsOn){ _ttsStop(); return; }
+  const cached = S.get('mishnah_cache_' + curId());
+  const verses = (cached && cached.he) ? cached.he : (_shinunVerses.length ? _shinunVerses : null);
+  if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
+  _ttsOn = true; _ttsIdx = 0;
+  const b = document.getElementById('ttsBtn'); if(b) b.classList.add('tts-on');
+  const verseEls = document.querySelectorAll('.text-area .verse');
+  (function speakNext(){
+    if (!_ttsOn || _ttsIdx >= verses.length){ _ttsStop(); return; }
+    document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
+    const el = verseEls[_ttsIdx];
+    if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    const u = new SpeechSynthesisUtterance(_stripForTts(verses[_ttsIdx]));
+    u.lang = 'he-IL'; u.rate = 0.9;
+    u.onend   = function(){ _ttsIdx++; speakNext(); };
+    u.onerror = function(){ _ttsIdx++; speakNext(); };
+    try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); }
+  })();
+}
+window.addEventListener('pagehide', _ttsStop);
 
 function toggleShinunMode() {
   shinunActive = !shinunActive;
@@ -1429,10 +1491,11 @@ function toggleShinunMode() {
   btn.classList.toggle('active', shinunActive);
   bar.classList.toggle('open', shinunActive);
   document.getElementById('shinunBanner').style.display = 'none';
+  _ttsStop();
 
   if (shinunActive) {
-    // Mark chapter for memorization automatically
-    if (!getMems().includes(chapNum)) toggleMem();
+    // סמן את הפרק לשינון אוטומטית
+    if (!getMems().includes(curId())) toggleMem();
     setShinunLevel(1);
     showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels await' : '🧠 מצב שינון — 4 שלבים מחכים לך');
   } else {
@@ -1445,6 +1508,8 @@ function toggleShinunMode() {
 
 function setShinunLevel(lvl) {
   shinunLevel = lvl;
+  _reviewSet = null; _passNum = 0;   // איפוס לולאת החזרה
+  _ttsStop();
   [1,2,3,4].forEach(i =>
     document.getElementById('slvl'+i).classList.toggle('active', i===lvl)
   );
@@ -1459,12 +1524,18 @@ function renderShinunVerses(verses, level) {
   const ta = document.getElementById('textArea');
 
   if (level === 1) {
+    _reviewSet = null; _passNum = 0;
     renderVerses(verses, null);
     return;
   }
 
+  const idxs = _reviewSet || verses.map((_, k) => k);
   let html = '';
-  verses.forEach((v, i) => {
+  if (_reviewSet) {
+    html += `<div style="text-align:center;font-size:12px;color:#7B2FF7;font-weight:700;margin-bottom:10px;">↻ סבב חזרה ${_passNum} — נותרו ${idxs.length} משניות</div>`;
+  }
+  idxs.forEach(i => {
+    const v = verses[i];
     const words = v.split(' ');
     let inner = '';
 
@@ -1487,7 +1558,7 @@ function renderShinunVerses(verses, level) {
 
     } else if (level === 4) {
       inner = `<div class="verse-wrap tappable" id="vw${i}" onclick="revealVerse4(${i})">` +
-        `<div class="verse-hidden-label" id="vhl${i}">פסוק ${toGematria(i+1)} — הקש לגלות 👆</div>` +
+        `<div class="verse-hidden-label" id="vhl${i}">משנה ${toGematria(i+1)} — הקש לגלות 👆</div>` +
         `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;">${v}</span>` +
         `</div>`;
     }
@@ -1552,20 +1623,50 @@ function assessVerse(idx, knew) {
   if (row) {
     row.innerHTML = knew
       ? '<div style="color:var(--green);font-size:12px;padding:4px 0;font-weight:600;">✓ מצוין!</div>'
-      : '<div style="color:#C04040;font-size:12px;padding:4px 0;font-weight:600;">↩ חזור על הפסוק</div>';
+      : '<div style="color:#C04040;font-size:12px;padding:4px 0;font-weight:600;">↩ חזור על המשנה</div>';
   }
-  // All assessed?
-  if (_shinunVerses.length && Object.keys(_testResults).length === _shinunVerses.length) {
-    const knew  = Object.values(_testResults).filter(Boolean).length;
-    const total = _shinunVerses.length;
-    const pct   = Math.round(knew / total * 100);
-    const banner = document.getElementById('shinunBanner');
-    banner.style.display = 'block';
-    banner.innerHTML = pct === 100
-      ? `🎉 מושלם! ידעת את כל ${total} הפסוקים בעל-פה!`
-      : `🎯 ידעת ${knew} מתוך ${total} פסוקים (${pct}%) — כדאי לחזור על השאר`;
-    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // האם סיימנו את כל המשניות בסבב הנוכחי?
+  const setIdxs = _reviewSet || _shinunVerses.map((_, k) => k);
+  const assessed = setIdxs.filter(i => i in _testResults).length;
+  if (!setIdxs.length || assessed < setIdxs.length) return;
+
+  const missed = setIdxs.filter(i => _testResults[i] === false);
+  const total  = setIdxs.length;
+  const knewN  = total - missed.length;
+  const pct    = Math.round(knewN / total * 100);
+  const banner = document.getElementById('shinunBanner');
+  banner.style.display = 'block';
+
+  const firstPass = (_reviewSet === null);
+  if (firstPass) recordMasteryScore(curId(), pct, missed.length === 0);
+
+  if (missed.length === 0) {
+    let msg = firstPass
+      ? `🎉 מושלם! ידעת את כל ${total} המשניות במעבר ראשון!`
+      : `🎉 כל הכבוד! שיננת את כל הפרק!`;
+    const m = getMastery(curId());
+    if (m && m.level) {
+      const mi = MASTERY_INFO[m.level];
+      msg += `<div class="shinun-mastery">שליטה: ${mi.e} ${mi.t} · ${m.perfects} שינונים מושלמים</div>`;
+    }
+    banner.innerHTML = msg;
+  } else {
+    banner.innerHTML =
+      `🎯 ידעת ${knewN} מתוך ${total} (${pct}%)` +
+      `<br><button class="shinun-retry-btn" onclick="retryMissed()">↻ חזור על ${missed.length} שלא ידעת</button>`;
+    banner._missed = missed;
   }
+  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function retryMissed() {
+  const banner = document.getElementById('shinunBanner');
+  const missed = (banner && banner._missed) ? banner._missed.slice() : [];
+  if (!missed.length) return;
+  _reviewSet = missed;
+  _passNum   = (_passNum || 0) + 1;
+  banner.style.display = 'none';
+  renderShinunVerses(_shinunVerses, 4);
 }
 
 /* ── Medal system ── */
