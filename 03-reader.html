@@ -87,10 +87,13 @@ html.dark #memBtn{color:#9B6FE0;}
 .qc-back{background:var(--surface);color:var(--text);border:.5px solid var(--border)!important;}
 
 /* ── Shinun (memorization) mode ── */
-.shinun-bar{display:none;gap:5px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:nowrap;}
+.shinun-bar{display:none;gap:5px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.shinun-bar::-webkit-scrollbar{display:none;}
 html.dark .shinun-bar{background:#1C1235;border-bottom-color:#4A3080;}
 .shinun-bar.open{display:flex;}
-.shinun-lvl{flex:1;padding:7px 4px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
+.shinun-lvl{flex:0 0 auto;min-width:62px;padding:7px 8px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
+.rt-word{cursor:pointer;border-bottom:1px dotted #B79BE8;-webkit-tap-highlight-color:transparent;}
+.rt-word.revealed{border-bottom:none;color:var(--primary);}
 html.dark .shinun-lvl{border-color:#5B3090;color:#9B6FE0;}
 .shinun-lvl.active{background:#7B2FF7;color:#fff;border-color:#7B2FF7;}
 /* Cover block (level 2) */
@@ -254,6 +257,8 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   <div class="shinun-bar" id="shinunBar">
     <button class="shinun-lvl active" id="slvl1" onclick="setShinunLevel(1)" data-i18n="read.shinun_review">📖<br>חזרה</button>
     <button class="shinun-lvl"        id="slvl2" onclick="setShinunLevel(2)" data-i18n="read.shinun_hide_ends">🔲<br>הסתר סיומות</button>
+    <button class="shinun-lvl"        id="slvl5" onclick="setShinunLevel(5)" data-i18n="read.shinun_rashei">🔡<br>ראשי תיבות</button>
+    <button class="shinun-lvl"        id="slvl6" onclick="setShinunLevel(6)" data-i18n="read.shinun_blanks">⬚<br>השלמת מילים</button>
     <button class="shinun-lvl"        id="slvl3" onclick="setShinunLevel(3)" data-i18n="read.shinun_hint">💡<br>רמז ראשון</button>
     <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
   </div>
@@ -1826,9 +1831,10 @@ function setShinunLevel(lvl) {
   shinunLevel = lvl;
   _reviewSet = null; _passNum = 0;   // איפוס לולאת החזרה
   _ttsStop();
-  [1,2,3,4].forEach(i =>
-    document.getElementById('slvl'+i).classList.toggle('active', i===lvl)
-  );
+  [1,2,3,4,5,6].forEach(i => {
+    const el = document.getElementById('slvl'+i);
+    if (el) el.classList.toggle('active', i===lvl);
+  });
   document.getElementById('shinunBanner').style.display = 'none';
   const cached = S.get('mishnah_cache_' + curId());
   if (cached && cached.he) renderShinunVerses(cached.he, lvl);
@@ -1877,6 +1883,24 @@ function renderShinunVerses(verses, level) {
         `<div class="verse-hidden-label" id="vhl${i}">משנה ${toGematria(i+1)} — הקש לגלות 👆</div>` +
         `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;">${v}</span>` +
         `</div>`;
+
+    } else if (level === 5) {
+      // ראשי תיבות — כל מילה מוצגת באות ראשונה; הקשה חושפת אותה (חשיפה הדרגתית מילה-מילה)
+      const wordsHtml = words.map((w, wi) =>
+        `<span class="rt-word" onclick="revealRT(${i},${wi},this)">${(w.charAt(0)||w)}</span>`
+      ).join(' ');
+      inner = `<span class="verse-text" style="font-size:${fontSize}px">${wordsHtml}</span>`;
+
+    } else if (level === 6) {
+      // השלמת מילים אקראית — חלק מהמילים מוסתרות; הקשה חושפת
+      const hideN = Math.max(1, Math.round(words.length * 0.4));
+      const hideSet = _seededHide(words.length, hideN, i);
+      const wordsHtml = words.map((w, wi) =>
+        hideSet.has(wi)
+          ? `<span class="cover-block" onclick="revealWordCover(${i},${wi},this)">${' '.repeat(Math.max(2,Math.min(w.length,6)))}</span>`
+          : w
+      ).join(' ');
+      inner = `<span class="verse-text" style="font-size:${fontSize}px">${wordsHtml}</span>`;
     }
 
     html += `<div class="verse">` +
@@ -1911,6 +1935,34 @@ function revealVerse3(idx) {
   if (vh) vh.remove();
   if (vw) vw.classList.remove('tappable');
   vw.onclick = null;
+}
+
+/* Level 5 — ראשי תיבות: חשוף מילה בודדת */
+function revealRT(vIdx, wIdx, el) {
+  const w = ((_shinunVerses[vIdx] || '').split(' '))[wIdx];
+  if (!w || !el) return;
+  el.textContent = w;
+  el.classList.add('revealed');
+  el.onclick = null;
+}
+/* Level 6 — השלמת מילים: חשוף מילה מוסתרת */
+function revealWordCover(vIdx, wIdx, el) {
+  const w = ((_shinunVerses[vIdx] || '').split(' '))[wIdx];
+  if (!w || !el) return;
+  el.textContent = w;
+  el.classList.add('revealed');
+  el.onclick = null;
+}
+/* בחירת אינדקסים אקראית-יציבה (אותו seed → אותו פיזור) */
+function _seededHide(n, count, seed) {
+  let s = ((seed + 1) * 2654435761) >>> 0;
+  const idx = Array.from({ length: n }, (_, k) => k);
+  for (let k = n - 1; k > 0; k--) {
+    s = (s * 1103515245 + 12345) >>> 0;
+    const j = s % (k + 1);
+    const t = idx[k]; idx[k] = idx[j]; idx[j] = t;
+  }
+  return new Set(idx.slice(0, Math.min(count, n)));
 }
 
 /* Level 4 — reveal + self-assess */
