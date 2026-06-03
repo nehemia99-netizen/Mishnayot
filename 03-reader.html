@@ -19,6 +19,9 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .chap-ref{font-size:11px;color:var(--text-muted);margin-top:1px;}
 .back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;}
 .topbar-actions{display:flex;gap:8px;flex-shrink:0;}
+.topbar-spacer{width:56px;flex-shrink:0;}
+.reader-toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,84px));justify-content:center;gap:8px;padding:8px 16px;border-bottom:.5px solid var(--border);background:var(--card);flex-shrink:0;}
+.reader-toolbar .icon-btn{width:100%;height:42px;border-radius:12px;font-size:21px;}
 .icon-btn{width:36px;height:36px;border-radius:50%;border:.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 #aaBtn{font-size:13px;font-weight:700;font-family:system-ui,sans-serif;letter-spacing:-.5px;}
 .icon-btn.active{background:var(--primary-light);border-color:var(--primary);}
@@ -196,14 +199,17 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
       <div class="chap-title" id="chapTitle">טוען...</div>
       <div class="chap-ref" id="chapRef"></div>
     </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" id="aaBtn" onclick="toggleControls()" title="גודל טקסט וגלילה">Aa</button>
-      <button class="icon-btn" id="commBtn" onclick="toggleCommentary()" title="פירוש" data-i18n-title="read.commentary">📖</button>
-      <button class="icon-btn" id="favBtn" onclick="toggleFav()" title="מועדף" data-i18n-title="read.favorite">🤍</button>
-      <button class="icon-btn" id="memBtn" onclick="toggleMem()" title="שינון" data-i18n-title="read.memorize">☆</button>
-      <button class="icon-btn" id="shinunModeBtn" onclick="toggleShinunMode()" title="מצב שינון" data-i18n-title="read.shinun_mode">🧠</button>
-      <button class="icon-btn" id="ttsBtn" onclick="toggleTTS()" title="הקראה קולית">🔊</button>
-    </div>
+    <span class="topbar-spacer"></span>
+  </div>
+
+  <!-- Action toolbar — 2 rows of buttons -->
+  <div class="reader-toolbar">
+    <button class="icon-btn" id="aaBtn" onclick="toggleControls()" title="גודל טקסט וגלילה">Aa</button>
+    <button class="icon-btn" id="commBtn" onclick="toggleCommentary()" title="פירוש" data-i18n-title="read.commentary">📖</button>
+    <button class="icon-btn" id="favBtn" onclick="toggleFav()" title="מועדף" data-i18n-title="read.favorite">🤍</button>
+    <button class="icon-btn" id="memBtn" onclick="toggleMem()" title="שינון" data-i18n-title="read.memorize">☆</button>
+    <button class="icon-btn" id="shinunModeBtn" onclick="toggleShinunMode()" title="מצב שינון" data-i18n-title="read.shinun_mode">🧠</button>
+    <button class="icon-btn" id="ttsBtn" onclick="toggleTTS()" title="הקראה קולית">🔊</button>
   </div>
 
   <!-- Nav bar -->
@@ -1804,7 +1810,7 @@ function toggleShinunMode() {
   if (shinunActive) {
     // אין לסמן אוטומטית "ידעתי בע״פ" עם הכניסה למצב שינון — זהו תרגול בלבד
     setShinunLevel(1);
-    showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels await' : '🧠 מצב שינון — 4 שלבים מחכים לך');
+    showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels + 🎙️ record yourself on each Mishnah' : '🧠 מצב שינון — 4 שלבי הסתרה + 🎙️ הקלט את עצמך לכל משנה');
   } else {
     shinunLevel = 1;
     // Restore normal view
