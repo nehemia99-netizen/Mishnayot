@@ -561,7 +561,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.14 BETA</div>
+          <div class="app-version">גרסה 1.5.15 BETA</div>
         </div>
       </div>
     </div>
@@ -1311,8 +1311,8 @@ function showMyChapterBanner() {
   const inner = document.createElement('div');
   inner.style.cssText = 'background:var(--card);border-radius:22px;padding:28px 24px;max-width:320px;width:88%;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.3);';
   inner.innerHTML = '<div style="font-size:44px;margin-bottom:8px;">⭐</div>'
-    + '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:6px;">הפרק שלי — ' + label + '</div>'
-    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">זה הפרק שבחרת ללמוד. רוצה ללמוד אותו עכשיו?</div>'
+    + '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:6px;">המשנה שלי — ' + label + '</div>'
+    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">זו המשנה שבחרת ללמוד. רוצה ללמוד אותה עכשיו?</div>'
     + '<div style="display:flex;gap:10px;justify-content:center;">'
     + '<button onclick="document.getElementById(\'_myChapBanner\').remove()" style="flex:1;padding:11px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">אחר כך</button>'
     + '<button onclick="document.getElementById(\'_myChapBanner\').remove();location.href=\'03-reader.html?chap=' + encodeURIComponent(myChap) + '&mode=normal\'" style="flex:2;padding:11px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">למד עכשיו ←</button>'

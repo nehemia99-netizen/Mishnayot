@@ -251,7 +251,7 @@ html.dark .chap-cell.mem{background:#1C1230;}
     <div id="playAllWrap" style="padding:0 16px 10px;display:none;">
       <button class="play-all-btn" onclick="playAllFavs()" style="width:100%;padding:10px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-family:inherit;font-size:13px;cursor:pointer;">▶ למד את כל המועדפים ברצף</button>
     </div>
-    <div id="favHint" style="display:none;padding:0 16px 8px;font-size:11px;color:var(--text-muted);text-align:center;">⭐ לחץ על הכוכב שעל פרק כדי לקבוע אותו כ״הפרק שלי״ (יוצג בעמוד הבית)</div>
+    <div id="favHint" style="display:none;padding:0 16px 8px;font-size:11px;color:var(--text-muted);text-align:center;">⭐ לחץ על הכוכב כדי לקבוע ״המשנה שלי״ — היא תיפתח אוטומטית בכניסה לאפליקציה</div>
     <div class="fav-grid" id="favGrid" style="padding:0 16px;"></div>
     <div style="height:16px;"></div>
     <div class="section-header" style="padding:14px 16px 6px;display:flex;justify-content:space-between;align-items:center;">
@@ -379,10 +379,18 @@ html.dark .chap-cell.mem{background:#1C1230;}
     return (t?t.he:p.tractate)+' '+toGem(p.perek);
   }
 
+  function _selToast(msg){
+    var t=document.getElementById('_selToast');
+    if(!t){ t=document.createElement('div'); t.id='_selToast';
+      t.style.cssText='position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;max-width:90%;text-align:center;';
+      document.body.appendChild(t); }
+    t.textContent=msg; t.style.opacity='1';
+    clearTimeout(t._tm); t._tm=setTimeout(function(){ t.style.opacity='0'; }, 2200);
+  }
   window.toggleMyChapter=function(id){
     var cur=S.get('tehillim_my_chapter');
-    if(cur===id){ S.remove('tehillim_my_chapter'); }
-    else { S.set('tehillim_my_chapter', id); }
+    if(cur===id){ S.remove('tehillim_my_chapter'); _selToast('☆ ׳המשנה שלי׳ בוטלה'); }
+    else { S.set('tehillim_my_chapter', id); _selToast('⭐ ' + favLabel(id) + ' נקבעה כ׳המשנה שלי׳'); }
     buildFavs();
   };
 
@@ -393,7 +401,7 @@ html.dark .chap-cell.mem{background:#1C1230;}
     document.getElementById('memCount').textContent=memArr.length+' פרקים';
     document.getElementById('playAllWrap').style.display=favArr.length?'block':'none';
     document.getElementById('favGrid').innerHTML=favArr.length
-      ? favArr.map(function(id){ var star=(myc===id); return '<div style="position:relative;cursor:pointer;padding:12px 6px 10px;border:1px solid #E53935;border-radius:10px;background:#FFF0F0;color:#B02020;font-size:12px;text-align:center;font-weight:600;overflow:visible;" onclick="openChap(\''+id+'\')"><span onclick="event.stopPropagation();toggleMyChapter(\''+id+'\')" title="קבע כ׳הפרק שלי׳" style="position:absolute;top:-8px;left:-6px;font-size:17px;line-height:1;cursor:pointer;filter:'+(star?'none':'grayscale(1) opacity(.4)')+';">⭐</span>'+favLabel(id)+'</div>'; }).join('')
+      ? favArr.map(function(id){ var star=(myc===id); return '<div style="position:relative;cursor:pointer;padding:12px 6px 10px;border:1px solid #E53935;border-radius:10px;background:#FFF0F0;color:#B02020;font-size:12px;text-align:center;font-weight:600;overflow:visible;" onclick="openChap(\''+id+'\')"><span onclick="event.stopPropagation();toggleMyChapter(\''+id+'\')" title="קבע כ׳המשנה שלי׳" style="position:absolute;top:-8px;left:-6px;font-size:17px;line-height:1;cursor:pointer;filter:'+(star?'none':'grayscale(1) opacity(.4)')+';">⭐</span>'+favLabel(id)+'</div>'; }).join('')
       : '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:24px;font-size:13px;line-height:1.7;">🤍 לחץ ❤️ בזמן לימוד כדי להוסיף פרקים למועדפים</div>';
     var fh=document.getElementById('favHint'); if(fh) fh.style.display=favArr.length?'block':'none';
     document.getElementById('memGrid').innerHTML=memArr.length

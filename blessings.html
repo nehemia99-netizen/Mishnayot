@@ -147,6 +147,24 @@ try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.d
       </div>
     </div>
 
+    <!-- b14: חפץ חיים יומי (שמירת הלשון) -->
+    <div class="blessing-item" id="b14">
+      <div class="blessing-header" onclick="toggleBlessing('b14')">
+        <span class="blessing-title">🗣️ חפץ חיים יומי — שמירת הלשון</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div id="ccDailyInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border-radius:8px;border-right:3px solid var(--primary);">ספר חפץ חיים — לימוד יומי מתחלף</div>
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;text-align:center;" id="ccRef"></div>
+        <div id="ccText" style="line-height:1.9;font-family:'David Libre','Times New Roman',serif;text-align:right;color:var(--text);"></div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:14px;padding-top:10px;border-top:.5px solid var(--border);">
+          <button onclick="navCC(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">‹ קודם</button>
+          <button onclick="resetCCToday()" style="background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:11px;padding:5px 10px;border-radius:14px;cursor:pointer;font-family:inherit;">📅 היום</button>
+          <button onclick="navCC(1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">הבא ›</button>
+        </div>
+      </div>
+    </div>
+
     <div class="group-header">🙏 ברכות ותפילות</div>
     <!-- b3: מי שברך לחולים -->
     <div class="blessing-item" id="b3">
@@ -240,7 +258,7 @@ const S = TH ? TH.S : {
 };
 
 /* ── כלי: טוגל אקורדיון ── */
-const ALL_BLESSINGS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13'];
+const ALL_BLESSINGS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13','b14'];
 
 function toggleBlessing(id) {
   const el = document.getElementById(id);
@@ -255,8 +273,42 @@ function toggleBlessing(id) {
     if (id === 'b7') { if (!mayanActive || !mayanActive.size) { mayanActive = new Set([1]); } applyMayan(); }
     if (id === 'b10') initAvot();
     if (id === 'b11') { _rambamIdx = _getRambamDayIdx(); _clearBadRambamCache(); _loadRambamFont(); setTimeout(renderRambam, 10); }
+    if (id === 'b14') { _ccIdx = _ccDayIdx(); setTimeout(renderCC, 10); }
   }
 }
+
+/* ── חפץ חיים יומי (לימוד מתחלף — כלל ליום, מחזור ~3 שבועות) ── */
+const CC_KLALIM = (function(){
+  var out=[], i;
+  for(i=1;i<=10;i++) out.push({ref:'Chafetz Chaim, Part One, The Prohibition Against Lashon Hara, Principle '+i, he:'הלכות לשון הרע · כלל '+_ccGem(i)});
+  for(i=1;i<=9;i++)  out.push({ref:'Chafetz Chaim, Part Two, The Prohibition Against Rechilut, Principle '+i, he:'הלכות רכילות · כלל '+_ccGem(i)});
+  return out;
+})();
+function _ccGem(n){ var h=['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ']; return h[n]||n; }
+function _ccDayIdx(){ var now=new Date(), start=new Date(now.getFullYear(),0,0); var day=Math.floor((now-start)/86400000); return ((day % CC_KLALIM.length)+CC_KLALIM.length)%CC_KLALIM.length; }
+let _ccIdx = 0, _ccCache = {};
+async function renderCC(){
+  var ref=document.getElementById('ccRef'), txt=document.getElementById('ccText'), info=document.getElementById('ccDailyInfo');
+  if(!ref||!txt) return;
+  var item=CC_KLALIM[_ccIdx];
+  ref.textContent=item.he;
+  if(info) info.textContent=(_ccIdx===_ccDayIdx())?'📅 הלימוד של היום':'לימוד '+(_ccIdx+1)+'/'+CC_KLALIM.length;
+  txt.textContent='⏳ טוען...';
+  try{
+    var data=_ccCache[item.ref];
+    if(!data){
+      var r=await fetch('https://www.sefaria.org/api/texts/'+encodeURIComponent(item.ref)+'?lang=he&context=0');
+      data=await r.json(); _ccCache[item.ref]=data;
+    }
+    var flat=function(he){return !he?'':typeof he==='string'?he:Array.isArray(he)?he.map(flat).join(' '):String(he);};
+    var t=flat(data.he).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    if(t.length>1800) t=t.slice(0,1800)+'…';
+    txt.textContent=t||'לא ניתן לטעון כעת. נסה שוב.';
+    try{ applyBlessingFont(); }catch(e){}
+  }catch(e){ txt.textContent='לא ניתן לטעון כעת — בדוק חיבור לאינטרנט.'; }
+}
+function navCC(d){ _ccIdx=(_ccIdx+d+CC_KLALIM.length)%CC_KLALIM.length; renderCC(); }
+function resetCCToday(){ _ccIdx=_ccDayIdx(); renderCC(); }
 
 /* ── גודל פונט ברכות ── */
 function changeBlessingFont(delta) {

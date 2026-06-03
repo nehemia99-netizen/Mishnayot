@@ -919,7 +919,7 @@ function openPicker() {
     '<div class="chap-picker-title">' + (_pkEn ? ('Chapter — ' + _tName) : ('בחר פרק — ' + _tName)) + '</div>' +
     '<div class="chap-grid" id="chapGrid"></div>' +
     '<a class="picker-close" href="02-selection.html" style="text-decoration:none;display:block;text-align:center;">' + (_pkEn ? 'Other tractate ▾' : 'מסכת אחרת ▾') + '</a>' +
-    '<button class="picker-close" onclick="setMyChapter()" style="color:#C07A00;border-color:#E0C080;">' + (_pkEn ? '⭐ Set as "My chapter"' : '⭐ קבע כ״הפרק שלי״') + '</button>' +
+    '<button class="picker-close" onclick="setMyChapter()" style="color:#C07A00;border-color:#E0C080;">' + (_pkEn ? '⭐ Set as "My Mishnah"' : '⭐ קבע כ״המשנה שלי״') + '</button>' +
     '<button class="picker-close" onclick="closePicker()">' + (_pkEn ? 'Close' : 'סגור') + '</button>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -947,7 +947,7 @@ function setMyChapter() {
   S.set('tehillim_my_chapter', curId());
   closePicker();
   const t = curTractateObj();
-  showToast(_rLang()==='en' ? '⭐ Set as your chapter' : '⭐ נקבע כ״הפרק שלי״: ' + (t?t.he:'') + ' ' + toGematria(chapNum));
+  showToast(_rLang()==='en' ? '⭐ Set as "My Mishnah"' : '⭐ ' + (t?t.he:'') + ' ' + toGematria(chapNum) + ' נקבעה כ״המשנה שלי״');
 }
 function closePicker() {
   const p = document.getElementById('chapPicker');
