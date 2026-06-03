@@ -116,6 +116,8 @@ html.dark .shinun-score-banner{background:#1C1235;border-color:#5B3090;color:#9B
 .icon-btn.tts-on{background:#7B2FF7;color:#fff;border-color:#7B2FF7;}
 .verse.tts-speaking{background:#F5F0FF;border-radius:8px;}
 html.dark .verse.tts-speaking{background:#241636;}
+.verse.verse-flash{animation:verseFlash 1.7s ease-out;border-radius:8px;}
+@keyframes verseFlash{0%,30%{background:rgba(58,125,68,.22);}100%{background:transparent;}}
 
 /* Dedication banner */
 .dedication-banner{display:flex;align-items:center;gap:10px;padding:9px 16px;background:linear-gradient(135deg,#E9F2E9,#DCF0DE);border-bottom:.5px solid #BBD6BB;flex-shrink:0;}
@@ -151,6 +153,9 @@ html.dark .dedication-banner{background:linear-gradient(135deg,#15291B,#0E1E14);
 .verse-bk-btn{width:34px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:16px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;opacity:.2;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s,transform .15s;font-family:system-ui,sans-serif;color:var(--text);}
 .verse-bk-btn.saved{opacity:1;color:#C07A00;}
 .verse-bk-btn.saved.pop{animation:bkPop .3s ease;}
+.verse-mem-btn{width:30px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;opacity:.28;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s,transform .15s;font-family:system-ui,sans-serif;color:var(--text);}
+.verse-mem-btn.marked{opacity:1;color:#7B2FF7;}
+.verse-mem-btn.marked.pop{animation:bkPop .3s ease;}
 @keyframes bkPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 
 /* Toast */
@@ -198,7 +203,10 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
   <div class="navbar">
     <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" title="פרק קודם" data-i18n-title="read.prev_chap">▶</button>
     <div class="nav-center">
-      <div class="chap-num-display" id="chapNumDisp" onclick="openPicker()" style="cursor:pointer;padding:4px 12px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">בחר פרק ▾</div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div class="chap-num-display" id="chapNumDisp" onclick="openPicker()" style="cursor:pointer;padding:4px 12px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">בחר פרק ▾</div>
+        <div class="chap-num-display" id="mishnahJumpBtn" onclick="openMishnahPicker()" title="קפוץ למשנה" style="cursor:pointer;padding:4px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">משנה ▾</div>
+      </div>
       <div class="mode-badge" id="modeBadge" style="display:none"></div>
     </div>
     <button class="nav-btn" id="nextBtn" onclick="navigate(1)" title="פרק הבא" data-i18n-title="read.next_chap">◀</button>
@@ -318,6 +326,7 @@ function toGematria(n) {
 /* ── URL params / state ── */
 const params  = new URLSearchParams(location.search);
 const MODE    = params.get('mode') || 'normal';
+let _pendingMishnah = parseInt(params.get('mishnah'), 10) || 0; // קפיצה למשנה ספציפית (פעם אחת)
 
 // פענוח מזהה פרק "Tractate.Perek" (לדוגמה "Berakhot.2")
 function parseChap(str) {
@@ -417,7 +426,8 @@ let currentCommData = null;      // מערך הפירוש לפרק הנוכחי
 const READ_KEY  = 'tehillim_readings';
 const SCORE_KEY = 'tehillim_score';
 const FAV_KEY   = 'tehillim_favs';
-const MEM_KEY   = 'tehillim_mem';
+const MEM_KEY   = 'tehillim_mem';          // פרקים שנלמדו בע״פ במלואם (נגזר — לתאימות עם בחירה/היסטוריה/גמיפיקציה)
+const MEM_M_KEY = 'tehillim_mem_m';        // משניות בודדות שסומנו "ידעתי בע״פ": ["Berakhot.2:3", ...]
 const SAVED_KEY = 'tehillim_saved_verses';
 
 /* ── Trim readings older than 365 days (runs once on load) ──
@@ -555,6 +565,8 @@ async function loadChapter(tractateId, perek) {
     // הפעל שינון אם פעיל, אחרת קריאה רגילה
     if (shinunActive && shinunLevel > 1) renderShinunVerses(data.he, shinunLevel);
     else renderVerses(data.he, commData);
+    // קפיצה למשנה ספציפית אם התבקשה דרך ה-URL (?mishnah=N) — פעם אחת בלבד
+    if (_pendingMishnah) { const _m = _pendingMishnah; _pendingMishnah = 0; setTimeout(function(){ scrollToMishnah(_m, true); }, 250); }
   } catch(e) {
     ta.innerHTML = _rLang()==='en'
       ? '<div class="error-msg">⚠️ Error loading chapter<br>Check internet connection<br><button class="retry-btn" onclick="loadChapter(\'' + tractateId + '\',' + perek + ')">Try again</button></div>'
@@ -562,8 +574,9 @@ async function loadChapter(tractateId, perek) {
   }
 }
 
-function renderVerses(verses, commData) {
+function renderVerses(verses, commData, preserveScroll) {
   const ta = document.getElementById('textArea');
+  const _prevScroll = ta.scrollTop;   // לשימור מיקום גלילה ברינדור-מחדש (פירוש/פונט/שינון)
   if (!verses || !verses.length) {
     ta.innerHTML = '<div class="error-msg">הפרק אינו זמין כעת.</div>';
     return;
@@ -592,6 +605,8 @@ function renderVerses(verses, commData) {
 
   const commLabel = commentaryType === 'tosafot' ? 'תוספות יו"ט' : 'ברטנורא';
   const savedVerses = S.get(SAVED_KEY) || [];
+  const memMSet = new Set(getMemM()); // משניות שסומנו "ידעתי בע״פ" (פר־משנה)
+  const _cid = curId();
   // שמור פסוקים מסוננים למיפוי
   const _versesToRender = filteredVerses;
   ta.innerHTML = (ta.dataset.hidaBanner || '') + _versesToRender.map((v, i) => {
@@ -605,20 +620,45 @@ function renderVerses(verses, commData) {
       }
     }
     const isSaved = savedVerses.some(sv => sv.chap === curId() && sv.verse === realIdx+1);
+    const isMemV  = memMSet.has(_cid + ':' + (realIdx+1));
     return '<div class="verse">' +
       (showVerseNums ? '<span class="verse-num">' + toGematria(realIdx+1) + '</span>' : '') +
       '<div class="verse-content">' +
       '<span class="verse-text" style="font-size:' + fontSize + 'px">' + stripCantillation(v) + '</span>' +
       commHtml +
       '</div>' +
+      '<button class="verse-mem-btn' + (isMemV ? ' marked' : '') + '" ' +
+        'onclick="toggleMemVerse(' + (realIdx+1) + ',this)" ' +
+        'title="ידעתי משנה זו בעל פה">' + (isMemV ? '★' : '☆') + '</button>' +
       '<button class="verse-bk-btn' + (isSaved ? ' saved' : '') + '" ' +
         'onclick="toggleSaveVerse(' + (realIdx+1) + ',this)" ' +
         'title="שמור פסוק">🔖</button>' +
       '</div>';
   }).join('') +
   '<div id="bottomSentinel" style="height:2px;width:100%;"></div>';
-  ta.scrollTop = 0;
-  if (!isDone) resetReadProgress(); // 2.2.11: skip reset if chapter already marked done
+  if (preserveScroll) {
+    // רינדר-מחדש (פירוש/פונט/שינון) — שמור על מיקום הגלילה ואל תאפס את התקדמות הקריאה
+    ta.scrollTop = _prevScroll;
+    if (!isDone) reattachBottomObserver();
+  } else {
+    ta.scrollTop = 0;
+    if (!isDone) resetReadProgress(); // 2.2.11: skip reset if chapter already marked done
+  }
+}
+
+/* ── חיבור מחדש של ה-observer לאחר רינדר-מחדש, בלי לאפס את מצב "הגעת לסוף" ── */
+function reattachBottomObserver() {
+  const ta = document.getElementById('textArea');
+  if (bottomObserver) { bottomObserver.disconnect(); bottomObserver = null; }
+  if (hasReachedBottom) return; // כבר סומן כנקרא — אין צורך
+  const sentinel = document.getElementById('bottomSentinel');
+  if (!sentinel) return;
+  const taRect = ta.getBoundingClientRect(), senRect = sentinel.getBoundingClientRect();
+  if (senRect.bottom <= taRect.bottom + 4) { reachedBottom(); return; }
+  bottomObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) reachedBottom();
+  }, { root: ta, threshold: 0.01, rootMargin: '0px 0px 40px 0px' });
+  bottomObserver.observe(sentinel);
 }
 
 /* ── Read progress — IntersectionObserver על sentinel ── */
@@ -745,7 +785,7 @@ function toggleCantillation(val) {
   const cached = S.get('mishnah_cache_' + curId());
   if (cached && cached.he) {
     if (shinunActive && shinunLevel > 1) renderShinunVerses(cached.he, shinunLevel);
-    else renderVerses(cached.he, commentaryOn ? currentCommData : null);
+    else renderVerses(cached.he, commentaryOn ? currentCommData : null, true);
   }
 }
 
@@ -907,6 +947,47 @@ function closePicker() {
   if (p) p.remove();
 }
 
+/* ── Mishnah jump — קפיצה למשנה ספציפית בתוך הפרק ── */
+function openMishnahPicker() {
+  const verses = document.querySelectorAll('#textArea .verse');
+  const n = verses.length;
+  if (!n) { showToast(_rLang()==='en' ? 'No mishnayot to show' : 'אין משניות להצגה'); return; }
+  const _en = _rLang() === 'en';
+  const t = curTractateObj();
+  const tName = _en ? curTractate : (t ? t.he : curTractate);
+  const overlay = document.createElement('div');
+  overlay.className = 'chap-picker';
+  overlay.id = 'mishnahPicker';
+  overlay.innerHTML = '<div class="chap-picker-inner">' +
+    '<div class="chap-picker-title">' + (_en ? ('Mishnah — ' + tName + ' ' + chapNum) : ('בחר משנה — ' + tName + ' ' + toGematria(chapNum))) + '</div>' +
+    '<div class="chap-grid" id="mishnahGrid"></div>' +
+    '<button class="picker-close" onclick="closeMishnahPicker()">' + (_en ? 'Close' : 'סגור') + '</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeMishnahPicker(); });
+  let html = '';
+  for (let i = 1; i <= n; i++) html += '<div class="chap-cell" onclick="jumpToMishnah(' + i + ')">' + toGematria(i) + '</div>';
+  document.getElementById('mishnahGrid').innerHTML = html;
+}
+function closeMishnahPicker() {
+  const p = document.getElementById('mishnahPicker');
+  if (p) p.remove();
+}
+function jumpToMishnah(n) {
+  closeMishnahPicker();
+  scrollToMishnah(n, true);
+}
+function scrollToMishnah(n, highlight) {
+  const verses = document.querySelectorAll('#textArea .verse');
+  const el = verses[n - 1];
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (highlight) {
+    el.classList.add('verse-flash');
+    setTimeout(() => el.classList.remove('verse-flash'), 1700);
+  }
+}
+
 function pickPerek(p) {
   closePicker();
   saveReadingProgress();
@@ -942,19 +1023,86 @@ function toggleFav() {
   showToast(_rLang()==='en' ? (i === -1 ? '❤️ Added to favorites' : '🤍 Removed from favorites') : (i === -1 ? '❤️ נוסף למועדפים' : '🤍 הוסר מהמועדפים'));
 }
 
-function toggleMem() {
+function getMemM() { return S.get(MEM_M_KEY) || []; }
+
+// מספר המשניות בפרק הנוכחי (לפי הקורפוס, נפילה רכה למספר הפסוקים המוצגים)
+function curPerekMishnayot() {
+  let n = 0;
+  try { n = Corpus.mishnayotIn(curTractate, chapNum) || 0; } catch(e) {}
+  if (!n) n = document.querySelectorAll('#textArea .verse').length;
+  return n;
+}
+
+// סנכרון הפרק לרשימת "פרקים שלמים בע״פ" (MEM_KEY) — נגזר ממצב המשניות
+function syncPerekMem() {
+  const cid = curId();
+  const total = curPerekMishnayot();
+  const memM = getMemM();
+  let marked = 0;
+  for (let k = 1; k <= total; k++) if (memM.includes(cid + ':' + k)) marked++;
   let mems = getMems();
-  const i = mems.indexOf(curId());
-  if (i === -1) mems.push(curId());
-  else mems.splice(i, 1);
-  S.set(MEM_KEY, mems);
-  updateFavMemButtons();
-  if (i === -1) {
-    addScore(5);
-    if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(5, 'memorization');
-    showToast(_rLang()==='en' ? '★ Added to memorization — +5 points!' : '★ נוסף לשינון — +5 מעלות!');
+  const has = mems.includes(cid);
+  if (total > 0 && marked === total && !has) { mems.push(cid); S.set(MEM_KEY, mems); }
+  else if ((marked < total || total === 0) && has) { mems = mems.filter(x => x !== cid); S.set(MEM_KEY, mems); }
+  if (typeof Gamification !== 'undefined' && Gamification.syncMemorizedFromMems) {
+    try { Gamification.syncMemorizedFromMems(); } catch(e) {}
   }
-  else showToast(_rLang()==='en' ? '☆ Removed from memorization' : '☆ הוסר מרשימת השינון');
+}
+
+// סימון/ביטול משנה בודדת כ"ידעתי בע״פ"
+function toggleMemVerse(verseNum, btn) {
+  const cid = curId();
+  const id  = cid + ':' + verseNum;
+  let memM = getMemM();
+  const i = memM.indexOf(id);
+  const adding = (i === -1);
+  if (adding) memM.push(id); else memM.splice(i, 1);
+  S.set(MEM_M_KEY, memM);
+  if (btn) {
+    btn.classList.toggle('marked', adding);
+    btn.textContent = adding ? '★' : '☆';
+    if (adding) { btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop'); }
+  }
+  if (adding) {
+    addScore(2);
+    if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(2, 'memorization');
+    showToast(_rLang()==='en' ? '★ Mishnah marked — +2 points!' : '★ סומנה משנה בע״פ — +2 מעלות!');
+  } else {
+    showToast(_rLang()==='en' ? '☆ Mishnah unmarked' : '☆ סימון המשנה הוסר');
+  }
+  syncPerekMem();
+  updateFavMemButtons();
+}
+
+// כפתור ☆ בסרגל — מסמן/מבטל את כל משניות הפרק בבת אחת
+function toggleMem() {
+  const cid = curId();
+  const total = curPerekMishnayot();
+  if (!total) return;
+  let memM = getMemM();
+  const allMarked = (function(){ for (let k=1;k<=total;k++) if (!memM.includes(cid+':'+k)) return false; return true; })();
+  if (allMarked) {
+    memM = memM.filter(x => !x.startsWith(cid + ':'));
+    S.set(MEM_M_KEY, memM);
+    showToast(_rLang()==='en' ? '☆ Whole chapter unmarked' : '☆ כל הפרק הוסר מהשינון');
+  } else {
+    let added = 0;
+    for (let k=1;k<=total;k++) { const id=cid+':'+k; if (!memM.includes(id)) { memM.push(id); added++; } }
+    S.set(MEM_M_KEY, memM);
+    if (added) {
+      addScore(2 * added);
+      if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(2 * added, 'memorization');
+    }
+    showToast(_rLang()==='en' ? ('★ ' + total + ' mishnayot marked') : ('★ כל הפרק סומן בע״פ (' + total + ' משניות)'));
+  }
+  syncPerekMem();
+  // רענן את כוכבי המשניות המוצגים
+  document.querySelectorAll('#textArea .verse-mem-btn').forEach((b, idx) => {
+    const on = getMemM().includes(cid + ':' + (idx + 1));
+    b.classList.toggle('marked', on);
+    b.textContent = on ? '★' : '☆';
+  });
+  updateFavMemButtons();
 }
 
 /* ── Save verse ── */
@@ -1387,7 +1535,7 @@ async function toggleCommentary() {
     currentCommData = null;
     // רינדר מחדש ללא פירוש (הנתונים כבר cached)
     const cached = S.get('mishnah_cache_' + curId());
-    if (cached && cached.he) renderVerses(cached.he, null);
+    if (cached && cached.he) renderVerses(cached.he, null, true);
   }
 }
 
@@ -1409,7 +1557,7 @@ async function loadCommentaryForCurrentChapter() {
     currentCommData = commData;
     // רינדר מחדש עם פירוש
     const cached = S.get('mishnah_cache_' + curId());
-    if (cached && cached.he) renderVerses(cached.he, commData);
+    if (cached && cached.he) renderVerses(cached.he, commData, true);
   } catch(e) {
     showToast(_rLang()==='en' ? '⚠️ Error loading commentary' : '⚠️ שגיאה בטעינת הפירוש');
     // נקה loading
@@ -1425,7 +1573,7 @@ async function setCommType(type) {
   currentCommData = null;
   // רינדר מחדש עם הפרק הנוכחי ופירוש חדש
   const cached = S.get('mishnah_cache_' + curId());
-  if (cached && cached.he) renderVerses(cached.he, null); // קודם כל נקה
+  if (cached && cached.he) renderVerses(cached.he, null, true); // קודם כל נקה
   await loadCommentaryForCurrentChapter();
 }
 
@@ -1499,15 +1647,14 @@ function toggleShinunMode() {
   _ttsStop();
 
   if (shinunActive) {
-    // סמן את הפרק לשינון אוטומטית
-    if (!getMems().includes(curId())) toggleMem();
+    // אין לסמן אוטומטית "ידעתי בע״פ" עם הכניסה למצב שינון — זהו תרגול בלבד
     setShinunLevel(1);
     showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels await' : '🧠 מצב שינון — 4 שלבים מחכים לך');
   } else {
     shinunLevel = 1;
     // Restore normal view
     const cached = S.get('mishnah_cache_' + curId());
-    if (cached && cached.he) renderVerses(cached.he, commentaryOn ? currentCommData : null);
+    if (cached && cached.he) renderVerses(cached.he, commentaryOn ? currentCommData : null, true);
   }
 }
 
@@ -1530,7 +1677,7 @@ function renderShinunVerses(verses, level) {
 
   if (level === 1) {
     _reviewSet = null; _passNum = 0;
-    renderVerses(verses, null);
+    renderVerses(verses, null, true);
     return;
   }
 
