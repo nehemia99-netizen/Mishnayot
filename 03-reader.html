@@ -63,17 +63,17 @@ html.dark #memBtn{color:#9B6FE0;}
 .retry-btn{margin-top:12px;display:inline-block;padding:8px 22px;background:var(--primary-light);color:var(--primary);border:.5px solid var(--primary);border-radius:20px;cursor:pointer;font-size:13px;}
 
 /* Bottom bar */
-.bottombar{border-top:.5px solid var(--border);padding:10px 16px calc(18px + env(safe-area-inset-bottom, 0px));background:var(--card);flex-shrink:0;}
+.bottombar{border-top:.5px solid var(--border);padding:7px 16px calc(9px + env(safe-area-inset-bottom, 0px));background:var(--card);flex-shrink:0;}
 .idle-warning{font-size:11px;color:#C07A00;display:none;text-align:center;margin-bottom:8px;padding:5px;background:rgba(192,122,0,.08);border-radius:8px;}
 /* Scroll progress */
-.read-progress-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;}
+.read-progress-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:7px;overflow:hidden;}
 .read-progress-bar{height:100%;width:0%;background:var(--primary);border-radius:2px;transition:width .15s;}
 .read-progress-bar.full{background:var(--green);}
-.done-btn{width:100%;padding:6px 14px 8px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,opacity .2s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.done-btn{width:100%;padding:8px 14px;border-radius:13px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,opacity .2s;display:flex;flex-direction:column;align-items:center;gap:1px;}
 .done-btn:active{opacity:.85;}
 .done-btn.done{background:var(--green);}
 .done-btn.locked{background:transparent;color:var(--text-muted);border:none;cursor:default;pointer-events:none;}
-.done-btn-meta{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;width:100%;}
+.done-btn-meta{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;width:100%;opacity:.92;}
 .done-btn-meta .meta-timer{color:#1a1a1a;}
 .done-btn-meta .meta-score{color:#c8960c;}
 .done-btn.locked .done-btn-meta .meta-timer{color:var(--text-muted);}
@@ -1657,19 +1657,33 @@ function toggleTTS(){
   const verses = (cached && cached.he) ? cached.he : (_shinunVerses.length ? _shinunVerses : null);
   if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
   _ttsOn = true; _ttsIdx = 0;
+  let _anySpoke = false;
   const b = document.getElementById('ttsBtn'); if(b) b.classList.add('tts-on');
-  const verseEls = document.querySelectorAll('.text-area .verse');
+  try { speechSynthesis.cancel(); } catch(e){}
+  const _noVoiceMsg = () => showToast(_rLang()==='en' ? '🔇 No Hebrew voice available on this device' : '🔇 אין קול עברי מותקן במכשיר זה');
   (function speakNext(){
     if (!_ttsOn || _ttsIdx >= verses.length){ _ttsStop(); return; }
+    const verseEls = document.querySelectorAll('#textArea .verse');
     document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
-    const el = verseEls[_ttsIdx];
-    if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
     const u = new SpeechSynthesisUtterance(_stripForTts(verses[_ttsIdx]));
     u.lang = 'he-IL'; u.rate = 0.9;
     _applyTtsVoice(u);
-    u.onend   = function(){ _ttsIdx++; speakNext(); };
-    u.onerror = function(){ _ttsIdx++; speakNext(); };
-    try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); }
+    let _started = false;
+    u.onstart = function(){
+      _started = true; _anySpoke = true;
+      const el = verseEls[_ttsIdx];
+      if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    };
+    u.onend = function(){
+      // אם המשפט הראשון הסתיים מיד בלי שדיבר בפועל — אין קול עברי, עצור
+      if (!_started && !_anySpoke && _ttsIdx === 0){ _ttsStop(); _noVoiceMsg(); return; }
+      _ttsIdx++; speakNext();
+    };
+    u.onerror = function(){
+      if (!_anySpoke){ _ttsStop(); _noVoiceMsg(); return; }
+      _ttsIdx++; speakNext();
+    };
+    try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); _noVoiceMsg(); }
   })();
 }
 window.addEventListener('pagehide', _ttsStop);
