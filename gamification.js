@@ -1,13 +1,13 @@
 /* ════════════════════════════════════════════════════════════
-   תהילהון — מודול גמיפיקציה (מעלות, רצפים, רמות)
+   תהילהון — מודול גמיפיקציה (זכויות, רצפים, רמות)
    נוצר: 1.2.0 (10.5.2026)
    ──────────────────────────────────────────────────────────────
    מודל נתונים ב-localStorage:
 
    tehillim_gamification = {
      ma'alot: {
-       total: 0,            // סך מעלות שנצברו אי פעם (לא מתאפס לעולם)
-       weekly: 0,           // מעלות השבוע (מתאפס בסוף שבוע)
+       total: 0,            // סך זכויות שנצברו אי פעם (לא מתאפס לעולם)
+       weekly: 0,           // זכויות השבוע (מתאפס בסוף שבוע)
        weeklyDate: 'YYYY-MM-DD',  // תאריך תחילת חישוב השבועי
        monthly: 0,
        monthlyMonth: 'YYYY-MM',
@@ -96,7 +96,7 @@ function save(data) {
   try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){}
 }
 
-/* ─── הוספת מעלות ─── */
+/* ─── הוספת זכויות ─── */
 function addMaalot(pts, reason) {
   if (!pts || pts <= 0) return null;
   const data = load();
@@ -258,7 +258,7 @@ function getDailyChapters() {
 
 /* ─── פעולה משולבת: סיום פרק ─── */
 function onChapterCompleted(chapId, secs) {
-  // 5 מעלות לפרק שלם + 1 מעלה לכל 10 שניות
+  // 5 זכויות לפרק שלם + 1 מעלה לכל 10 שניות
   const tenSecUnits = Math.floor((secs||0)/10);
   const pts = 5 + tenSecUnits;
   const r = addMaalot(pts, 'completed-chapter');
@@ -308,7 +308,7 @@ function showMaalotToast(meta) {
   const div = document.createElement('div');
   div.id = '_gam_toast_';
   div.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100%);background:#3A7D44;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;font-weight:600;font-family:system-ui;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.16,1,.3,1);direction:rtl;';
-  let html = '⭐ +' + meta.pts + ' מעלות';
+  let html = '⭐ +' + meta.pts + ' זכויות';
   if (meta.levelUp) html += ' · עלית לרמת ' + meta.levelUp.icon + ' ' + meta.levelUp.key + '!';
   div.innerHTML = html;
   document.body.appendChild(div);
@@ -597,7 +597,7 @@ function checkAndAwardBadges() {
   }
   if (newlyEarned.length) {
     save(data);
-    // הענק מעלות עבור כל badge חדש
+    // הענק זכויות עבור כל badge חדש
     for (const b of newlyEarned) addMaalot(b.reward, 'badge:' + b.id);
   }
   return newlyEarned;

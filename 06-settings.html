@@ -347,18 +347,18 @@ html.dark .google-btn{background:var(--surface);}
 
   <!-- ══ 6. אודות ══ -->
   <div id="secScoreLegend">
-    <div class="group-label" data-i18n="set.score_legend">מקרא מעלות</div>
+    <div class="group-label" data-i18n="set.score_legend">מקרא זכויות</div>
     <div class="group">
       <div class="row" onclick="toggleScoreLegend()" style="cursor:pointer;">
         <div class="row-left">
           <span class="row-icon">⭐</span>
-          <div class="row-label" id="scoreLegendToggleLabel" data-i18n="set.show_legend">הצג מקרא מעלות</div>
+          <div class="row-label" id="scoreLegendToggleLabel" data-i18n="set.show_legend">הצג מקרא זכויות</div>
         </div>
         <span id="scoreLegendChevron" style="font-size:14px;color:var(--text-muted);transition:transform .2s;">›</span>
       </div>
       <div id="scoreLegendContent" style="display:none;border-top:.5px solid var(--border-row);">
         <div class="score-legend-item"><span class="sl-icon">📖</span><div class="sl-label">השלמת קריאת פרק<div style="font-size:11px;color:var(--text-muted);">בונוס חד-פעמי בסיום פרק</div></div><span class="sl-pts">+5 ⭐</span></div>
-        <div class="score-legend-item"><span class="sl-icon">⏱️</span><div class="sl-label">כל 10 שניות קריאה<div style="font-size:11px;color:var(--text-muted);">דקה = 6 מעלות</div></div><span class="sl-pts">+1 ⭐</span></div>
+        <div class="score-legend-item"><span class="sl-icon">⏱️</span><div class="sl-label">כל 10 שניות קריאה<div style="font-size:11px;color:var(--text-muted);">דקה = 6 זכויות</div></div><span class="sl-pts">+1 ⭐</span></div>
         <div class="score-legend-item"><span class="sl-icon">★</span><div class="sl-label" style="color:#5B2DA0;">סימון פרק לשינון</div><span class="sl-pts">+10 ⭐</span></div>
         <div class="score-legend-item"><span class="sl-icon">📚</span><div class="sl-label">סיום סדר שלם מהמשנה (1 מ-6)</div><span class="sl-pts">+100 ⭐</span></div>
         <div class="score-legend-item"><span class="sl-icon">📅</span><div class="sl-label">סיום המשנה היומית (לפי לוח)<div style="font-size:11px;color:var(--text-muted);">לפי לוח המשנה היומית</div></div><span class="sl-pts">+50 ⭐</span></div>
@@ -410,7 +410,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.5.12 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.13 BETA · © 2026</div>
 </div>
 
 <script>
@@ -618,7 +618,7 @@ function toggleScoreLegend() {
   const chevron = document.getElementById('scoreLegendChevron');
   const open = content.style.display !== 'none';
   content.style.display = open ? 'none' : 'block';
-  label.textContent  = open ? (_sLang()==='en' ? 'Show Maalot Legend' : 'הצג מקרא מעלות') : (_sLang()==='en' ? 'Hide Maalot Legend' : 'הסתר מקרא מעלות');
+  label.textContent  = open ? (_sLang()==='en' ? 'Show Zechuyot Legend' : 'הצג מקרא זכויות') : (_sLang()==='en' ? 'Hide Zechuyot Legend' : 'הסתר מקרא זכויות');
   chevron.style.transform = open ? '' : 'rotate(90deg)';
 }
 
@@ -807,7 +807,7 @@ function showOnboardingAgain() {
 
 /* ── Reset data ── */
 function resetData() {
-  if (!confirm('⚠️ פעולה זו תמחק את כל הנתונים: קריאות, מעלות, מועדפים, שינון, אתגרים, הגדרות וקבוצות.\n\nהפעולה בלתי הפיכה. להמשיך?')) return;
+  if (!confirm('⚠️ פעולה זו תמחק את כל הנתונים: קריאות, זכויות, מועדפים, שינון, אתגרים, הגדרות וקבוצות.\n\nהפעולה בלתי הפיכה. להמשיך?')) return;
   if (!confirm('האם אתה בטוח לחלוטין? כל ההיסטוריה והנתונים יימחקו לצמיתות.')) return;
   // איפוס קשיח - מוחק את כל ה-localStorage שמתחיל ב-tehillim_
   const keys = Object.keys(localStorage).filter(function(k) { return k.indexOf('tehillim_') === 0; });

@@ -1073,7 +1073,7 @@ function toggleMemVerse(verseNum, btn) {
   if (adding) {
     addScore(2);
     if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(2, 'memorization');
-    showToast(_rLang()==='en' ? '★ Mishnah marked — +2 points!' : '★ סומנה משנה בע״פ — +2 מעלות!');
+    showToast(_rLang()==='en' ? '★ Mishnah marked — +2 points!' : '★ סומנה משנה בע״פ — +2 זכויות!');
   } else {
     showToast(_rLang()==='en' ? '☆ Mishnah unmarked' : '☆ סימון המשנה הוסר');
   }
@@ -1175,7 +1175,7 @@ function fmt(s) {
 
 function resetTimer() {
   stopTimer();
-  // 2.1.5: אם יש מעלות מהפרק הקודם, נשמור ל-accumulator לפני האיפוס
+  // 2.1.5: אם יש זכויות מהפרק הקודם, נשמור ל-accumulator לפני האיפוס
   if (sessionPts > 0) {
     try {
       const acc = JSON.parse(localStorage.getItem('tehillim_session_acc') || '{"pts":0,"chaps":0,"lastDone":false}');
@@ -1199,7 +1199,7 @@ function resetTimer() {
   document.getElementById('idleWarning').style.display = 'none';
 }
 
-/* החזרת המעלות החזויות: 5 לפרק שלם + 1 לכל 10 שניות (2.0.8) */
+/* החזרת הזכויות החזויות: 5 לפרק שלם + 1 לכל 10 שניות (2.0.8) */
 function projectedMaalot() {
   if (isDone) return sessionPts;
   // אם הטיימר עוד לא הגיע ל-10 שניות - מציג 0 (לא להראות +5 לפני שהתחיל לקרוא)
@@ -1403,7 +1403,7 @@ function finishChapter() {
   dismissConfirm();
   isDone = true;
 
-  // === מעלות (2.0.8): 5 + (secs/10) ===
+  // === זכויות (2.0.8): 5 + (secs/10) ===
   let earned = 0;
   let gamMeta = null;
   if (typeof Gamification !== 'undefined' && Gamification.onChapterCompleted) {
@@ -1450,7 +1450,7 @@ function finishChapter() {
 
   // 2.1.5: הטוסט מציג את sessionPts (אותו ערך כמו במונה בפינה)
   const _isEn = _rLang() === 'en';
-  let toastMsg = _isEn ? '✨ Well done! +' + sessionPts + ' points' : '✨ כל הכבוד! +' + sessionPts + ' מעלות';
+  let toastMsg = _isEn ? '✨ Well done! +' + sessionPts + ' points' : '✨ כל הכבוד! +' + sessionPts + ' זכויות';
   if (gamMeta && gamMeta.levelUp) {
     toastMsg += _isEn ? ' · Level up: ' + (gamMeta.levelUp.icon||'') + ' ' + (gamMeta.levelUp.key||'') : ' · עלית לרמת ' + (gamMeta.levelUp.icon||'') + ' ' + (gamMeta.levelUp.key||'');
   }
@@ -1895,7 +1895,7 @@ function checkAndShowMedal() {
   allEarned.push({ level: earned.level, date: todayStr, chaps: todayChaps, ts: Date.now() });
   S.set('tehillim_medals_earned', allEarned);
 
-  // הענק מעלות בונוס
+  // הענק זכויות בונוס
   if (earned.bonus) {
     addScore(earned.bonus);
     if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(earned.bonus, 'medal-bonus');
@@ -1943,9 +1943,9 @@ function exitSession() {
       if (textArea) {
         const scrolledToEnd = textArea.scrollTop + textArea.clientHeight >= textArea.scrollHeight - 50;
         if (scrolledToEnd) {
-          // מסמן את הפרק כהושלם + מעלות (2.2.3: תוקן — לא היה מעניק מעלות)
+          // מסמן את הפרק כהושלם + זכויות (2.2.3: תוקן — לא היה מעניק זכויות)
           isDone = true;
-          // מעלות — בדיוק כמו finishChapter()
+          // זכויות — בדיוק כמו finishChapter()
           let earned = 0;
           if (typeof Gamification !== 'undefined' && Gamification.onChapterCompleted) {
             const gamMeta = Gamification.onChapterCompleted(curId(), timerSec);

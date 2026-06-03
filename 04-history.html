@@ -270,7 +270,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
       </div>
       <div class="sum-card">
         <div class="sum-num" id="todayScore" style="color:#C07A00;">+0</div>
-        <div class="sum-lbl" data-i18n="hist.points">✡<br>מעלות</div>
+        <div class="sum-lbl" data-i18n="hist.points">✡<br>זכויות</div>
       </div>
     </div>
 
@@ -309,7 +309,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
     <div class="level-card" id="levelCard">
       <div class="level-emoji" id="lvlEmoji">🌱</div>
       <div class="level-name" id="lvlName">תלמיד</div>
-      <div class="level-sub" id="lvlSub">0 מעלות</div>
+      <div class="level-sub" id="lvlSub">0 זכויות</div>
       <div class="level-progress">
         <div class="level-progress-text" id="lvlProgText">עד הרמה הבאה</div>
         <div class="level-bar-wrap"><div class="level-bar" id="lvlBar" style="width:0%"></div></div>
@@ -381,7 +381,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
     <div class="challenges-page">
       <div class="challenges-page-header">
         <div class="challenges-page-title" data-i18n="hist.challenges_title">🎯 האתגרים שלך</div>
-        <div class="challenges-page-sub" data-i18n="hist.challenges_intro">איסוף מעלות באמצעות אתגרים יומיים, שבועיים וחודשיים</div>
+        <div class="challenges-page-sub" data-i18n="hist.challenges_intro">איסוף זכויות באמצעות אתגרים יומיים, שבועיים וחודשיים</div>
       </div>
       <div id="allChallengesList"></div>
 
@@ -404,7 +404,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
       </div>
 
       <div class="legend-box">
-        <h4 data-i18n="hist.legend_box_title">📊 מקרא — איך צוברים מעלות?</h4>
+        <h4 data-i18n="hist.legend_box_title">📊 מקרא — איך צוברים זכויות?</h4>
         <div class="legend-row"><span>📖 לימוד פרק שלם (בונוס)</span><span class="legend-pts">5</span></div>
         <div class="legend-row"><span>⏱️ כל 10 שניות לימוד</span><span class="legend-pts">1</span></div>
         <div class="legend-row"><span>⭐ סימון פרק כ"למדתי בע״פ"</span><span class="legend-pts">10</span></div>
@@ -578,14 +578,14 @@ function renderAchievementsTab() {
   const _lvlLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   document.getElementById('lvlEmoji').textContent = curr.icon || '🌱';
   document.getElementById('lvlName').textContent = (_lvlLang === 'en' && curr.en) ? curr.en : (curr.key || 'מתחיל');
-  document.getElementById('lvlSub').textContent = total.toLocaleString() + (_lvlLang === 'en' ? ' Maalot' : ' מעלות');
+  document.getElementById('lvlSub').textContent = total.toLocaleString() + (_lvlLang === 'en' ? ' Zechuyot' : ' זכויות');
   document.getElementById('lvlChaps').textContent = stats.uniqueChapters || 0;
   document.getElementById('lvlStreak').textContent = (stats.streak || 0) + '🔥';
   document.getElementById('lvlMem').textContent = (stats.memorized || 0) + '★';
   // התקדמות לרמה הבאה
   if (next) {
     const remain = (levelObj.toNext != null) ? levelObj.toNext : (next.min - total);
-    document.getElementById('lvlProgText').textContent = 'עוד ' + remain.toLocaleString() + ' מעלות לרמת ' + (next.icon||'') + ' ' + next.key;
+    document.getElementById('lvlProgText').textContent = 'עוד ' + remain.toLocaleString() + ' זכויות לרמת ' + (next.icon||'') + ' ' + next.key;
     document.getElementById('lvlBar').style.width = (levelObj.pct || 0) + '%';
   } else {
     document.getElementById('lvlProgText').textContent = '✨ הגעת לרמה הגבוהה ביותר!';
@@ -658,7 +658,7 @@ function renderAchievementsTab() {
 function renderChallengesPage() {
   if (typeof Gamification === 'undefined') {
     document.getElementById('allChallengesList').innerHTML =
-      '<div class="ch-history-empty">מערכת המעלות עוד לא נטענה. רענן את הדף.</div>';
+      '<div class="ch-history-empty">מערכת הזכויות עוד לא נטענה. רענן את הדף.</div>';
     return;
   }
   const list = Gamification.getActiveChallenges();
@@ -946,7 +946,7 @@ function renderYesterday() {
   const doneCh    = new Set(dayRecs.filter(r => !r.partial).map(r => r.chap));
   const totalSecs = dayRecs.reduce((a,r) => a + (r.secs||0), 0);
 
-  // מעלות: מ-gamification.byDay אם קיים, אחרת מ-tehillim_score.daily
+  // זכויות: מ-gamification.byDay אם קיים, אחרת מ-tehillim_score.daily
   let pts = 0;
   try {
     if (typeof Gamification !== 'undefined' && Gamification.load) {
@@ -995,7 +995,7 @@ function renderYesterday() {
   html += '<div class="summary-row" style="margin-bottom:14px;">' +
     '<div class="sum-card"><div class="sum-num">' + doneCh.size + '</div><div class="sum-lbl">פרקים<br>נקראו</div></div>' +
     '<div class="sum-card"><div class="sum-num">' + fmtSecs(totalSecs) + '</div><div class="sum-lbl">זמן<br>קריאה</div></div>' +
-    '<div class="sum-card"><div class="sum-num" style="color:#C07A00;">+' + pts + '</div><div class="sum-lbl">✡<br>מעלות</div></div>' +
+    '<div class="sum-card"><div class="sum-num" style="color:#C07A00;">+' + pts + '</div><div class="sum-lbl">✡<br>זכויות</div></div>' +
     '<div class="sum-card"><div class="sum-num">' + claimedThatDay.length + '</div><div class="sum-lbl">🎯<br>אתגרים</div></div>' +
   '</div>';
 
@@ -1253,7 +1253,7 @@ function renderAchievements() {
 
   const statsData = [
     { num: doneCh.size,         lbl: '📖 פרקים נלמדו'           },
-    { num: '+' + pts,           lbl: '⭐ מעלות',    color:'#C07A00' },
+    { num: '+' + pts,           lbl: '⭐ זכויות',    color:'#C07A00' },
     { num: fmtMins(mins),       lbl: '⏱ זמן לימוד'               },
     { num: mem.length,          lbl: '🧠 משניות בע"פ'            },
     { num: (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })(),
@@ -1361,7 +1361,7 @@ window.showCert = function(level) {
       '<div style="text-align:center;margin:10px 0 4px;">' +
         '<div style="display:inline-block;background:' + m.color + '22;border:1.5px solid ' + m.color + '55;border-radius:12px;padding:8px 20px;">' +
           '<div style="font-size:11px;opacity:.6;margin-bottom:2px;">' + (_cLang === 'en' ? 'Bonus' : 'בונוס') + '</div>' +
-          '<div style="font-size:20px;font-weight:800;color:' + m.color + '">+' + m.bonus + ' ⭐ ' + (_cLang === 'en' ? 'Maalot' : 'מעלות') + '</div>' +
+          '<div style="font-size:20px;font-weight:800;color:' + m.color + '">+' + m.bonus + ' ⭐ ' + (_cLang === 'en' ? 'Zechuyot' : 'זכויות') + '</div>' +
         '</div>' +
       '</div>' +
 
@@ -1390,13 +1390,13 @@ function buildShareText(level) {
   const _sLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   if (_sLang === 'en') {
     return m.emoji + ' I earned the ' + (m.en || m.label) + ' Medal for studying Mishnah!\n' +
-           'Bonus: +' + m.bonus + ' Maalot ⭐\n\n' +
+           'Bonus: +' + m.bonus + ' Zechuyot ⭐\n\n' +
            '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
            '📲 Join Mishnayon: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
            '— Mishnayon 📖';
   }
   return m.emoji + ' זכיתי במדליית ' + m.label + ' על לימוד משניות!\n' +
-         'בונוס: +' + m.bonus + ' מעלות ⭐\n\n' +
+         'בונוס: +' + m.bonus + ' זכויות ⭐\n\n' +
          '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
          '📲 הצטרף למשניון: ' + APP_URL + '\n' +
          '— משניון 📖';

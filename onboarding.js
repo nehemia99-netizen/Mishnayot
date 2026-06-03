@@ -18,9 +18,9 @@ function _getLang() {
 
 const STEPS_HE = [
   { icon:'📖', title:'ברוך הבא למשניון!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#3A7D44' },
-  { icon:'⭐', title:'מערכת מעלות', body:'כל פרק שתלמד ייתן לך נקודות "מעלות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#1E5A2E' },
+  { icon:'⭐', title:'מערכת זכויות', body:'כל פרק שתלמד ייתן לך נקודות "זכויות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#1E5A2E' },
   { icon:'📚', title:'פירוש למשנה', body:'לחץ על כפתור הפירוש בקורא כדי לקרוא פירוש לכל משנה — ברטנורא ותוספות יום טוב. הפירוש מופיע מתחת לכל משנה ומעמיק את ההבנה.', bg:'#993556' },
-  { icon:'🎯', title:'אתגרים יומיים', body:'יש לך 3 אתגרים פעילים בכל זמן: יומי, שבועי, וחודשי. השלם אותם ותקבל בונוס מעלות. אתגר חדש בכל יום חדש.', bg:'#3B6D11' },
+  { icon:'🎯', title:'אתגרים יומיים', body:'יש לך 3 אתגרים פעילים בכל זמן: יומי, שבועי, וחודשי. השלם אותם ותקבל בונוס זכויות. אתגר חדש בכל יום חדש.', bg:'#3B6D11' },
   { icon:'🧠', title:'שינון בעל פה', body:'סמן פרק בכוכב ☆ אחרי ששיננת אותו בעל פה. הכפתור 🧠 יפתח לך כלי לימוד עם 4 רמות הסתרה — מהקלה עד למבחן מלא.', bg:'#7B2FF7' },
   { icon:'👥', title:'קבוצות ואתגרים משותפים', bg:'#6B3AAA', groupSlide:true },
   { icon:'📲', title:'כמה דברים חשובים', bg:'#1A6B3A', infoSlide:true },
@@ -30,7 +30,7 @@ const STEPS_HE = [
 
 const STEPS_EN = [
   { icon:'📖', title:'Welcome to Mishnayon!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#3A7D44' },
-  { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Maalot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#1E5A2E' },
+  { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Zechuyot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#1E5A2E' },
   { icon:'📚', title:'Mishnah Commentary', body:'Tap the commentary button in the reader to see explanations for each Mishnah — Bartenura and Tosafot Yom Tov. Commentary appears below each Mishnah.', bg:'#993556' },
   { icon:'🎯', title:'Daily Challenges', body:'You have 3 active challenges at all times: daily, weekly, and monthly. Complete them for bonus points. A new challenge every new day.', bg:'#3B6D11' },
   { icon:'🧠', title:'Memorization Mode', body:'Mark a chapter with a star ☆ after memorizing it. The 🧠 button opens a learning tool with 4 levels of concealment — from easy to a full test.', bg:'#7B2FF7' },
@@ -192,7 +192,7 @@ function render() {
         + `<div style="font-size:14px;font-weight:700;color:#3A7D44;margin-bottom:3px;">${isEn ? 'Sign in with Google' : 'הירשם עם Google'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
             ? 'To save your points and chapters — sign in with Google. Free and instant.'
-            : 'כדי שהמעלות והפרקים שלמדת <b>יישמרו</b> — חשוב להתחבר עם חשבון Google. בחינם ובשניות.'}</div>`
+            : 'כדי שהזכויות והפרקים שלמדת <b>יישמרו</b> — חשוב להתחבר עם חשבון Google. בחינם ובשניות.'}</div>`
         + '</div>'
         + '<div style="background:#FFF8EE;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">🛠️</div>'

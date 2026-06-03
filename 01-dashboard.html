@@ -187,7 +187,7 @@ function claimChallenge(key,reward){
     } catch(e){}
     if(Gamification.showMaalotToast)Gamification.showMaalotToast(meta);
     renderChallenges();updateGamStrip();
-    // 2.2.12: רענן גרף כדי שהמעלות מהאתגר יופיעו מיד
+    // 2.2.12: רענן גרף כדי שהזכויות מהאתגר יופיעו מיד
     const activeTab=document.querySelector('.tab.active');
     if(typeof buildChart==='function')buildChart(activeTab?activeTab.dataset.tab:'day');
   }
@@ -201,7 +201,7 @@ async function shareGraph(ev){
   const r=S.get('tehillim_reading')||{};
   const k=localDateStr();
   const mins=Math.round((r.dailyMinutes&&r.dailyMinutes[k])||0);
-  // מעלות - לאסוף מכל המקורות ולקחת את המקסימום (יותר אמין)
+  // זכויות - לאסוף מכל המקורות ולקחת את המקסימום (יותר אמין)
   let totalPts = 0, todayPts = 0, levelKey = '', chapsCount = 0;
   // מקור 1: tehillim_score (מתעדכן רציף ע"י 03-reader.addScore)
   const sc2 = S.get('tehillim_score') || {};
@@ -232,12 +232,12 @@ async function shareGraph(ev){
   const _sgUrl = _sgLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _sgLang === 'en'
     ? '📊 My Mishnayon Progress\n' +
-      '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Maalot\n' +
-      '⭐ Total: ' + totalPts.toLocaleString() + ' Maalot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
+      '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Zechuyot\n' +
+      '⭐ Total: ' + totalPts.toLocaleString() + ' Zechuyot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
       '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' + _sgUrl
     : '📊 ההתקדמות שלי במשניון\n' +
-              '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' מעלות\n' +
-              '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' מעלות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
+              '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' זכויות\n' +
+              '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' זכויות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
               '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
               APP_URL_DASH;
   const file=new File([blob],'tehilahon-graph.png',{type:'image/png'});
@@ -561,7 +561,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.12 BETA</div>
+          <div class="app-version">גרסה 1.5.13 BETA</div>
         </div>
       </div>
     </div>
@@ -593,7 +593,7 @@ html.dark .lottery-trigger{opacity:.85;}
       </div>
       <div class="metric-pill">
         <div class="metric-opt active" id="mTime" onclick="setMetric('time')" data-i18n="graph.time">⏱ זמן</div>
-        <div class="metric-opt" id="mScore" onclick="setMetric('score')" data-i18n="graph.score">✡ מעלות</div>
+        <div class="metric-opt" id="mScore" onclick="setMetric('score')" data-i18n="graph.score">✡ זכויות</div>
       </div>
     </div>
     <div class="graph-card" id="graphCard">
@@ -630,8 +630,8 @@ html.dark .lottery-trigger{opacity:.85;}
           <circle cx="272" cy="18" r="3.5" fill="#C07A00"/>
           <circle cx="325" cy="5" r="4" fill="#C07A00"/>
         </svg>
-        <!-- מספר מעלות דמו -->
-        <div class="geo-score">148 מעלות</div>
+        <!-- מספר זכויות דמו -->
+        <div class="geo-score">148 זכויות</div>
         <!-- תוכן מרכזי -->
         <div class="geo-content">
           <div class="geo-emoji">📈</div>
@@ -646,7 +646,7 @@ html.dark .lottery-trigger{opacity:.85;}
     </div>
   </div>
 
-  <a href="04-history.html#achievements" class="gam-strip" id="gamStrip" aria-label="המעלות שלי">
+  <a href="04-history.html#achievements" class="gam-strip" id="gamStrip" aria-label="הזכויות שלי">
     <div class="gam-stat">
       <div class="gam-stat-num" style="font-size:17px;"><span id="gamLevelIcon">🌱</span> <span id="gamLevelName">מתחיל</span></div>
     </div>
@@ -1259,7 +1259,7 @@ function _applySimpleMode() {
       ? (_bLang === 'en'
           ? 'Total: ' + total.toLocaleString() + ' chapters studied' + scoreStr
           : 'סה״כ ' + total.toLocaleString() + ' פרקים נלמדו' + scoreStr)
-      : (_bLang === 'en' ? 'Every chapter earns spiritual Maalot ⭐' : 'כל פרק = מעלות רוחניות ⭐');
+      : (_bLang === 'en' ? 'Every chapter earns spiritual Zechuyot ⭐' : 'כל פרק = זכויות רוחניות ⭐');
   }
 }
 
@@ -1516,7 +1516,7 @@ function showChapterToast(pts, chap, partial) {
     : '0 6px 20px rgba(59,140,20,.45)';
   div.style.cssText = 'position:absolute;top:-8px;left:50%;transform:translateX(-50%) translateY(-10px);background:' + grad + ';color:#fff;padding:9px 22px;border-radius:24px;font-size:14px;font-weight:700;font-family:system-ui;z-index:50;box-shadow:' + shadow + ';white-space:nowrap;opacity:0;transition:opacity .3s,transform .3s;direction:rtl;';
   const icon = partial ? '⏱' : '✨';
-  div.innerHTML = icon + ' +' + pts + ' מעלות נוספו!';
+  div.innerHTML = icon + ' +' + pts + ' זכויות נוספו!';
   // ודא שיש לגרף-section position:relative
   if (getComputedStyle(graphSec).position === 'static') {
     graphSec.style.position = 'relative';
@@ -1605,7 +1605,7 @@ function getRealData(tab,metric){
   const sc=S.get('tehillim_score')||{};
   const dMins=rd.dailyMinutes||{};
   const dScore=(sc.daily)||{};
-  const unit=metric==='time'?'דק׳':'מעלות';
+  const unit=metric==='time'?'דק׳':'זכויות';
 
   function ds(ago){const d=new Date(TODAY);d.setDate(d.getDate()-ago);return localDateStr(d);}
   function v(dateStr){
@@ -1741,7 +1741,7 @@ function getRealData(tab,metric){
   }
 }
 function chartColors(metric,dark){
-  if(metric==='score')return{line:dark?'#F5C842':'#C07A00',fill:dark?'rgba(245,200,66,0.12)':'rgba(192,122,0,0.10)',unit:'מעלות'};
+  if(metric==='score')return{line:dark?'#F5C842':'#C07A00',fill:dark?'rgba(245,200,66,0.12)':'rgba(192,122,0,0.10)',unit:'זכויות'};
   return{line:dark?'#6FBF7A':'#3A7D44',fill:dark?'rgba(90,168,232,0.12)':'rgba(24,95,165,0.10)',unit:'דק׳'};
 }
 let chartInst;
@@ -2276,7 +2276,7 @@ async function shareApp(){
   const r=S.get('tehillim_reading')||{};
   const k=localDateStr();
   const mins=Math.round((r.dailyMinutes&&r.dailyMinutes[k])||0);
-  // === אסוף נתוני מעלות מכל המקורות (כמו ב-shareGraph) ===
+  // === אסוף נתוני זכויות מכל המקורות (כמו ב-shareGraph) ===
   let totalPts = 0, todayPts = 0, levelKey = '', chapsCount = 0;
   // מקור 1: tehillim_score (מתעדכן רציף ע"י 03-reader.addScore)
   const sc2 = S.get('tehillim_score') || {};
@@ -2307,13 +2307,13 @@ async function shareApp(){
   const _saUrl = _saLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _saLang === 'en'
     ? '📖 My Mishnayon Progress\n' +
-      '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Maalot\n' +
-      '⭐ Total: ' + totalPts.toLocaleString() + ' Maalot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
+      '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Zechuyot\n' +
+      '⭐ Total: ' + totalPts.toLocaleString() + ' Zechuyot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
       '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' +
       'Join me on *Mishnayon*:\n' + _saUrl
     : '📖 ההתקדמות שלי במשניון\n' +
-              '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' מעלות\n' +
-              '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' מעלות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
+              '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' זכויות\n' +
+              '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' זכויות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
               '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
               'הצטרף אלי לאפליקציית *משניון*:\n' +
               _saUrl;
@@ -2419,7 +2419,7 @@ function _checkStreakMilestone(streak) {
 <div id="lotterySheet">
   <div class="lottery-handle"></div>
   <div class="lottery-title">🎲 הגרלת פרק</div>
-  <div class="lottery-sub">בחר רמת ניחוש — וקבל מעלות אם צדקת!</div>
+  <div class="lottery-sub">בחר רמת ניחוש — וקבל זכויות אם צדקת!</div>
   <div class="lottery-cards">
     <div class="lottery-card" onclick="playLottery('exact')">
       <div class="lottery-card-icon">🔢</div>
@@ -2800,7 +2800,7 @@ function showLotteryResult({guess, won, pts, detail}) {
   document.getElementById('lresDetail').textContent = detail;
   const maalotEl = document.getElementById('lresMaalot');
   if (won && pts > 0) {
-    maalotEl.textContent = '+' + pts + ' מעלות ⭐';
+    maalotEl.textContent = '+' + pts + ' זכויות ⭐';
     maalotEl.style.display = '';
     // Award points
     if (typeof Gamification !== 'undefined' && Gamification.addMaalot) {
@@ -2942,7 +2942,7 @@ window.loadDashCommunity = async function loadDashCommunity(){
       const u=ls.docs.map(d=>d.data()).filter(d=>d.displayName);
       const cl=[['#EEEDFE','#3C3489'],['#FFF3E0','#7A4A00'],['#F3E5F5','#6A1B9A']];
       lbEl.innerHTML=u.length
-        ?u.map((p,i)=>'<div class="user-row"><div class="avatar" style="background:'+(cl[i]?cl[i][0]:'#eee')+';color:'+(cl[i]?cl[i][1]:'#333')+';">'+(p.displayName||'?').split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div class="user-name">'+p.displayName+'</div><div class="user-score">⭐ '+(p.score||0).toLocaleString()+' מעלות</div></div>').join('')
+        ?u.map((p,i)=>'<div class="user-row"><div class="avatar" style="background:'+(cl[i]?cl[i][0]:'#eee')+';color:'+(cl[i]?cl[i][1]:'#333')+';">'+(p.displayName||'?').split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div class="user-name">'+p.displayName+'</div><div class="user-score">⭐ '+(p.score||0).toLocaleString()+' זכויות</div></div>').join('')
         :'<div style="padding:8px;color:var(--text-muted);font-size:12px;">אין עדיין משתמשים</div>';
     }
   }catch(e){console.warn('community load error',e);}

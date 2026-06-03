@@ -52,9 +52,9 @@ const DICT = {
   'tab.month':               { he: 'חודשי',                   en: 'Monthly' },
   'tab.half_year':           { he: 'חצי שנה',                 en: '6m' },
   'graph.time':              { he: '⏱ זמן',                   en: '⏱ Time' },
-  'graph.score':             { he: '✡ מעלות',                en: '✡ Maalot' },
+  'graph.score':             { he: '✡ זכויות',                en: '✡ Zechuyot' },
   'graph.minutes_unit':      { he: 'דק׳',                     en: 'min' },
-  'graph.score_unit':        { he: 'מעלות',                   en: 'points' },
+  'graph.score_unit':        { he: 'זכויות',                   en: 'points' },
   'graph.label.today':       { he: 'היום בסה״כ',              en: 'Today total' },
 
   // ברכות
@@ -100,7 +100,7 @@ const DICT = {
 
   // קורא (03-reader)
   'reader.time':             { he: 'זמן לימוד',               en: 'Study time' },
-  'reader.points':           { he: '✡ מעלות',                en: '✡ Maalot' },
+  'reader.points':           { he: '✡ זכויות',                en: '✡ Zechuyot' },
   'reader.done_btn':         { he: 'סיימתי פרק',              en: 'Finished chapter' },
   'reader.idle_warning':     { he: '⏸ הטיימר נעצר — עבור לפרק הבא כדי להמשיך', en: '⏸ Timer paused — move to next chapter to continue' },
 
@@ -111,7 +111,7 @@ const DICT = {
   'hist.challenges':         { he: '🎯 אתגרים',                en: '🎯 Challenges' },
   'hist.chaps_today':        { he: 'פרקים נלמדו',             en: 'Chapters studied' },
   'hist.reading_time':       { he: 'זמן לימוד',               en: 'Study time' },
-  'hist.points':             { he: 'מעלות',                   en: 'Maalot' },
+  'hist.points':             { he: 'זכויות',                   en: 'Zechuyot' },
   'hist.chaps_today_title':  { he: 'פרקים שנלמדו היום',        en: 'Chapters studied today' },
   'hist.last_7_days':        { he: '7 הימים האחרונים',        en: 'Last 7 days' },
   'hist.delete_today':       { he: '🗑 מחק נתוני לימוד של היום', en: '🗑 Delete today\'s reading data' },
@@ -133,8 +133,8 @@ const DICT = {
   'set.test_notification':   { he: 'שלח תזכורת בדיקה',        en: 'Send test notification' },
   'set.reading':             { he: 'לימוד',                   en: 'Study' },
   'set.privacy':             { he: 'פרטיות',                  en: 'Privacy' },
-  'set.score_legend':        { he: '✡ מקרא מעלות',           en: '✡ Maalot Legend' },
-  'set.show_legend':         { he: 'הצג מקרא מעלות',         en: 'Show Maalot Legend' },
+  'set.score_legend':        { he: '✡ מקרא זכויות',           en: '✡ Zechuyot Legend' },
+  'set.show_legend':         { he: 'הצג מקרא זכויות',         en: 'Show Zechuyot Legend' },
   'set.backup':              { he: 'גיבוי ושחזור',            en: 'Backup & Restore' },
   'set.export':              { he: 'ייצוא נתונים',            en: 'Export data' },
   'set.import':              { he: 'ייבוא נתונים',            en: 'Import data' },
@@ -193,7 +193,7 @@ const DICT = {
   'hist.legend_fav':         { he: 'מועדף',                   en: 'Favorite' },
   'hist.legend_none':        { he: 'טרם',                     en: 'Not yet' },
   'hist.challenges_title':   { he: '🎯 האתגרים שלך',          en: '🎯 Your Challenges' },
-  'hist.challenges_intro':   { he: 'איסוף מעלות באמצעות אתגרים יומיים, שבועיים וחודשיים', en: 'Collect points via daily, weekly and monthly challenges' },
+  'hist.challenges_intro':   { he: 'איסוף זכויות באמצעות אתגרים יומיים, שבועיים וחודשיים', en: 'Collect points via daily, weekly and monthly challenges' },
   'hist.badges_themed':      { he: 'הישגים נושאיים',          en: 'Themed Achievements' },
   'hist.group_challenge':    { he: '👥 אתגר קבוצתי',          en: '👥 Group Challenge' },
   'hist.group_card':         { he: 'אתגר משותף עם הקבוצה',    en: 'Group shared challenge' },
@@ -320,7 +320,7 @@ const DICT = {
 
   // תוספות 2.1.2 — תרגומים חסרים
   'graph.minutes_today':     { he: 'דק׳ היום',                en: 'min today' },
-  'graph.maalot_today':      { he: 'מעלות היום',              en: 'maalot today' },
+  'graph.maalot_today':      { he: 'זכויות היום',              en: 'zechuyot today' },
   'home.refresh_challenges': { he: '🔄 רענן',                  en: '🔄 Refresh' },
   'reader.continue':         { he: 'סיום וחזרה',              en: "I\u2019m Done" },
   'reader.done_short':       { he: 'סיימתי פרק',              en: 'Chapter complete' },
@@ -344,13 +344,13 @@ const DICT = {
   'hist.cal_none':           { he: 'לא נקרא',                     en: 'Not read' },
   'hist.cal_many':           { he: 'הרבה',                        en: 'A lot' },
   'hist.cal_shabbat':        { he: 'שישי/שבת',                    en: 'Fri/Sat' },
-  'hist.legend_box_title':   { he: '📊 מקרא — איך צוברים מעלות?', en: '📊 How to earn Maalot?' },
+  'hist.legend_box_title':   { he: '📊 מקרא — איך צוברים זכויות?', en: '📊 How to earn Zechuyot?' },
 
   // קהילה — תוספות (07-community)
   'comm.today_stat':         { he: '📅 היום',                         en: '📅 Today' },
   'comm.gs_chaps':           { he: '📖 פרקים<br>היום',               en: '📖 Chapters<br>today' },
   'comm.gs_mins':            { he: '⏱ דקות<br>היום',                 en: '⏱ Minutes<br>today' },
-  'comm.gs_score':           { he: '⭐ סה״כ<br>מעלות',               en: '⭐ Total<br>Maalot' },
+  'comm.gs_score':           { he: '⭐ סה״כ<br>זכויות',               en: '⭐ Total<br>Zechuyot' },
   'comm.group_lb':           { he: 'לוח מובילים — הקבוצה',           en: 'Group leaderboard' },
   'comm.mission_title':      { he: '📖 מבצע משותף',                  en: '📖 Joint mission' },
   'comm.mission_sub':        { he: 'סיום המשנה יחד',             en: 'Finish the Mishnah together' },
