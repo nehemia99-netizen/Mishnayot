@@ -420,6 +420,7 @@ const DICT = {
   'read.shinun_hide_ends':  { he: '🔲<br>הסתר סיומות',                         en: '🔲<br>Hide endings' },
   'read.shinun_rashei':     { he: '🔡<br>ראשי תיבות',                          en: '🔡<br>First letters' },
   'read.shinun_blanks':     { he: '⬚<br>השלמת מילים',                          en: '⬚<br>Fill blanks' },
+  'read.shinun_flash':      { he: '⚡<br>בקיאות',                              en: '⚡<br>Flash' },
   'read.shinun_hint':       { he: '💡<br>רמז ראשון',                           en: '💡<br>First hint' },
   'read.shinun_test':       { he: '🎯<br>מבחן',                               en: '🎯<br>Test' },
   'read.loading':           { he: 'טוען פרק...',                               en: 'Loading chapter...' },

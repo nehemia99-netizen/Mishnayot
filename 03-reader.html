@@ -175,6 +175,11 @@ body.reader-shinun .verse-rec-btn{display:flex;}
 .verse-rec-btn.has-rec{opacity:1;color:#2E7D32;}
 .verse-rec-btn.recording{opacity:1;color:#C0392B;animation:recPulse 1s infinite;}
 @keyframes recPulse{0%,100%{opacity:1}50%{opacity:.35}}
+.verse-note-btn{width:30px;height:27px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:14px;display:none;align-items:center;justify-content:center;opacity:.5;-webkit-tap-highlight-color:transparent;flex-shrink:0;font-family:system-ui,sans-serif;}
+body.reader-shinun .verse-note-btn{display:flex;}
+.verse-note-btn.has-note{opacity:1;}
+.verse-note{margin-top:7px;padding:6px 10px;background:#FFF8E6;border-right:3px solid #E0B000;border-radius:8px;font-size:13px;line-height:1.6;color:#7A5A00;}
+html.dark .verse-note{background:#2A2410;color:#D9B85A;border-right-color:#8A6A10;}
 @keyframes bkPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 
 /* Toast */
@@ -267,6 +272,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     <button class="shinun-lvl"        id="slvl6" onclick="setShinunLevel(6)" data-i18n="read.shinun_blanks">⬚<br>השלמת מילים</button>
     <button class="shinun-lvl"        id="slvl3" onclick="setShinunLevel(3)" data-i18n="read.shinun_hint">💡<br>רמז ראשון</button>
     <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
+    <button class="shinun-lvl"        id="slvl7" onclick="setShinunLevel(7)" data-i18n="read.shinun_flash">⚡<br>בקיאות</button>
   </div>
   <div class="shinun-score-banner" id="shinunBanner"></div>
 
@@ -642,6 +648,7 @@ function renderVerses(verses, commData, preserveScroll) {
   const commLabel = commentaryType === 'tosafot' ? 'תוספות יו"ט' : 'ברטנורא';
   const savedVerses = S.get(SAVED_KEY) || [];
   const memMSet = new Set(getMemM()); // משניות שסומנו "ידעתי בע״פ" (פר־משנה)
+  const notesMap = S.get('mishnah_notes') || {}; // סימנים אישיים פר־משנה
   const _cid = curId();
   // שמור פסוקים מסוננים למיפוי
   const _versesToRender = filteredVerses;
@@ -657,11 +664,13 @@ function renderVerses(verses, commData, preserveScroll) {
     }
     const isSaved = savedVerses.some(sv => sv.chap === curId() && sv.verse === realIdx+1);
     const isMemV  = memMSet.has(_cid + ':' + (realIdx+1));
+    const noteTxt = notesMap[_cid + ':' + (realIdx+1)];
+    const noteHtml = noteTxt ? ('<div class="verse-note">💡 ' + _escHtml(noteTxt) + '</div>') : '';
     return '<div class="verse">' +
       (showVerseNums ? '<span class="verse-num">' + toGematria(realIdx+1) + '</span>' : '') +
       '<div class="verse-content">' +
       '<span class="verse-text" style="font-size:' + fontSize + 'px">' + stripCantillation(v) + '</span>' +
-      commHtml +
+      commHtml + noteHtml +
       '</div>' +
       '<div class="verse-actions">' +
         '<button class="verse-mem-btn' + (isMemV ? ' marked' : '') + '" ' +
@@ -674,6 +683,9 @@ function renderVerses(verses, commData, preserveScroll) {
           'onclick="toggleRec(' + (realIdx+1) + ',this)" ' +
           'oncontextmenu="return delRec(' + (realIdx+1) + ',this)" ' +
           'title="הקלט את עצמך אומר את המשנה">🎙️</button>' +
+        '<button class="verse-note-btn' + (noteTxt ? ' has-note' : '') + '" ' +
+          'onclick="toggleNote(' + (realIdx+1) + ',this)" ' +
+          'title="סימן/הערה אישית למשנה">📝</button>' +
       '</div>' +
       '</div>';
   }).join('') +
@@ -1693,6 +1705,22 @@ function _applyTtsVoice(u){
 }
 // חימום רשימת הקולות (חלק מהדפדפנים טוענים אסינכרונית)
 try { if (typeof speechSynthesis !== 'undefined') { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function(){ speechSynthesis.getVoices(); }; } } catch(e){}
+/* ── סימן אישי למשנה ── */
+function _escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toggleNote(verseNum, btn) {
+  const key = curId() + ':' + verseNum;
+  const notes = S.get('mishnah_notes') || {};
+  const cur = notes[key] || '';
+  const txt = prompt(_rLang()==='en' ? 'Personal note / mnemonic for this Mishnah:' : 'סימן/הערה אישית למשנה זו:', cur);
+  if (txt === null) return; // ביטול
+  const t = txt.trim();
+  if (t) notes[key] = t; else delete notes[key];
+  S.set('mishnah_notes', notes);
+  showToast(t ? (_rLang()==='en'?'📝 Note saved':'📝 הסימן נשמר') : (_rLang()==='en'?'📝 Note removed':'📝 הסימן הוסר'));
+  const cached = S.get('mishnah_cache_' + curId());
+  if (cached && cached.he) renderVerses(cached.he, commentaryOn ? currentCommData : null, true);
+}
+
 function _ttsNoVoice(){ showToast(_rLang()==='en' ? '🔇 No Hebrew voice available on this device' : '🔇 אין קול עברי מותקן במכשיר זה'); }
 function _ttsStop(){
   _ttsOn = false;
@@ -1882,7 +1910,7 @@ function setShinunLevel(lvl) {
   shinunLevel = lvl;
   _reviewSet = null; _passNum = 0;   // איפוס לולאת החזרה
   _ttsStop();
-  [1,2,3,4,5,6].forEach(i => {
+  [1,2,3,4,5,6,7].forEach(i => {
     const el = document.getElementById('slvl'+i);
     if (el) el.classList.toggle('active', i===lvl);
   });
@@ -1953,6 +1981,13 @@ function renderShinunVerses(verses, level) {
           : w
       ).join(' ');
       inner = `<span class="verse-text" style="font-size:${fontSize}px">${wordsHtml}</span>`;
+
+    } else if (level === 7) {
+      // בקיאות מהירה — הבזק: הקש לראות את המשנה ל-3 שניות ואז היא נעלמת
+      inner = `<div class="verse-wrap tappable" id="vw${i}" onclick="flashVerse(${i})">` +
+        `<div class="verse-hidden-label" id="vhl${i}">משנה ${toGematria(i+1)} — הקש להבזק ⚡</div>` +
+        `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;">${v}</span>` +
+        `</div>`;
     }
 
     html += `<div class="verse">` +
@@ -2004,6 +2039,14 @@ function revealWordCover(vIdx, wIdx, el) {
   el.textContent = w;
   el.classList.add('revealed');
   el.onclick = null;
+}
+/* Level 7 — בקיאות מהירה: הבזק את המשנה ל-3 שניות */
+function flashVerse(idx) {
+  const vt = document.getElementById('vt' + idx), vhl = document.getElementById('vhl' + idx);
+  if (!vt) return;
+  vt.style.display = 'block'; if (vhl) vhl.style.display = 'none';
+  clearTimeout(vt._flashTmr);
+  vt._flashTmr = setTimeout(function(){ vt.style.display = 'none'; if (vhl) vhl.style.display = 'block'; }, 3000);
 }
 /* בחירת אינדקסים אקראית-יציבה (אותו seed → אותו פיזור) */
 function _seededHide(n, count, seed) {
