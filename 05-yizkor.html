@@ -87,6 +87,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 
     <button id="genBtn" class="gen-btn" onclick="generate()" disabled>🕯️ התחל לימוד לעילוי נשמה</button>
     <div class="note" id="genNote">הלימוד ייפתח כרצף פרקים, עם הקדשה לשם שהזנת.</div>
+
+    <button id="freeBtn" class="gen-btn" onclick="freeStudy()" style="margin-top:14px;background:var(--card);color:var(--primary);border:1.5px solid var(--primary);" disabled>📖 לימוד חופשי — בחר פרקים בעצמך</button>
+    <div class="note">או למד פרקים חופשי לבחירתך — והשם יְרַחֵף בראש הקורא לאורך כל הלימוד (עד חצות).</div>
   </div>
 </div>
 
@@ -191,7 +194,20 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
     pv.style.display='block';
     btn.disabled=false;
   }
-  window.onInput=rebuild;
+  window.onInput=function(){
+    rebuild();
+    var nm=(document.getElementById('nameInp').value||'').trim();
+    var fb=document.getElementById('freeBtn'); if(fb) fb.disabled = (nm.length===0);
+  };
+
+  // לימוד חופשי — מקדישים שם ולומדים פרקים לבחירה (השם בבאנר עד חצות)
+  window.freeStudy=function(){
+    var name=(document.getElementById('nameInp').value||'').trim();
+    if(!name) return;
+    var today=(typeof localDateStr==='function')?localDateStr():new Date().toISOString().slice(0,10);
+    S.set('tehillim_dedication', { name:name, date:today, type:(mode==='nsh'?'neshama':'refuah'), gender:gender });
+    location.href='02-selection.html';
+  };
 
   window.generate=function(){
     var plan=buildPlan();

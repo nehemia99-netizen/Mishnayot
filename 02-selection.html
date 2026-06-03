@@ -16,6 +16,8 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;flex-shrink:0;}
 .topbar-title{font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
 .search-icon-btn{width:32px;height:32px;border-radius:50%;border:.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;-webkit-tap-highlight-color:transparent;}
+.navsel{flex:1;min-width:0;padding:10px 8px;border-radius:10px;border:1px solid var(--primary-border,#BBD6BB);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;}
+.navsel:focus{outline:none;border-color:var(--primary);}
 .topbar-left{display:flex;align-items:center;gap:6px;}
 .back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;white-space:nowrap;font-weight:600;}
 
@@ -212,7 +214,13 @@ html.dark .chap-cell.mem{background:#1C1230;}
 
   <!-- TAB 0: hierarchical Order → Tractate → Chapter -->
   <div class="tab-content active" id="tab0">
-    <div class="quick-row" style="padding:12px 16px 0;display:flex;gap:10px;">
+    <!-- בוררים מהירים: סדר → מסכת → פרק -->
+    <div class="nav-selectors" style="padding:12px 16px 2px;display:flex;gap:7px;">
+      <select id="selSeder" class="navsel" onchange="onSederChange()"></select>
+      <select id="selMasechet" class="navsel" onchange="onMasechetChange()"><option value="">מסכת…</option></select>
+      <select id="selPerek" class="navsel" onchange="onPerekChange()"><option value="">פרק…</option></select>
+    </div>
+    <div class="quick-row" style="padding:10px 16px 0;display:flex;gap:10px;">
       <div class="quick-card qc-yomit" onclick="openYomitModal()" style="flex:1;padding:12px;border:.5px solid var(--primary);border-radius:12px;background:var(--primary-light);cursor:pointer;text-align:center;">
         <div class="qc-icon-big" style="font-size:20px;margin-bottom:2px;">📅</div>
         <div class="qc-name" style="font-size:14px;font-weight:700;color:var(--primary);">משנה יומית</div>
@@ -447,20 +455,30 @@ html.dark .chap-cell.mem{background:#1C1230;}
     }catch(e){}
   })();
 
-  // init — כל הסדרים סגורים; אם הגענו מלימוד פרק, נפתח את הסדר שלו
+  // ── בוררים מהירים: סדר → מסכת → פרק ──
+  window.onSederChange=function(){
+    var o=Corpus.getOrder(document.getElementById('selSeder').value);
+    var ms=document.getElementById('selMasechet');
+    ms.innerHTML='<option value="">מסכת…</option>'+(o?o.tractates.map(function(tid){var t=Corpus.getTractate(tid);return '<option value="'+tid+'">'+t.he+'</option>';}).join(''):'');
+    document.getElementById('selPerek').innerHTML='<option value="">פרק…</option>';
+  };
+  window.onMasechetChange=function(){
+    var t=Corpus.getTractate(document.getElementById('selMasechet').value);
+    var h='<option value="">פרק…</option>';
+    if(t){ for(var p=1;p<=t.length;p++) h+='<option value="'+p+'">'+toGem(p)+'</option>'; }
+    document.getElementById('selPerek').innerHTML=h;
+  };
+  window.onPerekChange=function(){
+    var tid=document.getElementById('selMasechet').value, pr=parseInt(document.getElementById('selPerek').value,10);
+    if(tid && pr) location.href='03-reader.html?chap='+encodeURIComponent(Corpus.chapId(tid,pr));
+  };
+  function fillSederSelect(){
+    document.getElementById('selSeder').innerHTML='<option value="">סדר…</option>'+Corpus.orders.map(function(o){return '<option value="'+o.id+'">'+o.he+'</option>';}).join('');
+  }
+
+  // init — האקורדיון נשאר סגור לגמרי (הניווט המהיר למעלה); בלי פתיחה אוטומטית
+  fillSederSelect();
   buildOrders();
-  (function autoOpenLast(){
-    try {
-      var last = S.get('mishnah_cycle_pos');
-      if (!last) {
-        var rd = S.get('tehillim_readings') || [];
-        rd = Array.isArray(rd) ? rd : Object.values(rd||{});
-        if (rd.length) last = rd[rd.length-1].chap;
-      }
-      var p = last && Corpus.parseChapId(last);
-      if (p && Corpus.getTractate(p.tractate)) toggleOrder(Corpus.getTractate(p.tractate).order);
-    } catch(e){}
-  })();
 
   // פתיחה ישירה של לשונית המועדפים (?fav=1 / ?tab=1 / ?tab=fav מעמוד הבית)
   (function openFavTab(){
