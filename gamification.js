@@ -613,6 +613,36 @@ function getBadgesStatus() {
   }));
 }
 
+/* ════════════════════════════════════════════════════════════
+   חזרה מרווחת (Spaced Repetition — Leitner) — פר־פרק
+   mishnah_srs = { "Berakhot.2": { box, due:'YYYY-MM-DD', last } }
+   ════════════════════════════════════════════════════════════ */
+const SRS_KEY = 'mishnah_srs';
+const SRS_INTERVALS = [1, 3, 7, 16, 35, 90]; // ימים לפי תיבה (Leitner)
+function _srsLoad() { try { return JSON.parse(localStorage.getItem(SRS_KEY)) || {}; } catch(e) { return {}; } }
+function _srsSave(d) { try { localStorage.setItem(SRS_KEY, JSON.stringify(d)); } catch(e){} }
+function _srsAddDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return localDateStr(d); }
+// תזמון פרק לחזרה: perfect=true מקדם תיבה, אחרת חוזר לתיבה 0
+function srsSchedule(chapId, perfect) {
+  if (!chapId) return;
+  const d = _srsLoad();
+  const cur = d[chapId] || { box: 0 };
+  const box = perfect ? Math.min((cur.box || 0) + 1, SRS_INTERVALS.length - 1) : 0;
+  d[chapId] = { box: box, due: _srsAddDays(SRS_INTERVALS[box]), last: today() };
+  _srsSave(d);
+  return d[chapId];
+}
+function srsRemove(chapId) { const d = _srsLoad(); if (d[chapId]) { delete d[chapId]; _srsSave(d); } }
+// פרקים שהגיע זמנם לחזרה (due<=today), ממוינים מהוותיק
+function srsDueList() {
+  const d = _srsLoad(), t = today(), out = [];
+  for (const k in d) { if (d[k] && d[k].due <= t) out.push(k); }
+  out.sort((a, b) => (d[a].due < d[b].due ? -1 : 1));
+  return out;
+}
+function srsCount() { return srsDueList().length; }
+function srsTotal() { return Object.keys(_srsLoad()).length; }
+
 /* ─── חשיפה גלובלית ─── */
 global.Gamification = {
   LEVELS, levelOf,
@@ -629,6 +659,8 @@ global.Gamification = {
   CHALLENGES, getActiveChallenges, claimChallenge, getChallengeMetrics,
   // Badges 1.5.0
   BADGES, checkAndAwardBadges, getBadgesStatus, getBadgeContext,
-  getDailyChapters, DAILY_CHAPS_BY_DAY
+  getDailyChapters, DAILY_CHAPS_BY_DAY,
+  // SRS — חזרה מרווחת
+  srsSchedule, srsRemove, srsDueList, srsCount, srsTotal
 };
 })(window);

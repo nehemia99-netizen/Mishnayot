@@ -346,6 +346,7 @@ function toGematria(n) {
 const params  = new URLSearchParams(location.search);
 const MODE    = params.get('mode') || 'normal';
 let _pendingMishnah = parseInt(params.get('mishnah'), 10) || 0; // קפיצה למשנה ספציפית (פעם אחת)
+let _pendingReview  = params.get('review') === '1';             // כניסה אוטומטית למבחן (חזרה מרווחת)
 
 // פענוח מזהה פרק "Tractate.Perek" (לדוגמה "Berakhot.2")
 function parseChap(str) {
@@ -586,6 +587,7 @@ async function loadChapter(tractateId, perek) {
     else renderVerses(data.he, commData);
     // קפיצה למשנה ספציפית אם התבקשה דרך ה-URL (?mishnah=N) — פעם אחת בלבד
     if (_pendingMishnah) { const _m = _pendingMishnah; _pendingMishnah = 0; setTimeout(function(){ scrollToMishnah(_m, true); }, 250); }
+    if (_pendingReview) { _pendingReview = false; setTimeout(function(){ if (!shinunActive) toggleShinunMode(); setShinunLevel(4); }, 300); }
   } catch(e) {
     ta.innerHTML = _rLang()==='en'
       ? '<div class="error-msg">⚠️ Error loading chapter<br>Check internet connection<br><button class="retry-btn" onclick="loadChapter(\'' + tractateId + '\',' + perek + ')">Try again</button></div>'
@@ -1636,6 +1638,10 @@ function recordMasteryScore(id, pct, perfectFirstPass){
   m.level   = m.perfects>=3 ? 3 : m.perfects>=2 ? 2 : m.perfects>=1 ? 1 : 0;
   m.lastTest = localDateStr();
   all[id] = m; S.set(MASTERY_KEY, all);
+  // חזרה מרווחת — תזמן את הפרק לחזרה (perfect מקדם, אחרת חוזר לתיבה הראשונה)
+  if (typeof Gamification !== 'undefined' && Gamification.srsSchedule) {
+    try { Gamification.srsSchedule(id, !!perfectFirstPass); } catch(e){}
+  }
   return m;
 }
 
