@@ -156,6 +156,10 @@ html.dark .dedication-banner{background:linear-gradient(135deg,#15291B,#0E1E14);
 .verse-mem-btn{width:30px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;opacity:.28;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s,transform .15s;font-family:system-ui,sans-serif;color:var(--text);}
 .verse-mem-btn.marked{opacity:1;color:#7B2FF7;}
 .verse-mem-btn.marked.pop{animation:bkPop .3s ease;}
+.verse-rec-btn{width:30px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:15px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;opacity:.28;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s;font-family:system-ui,sans-serif;}
+.verse-rec-btn.has-rec{opacity:1;}
+.verse-rec-btn.recording{opacity:1;animation:recPulse 1s infinite;}
+@keyframes recPulse{0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes bkPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 
 /* Toast */
@@ -630,6 +634,10 @@ function renderVerses(verses, commData, preserveScroll) {
       '<button class="verse-mem-btn' + (isMemV ? ' marked' : '') + '" ' +
         'onclick="toggleMemVerse(' + (realIdx+1) + ',this)" ' +
         'title="ידעתי משנה זו בעל פה">' + (isMemV ? '★' : '☆') + '</button>' +
+      '<button class="verse-rec-btn" id="rec_' + (realIdx+1) + '" ' +
+        'onclick="toggleRec(' + (realIdx+1) + ',this)" ' +
+        'oncontextmenu="return delRec(' + (realIdx+1) + ',this)" ' +
+        'title="הקלט את עצמך אומר את המשנה (לחיצה ארוכה למחיקה)">🎙️</button>' +
       '<button class="verse-bk-btn' + (isSaved ? ' saved' : '') + '" ' +
         'onclick="toggleSaveVerse(' + (realIdx+1) + ',this)" ' +
         'title="שמור פסוק">🔖</button>' +
@@ -644,6 +652,7 @@ function renderVerses(verses, commData, preserveScroll) {
     ta.scrollTop = 0;
     if (!isDone) resetReadProgress(); // 2.2.11: skip reset if chapter already marked done
   }
+  try { setTimeout(refreshRecButtons, 0); } catch(e){}
 }
 
 /* ── חיבור מחדש של ה-observer לאחר רינדר-מחדש, בלי לאפס את מצב "הגעת לסוף" ── */
@@ -1687,6 +1696,92 @@ function toggleTTS(){
   })();
 }
 window.addEventListener('pagehide', _ttsStop);
+
+/* ══════════════════════════════════════════
+   הקלטה עצמית של משניות (MediaRecorder + IndexedDB)
+══════════════════════════════════════════ */
+let _recDB = null, _recActive = null, _recMR = null, _recChunks = [], _recStream = null, _recAudio = null;
+function _recOpenDB() {
+  return new Promise((resolve, reject) => {
+    if (_recDB) return resolve(_recDB);
+    const req = indexedDB.open('mishnayon_rec', 1);
+    req.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains('rec')) db.createObjectStore('rec'); };
+    req.onsuccess = e => { _recDB = e.target.result; resolve(_recDB); };
+    req.onerror = e => reject(e);
+  });
+}
+function _recKey(verseNum) { return curId() + ':' + verseNum; }
+async function _recGet(key) { const db = await _recOpenDB(); return new Promise((res,rej)=>{ const r=db.transaction('rec').objectStore('rec').get(key); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error); }); }
+async function _recPut(key, blob) { const db = await _recOpenDB(); return new Promise((res,rej)=>{ const r=db.transaction('rec','readwrite').objectStore('rec').put(blob,key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+async function _recDelete(key) { const db = await _recOpenDB(); return new Promise((res,rej)=>{ const r=db.transaction('rec','readwrite').objectStore('rec').delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+async function _recKeysForChap() { const db = await _recOpenDB(); return new Promise((res)=>{ const out=[]; const r=db.transaction('rec').objectStore('rec').openKeyCursor(); const pre=curId()+':'; r.onsuccess=e=>{ const c=e.target.result; if(c){ if(String(c.key).indexOf(pre)===0) out.push(String(c.key)); c.continue(); } else res(out); }; r.onerror=()=>res(out); }); }
+
+async function refreshRecButtons() {
+  if (typeof indexedDB === 'undefined') { document.querySelectorAll('.verse-rec-btn').forEach(b=>b.style.display='none'); return; }
+  let keys = [];
+  try { keys = await _recKeysForChap(); } catch(e){ return; }
+  const have = new Set(keys);
+  document.querySelectorAll('.verse-rec-btn').forEach(b => {
+    const vn = b.id.replace('rec_','');
+    if (have.has(_recKey(vn))) { b.classList.add('has-rec'); b.classList.remove('recording'); b.textContent='▶'; }
+    else { b.classList.remove('has-rec','recording'); b.textContent='🎙️'; }
+  });
+}
+
+async function toggleRec(verseNum, btn) {
+  // אם מקליט כרגע את אותה משנה — עצור ושמור
+  if (_recActive === verseNum && _recMR) { _recStopAndSave(); return; }
+  // אם מקליט משנה אחרת — עצור קודם
+  if (_recMR) { try { _recMR.stop(); } catch(e){} }
+  // אם כבר יש הקלטה — נגן
+  if (btn.classList.contains('has-rec')) {
+    try {
+      const blob = await _recGet(_recKey(verseNum));
+      if (blob) { if (_recAudio) { try{_recAudio.pause();}catch(e){} } _recAudio = new Audio(URL.createObjectURL(blob)); _recAudio.play(); showToast(_rLang()==='en'?'▶ Playing your recording':'▶ משמיע את ההקלטה שלך'); }
+    } catch(e){ showToast('שגיאה בהשמעה'); }
+    return;
+  }
+  // אחרת — התחל הקלטה
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast('המכשיר אינו תומך בהקלטה'); return; }
+  try {
+    _recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    _recMR = new MediaRecorder(_recStream);
+    _recChunks = [];
+    _recActive = verseNum;
+    _recMR.ondataavailable = e => { if (e.data && e.data.size) _recChunks.push(e.data); };
+    _recMR.onstop = async () => {
+      try {
+        const blob = new Blob(_recChunks, { type: (_recChunks[0] && _recChunks[0].type) || 'audio/webm' });
+        if (blob.size > 0) { await _recPut(_recKey(verseNum), blob); showToast(_rLang()==='en'?'🎙️ Recording saved':'🎙️ ההקלטה נשמרה'); }
+      } catch(e){ showToast('שגיאה בשמירת ההקלטה'); }
+      if (_recStream) { _recStream.getTracks().forEach(t=>t.stop()); _recStream=null; }
+      _recMR=null; _recActive=null;
+      refreshRecButtons();
+    };
+    _recMR.start();
+    btn.classList.add('recording'); btn.classList.remove('has-rec'); btn.textContent='⏹';
+    showToast(_rLang()==='en'?'🔴 Recording… tap again to stop':'🔴 מקליט… לחץ שוב לעצירה');
+  } catch(e) { showToast(_rLang()==='en'?'Microphone permission denied':'אין הרשאת מיקרופון'); _recActive=null; _recMR=null; }
+}
+function _recStopAndSave() { if (_recMR) { try { _recMR.stop(); } catch(e){} } }
+
+async function delRec(verseNum, btn) {
+  // לחיצה ימנית / לחיצה ארוכה — מחיקת הקלטה
+  if (!btn.classList.contains('has-rec')) return false;
+  try { await _recDelete(_recKey(verseNum)); showToast(_rLang()==='en'?'🗑 Recording deleted':'🗑 ההקלטה נמחקה'); refreshRecButtons(); } catch(e){}
+  return false; // מנע תפריט הקשר
+}
+// לחיצה ארוכה במגע = מחיקה
+(function _recLongPress(){
+  let t=null;
+  document.addEventListener('touchstart', e=>{
+    const b=e.target.closest && e.target.closest('.verse-rec-btn.has-rec');
+    if(!b) return;
+    t=setTimeout(()=>{ const vn=b.id.replace('rec_',''); delRec(parseInt(vn,10), b); t=null; }, 650);
+  }, {passive:true});
+  document.addEventListener('touchend', ()=>{ if(t){ clearTimeout(t); t=null; } }, {passive:true});
+})();
+window.addEventListener('pagehide', ()=>{ if(_recMR){ try{_recMR.stop();}catch(e){} } if(_recAudio){ try{_recAudio.pause();}catch(e){} } });
 
 function toggleShinunMode() {
   shinunActive = !shinunActive;
