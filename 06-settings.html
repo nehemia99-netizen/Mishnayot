@@ -60,6 +60,7 @@ html.dark .group{box-shadow:none;}
 
 /* Select */
 .sel{font-size:13px;border:.5px solid var(--border);border-radius:20px;padding:5px 10px;background:var(--primary-light);color:var(--primary);-webkit-appearance:none;cursor:pointer;}
+#selTtsVoice{max-width:120px;text-align:left;direction:ltr;text-overflow:ellipsis;}
 
 /* Hourly expand */
 .rem-expand{display:none;padding:10px 16px 14px;border-top:.5px solid var(--border-row);background:var(--surface);}
@@ -409,7 +410,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.5.11 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.12 BETA · © 2026</div>
 </div>
 
 <script>
@@ -487,10 +488,11 @@ function populateTtsVoices() {
   const isFem = n => /carmit|female|woman|girl|נקב|אישה|נשי/i.test(n || '');
   const males   = voices.filter(v => !isFem(v.name));
   const females = voices.filter(v => isFem(v.name));
-  let opts = '<option value="male">קול גברי (ברירת מחדל)</option>';
-  males.forEach(v   => opts += '<option value="' + v.name + '">' + v.name + '</option>');
-  females.forEach(v => opts += '<option value="' + v.name + '">' + v.name + ' (נשי)</option>');
-  opts += '<option value="female">קול נשי</option>';
+  const shortName = n => (n||'').replace(/^(Microsoft|Google|Apple)\s+/i,'').replace(/\s*[-(].*$/,'').trim() || n;
+  let opts = '<option value="male">גברי ✓</option>';
+  males.forEach(v   => opts += '<option value="' + v.name + '">' + shortName(v.name) + '</option>');
+  females.forEach(v => opts += '<option value="' + v.name + '">' + shortName(v.name) + '</option>');
+  opts += '<option value="female">נשי</option>';
   sel.innerHTML = opts;
   sel.value = cur;
   if (sel.value !== cur) sel.value = 'male'; // אם הקול שנשמר אינו זמין יותר

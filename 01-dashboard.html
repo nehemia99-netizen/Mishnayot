@@ -561,7 +561,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.11 BETA</div>
+          <div class="app-version">גרסה 1.5.12 BETA</div>
         </div>
       </div>
     </div>
@@ -1055,7 +1055,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       return;
     }
     const _mc = S.get('tehillim_my_chapter');
-    if (!_mc || typeof _mc !== 'number' || _mc < 1 || _mc > 150) return;
+    if (!_mc) return;
     const freq = (S.get('tehillim_settings')||{}).myChapterBannerFreq || 'daily';
     // always = פעם אחת לכל session (לא כל לחיצת בית)
     // daily = פעם אחת ביום
@@ -1292,9 +1292,17 @@ window.openBlessingDirect = function(which) {
   }, 150);
 };
 
+function _myChapLabel(id){
+  if (typeof Corpus==='undefined') return '';
+  const p = Corpus.parseChapId(String(id)); if(!p) return '';
+  const t = Corpus.getTractate(p.tractate); if(!t) return '';
+  const g = (typeof toGematria==='function') ? toGematria(p.perek) : p.perek;
+  return t.he + ' · פרק ' + g;
+}
 function showMyChapterBanner() {
   const myChap = S.get('tehillim_my_chapter');
-  if (!myChap || typeof myChap !== 'number' || myChap < 1 || myChap > 150) return;
+  const label = _myChapLabel(myChap);
+  if (!myChap || !label) return;
   const existing = document.getElementById('_myChapBanner');
   if (existing) existing.remove();
   const d = document.createElement('div');
@@ -1303,11 +1311,11 @@ function showMyChapterBanner() {
   const inner = document.createElement('div');
   inner.style.cssText = 'background:var(--card);border-radius:22px;padding:28px 24px;max-width:320px;width:88%;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.3);';
   inner.innerHTML = '<div style="font-size:44px;margin-bottom:8px;">⭐</div>'
-    + '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:6px;">הפרק שלי — פרק ' + myChap + '</div>'
-    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">זה הפרק שבחרת לקרוא. רוצה לקרוא אותו עכשיו?</div>'
+    + '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:6px;">הפרק שלי — ' + label + '</div>'
+    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">זה הפרק שבחרת ללמוד. רוצה ללמוד אותו עכשיו?</div>'
     + '<div style="display:flex;gap:10px;justify-content:center;">'
     + '<button onclick="document.getElementById(\'_myChapBanner\').remove()" style="flex:1;padding:11px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">אחר כך</button>'
-    + '<button onclick="document.getElementById(\'_myChapBanner\').remove();location.href=\'03-reader.html?chap=' + myChap + '&mode=normal\'" style="flex:2;padding:11px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">קרא עכשיו ←</button>'
+    + '<button onclick="document.getElementById(\'_myChapBanner\').remove();location.href=\'03-reader.html?chap=' + encodeURIComponent(myChap) + '&mode=normal\'" style="flex:2;padding:11px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">למד עכשיו ←</button>'
     + '</div>';
   d.appendChild(inner);
   d.onclick = function(e){ if(e.target===d) d.remove(); };

@@ -412,10 +412,10 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div class="legend-row"><span>🌟 כל 525 הפרקים</span><span class="legend-pts">500</span></div>
         <div class="legend-row"><span>📅 סיום פרקי היום (לפי לוח עברי)</span><span class="legend-pts">50</span></div>
         <div class="legend-row"><span>🏆 השלמת אתגר</span><span class="legend-pts">5-200</span></div>
-        <div class="legend-row"><span>🥉 מדליית ארד (פרק ביום)</span><span class="legend-pts">10</span></div>
-        <div class="legend-row"><span>🥈 מדליית כסף (3 פרקים)</span><span class="legend-pts">20</span></div>
-        <div class="legend-row"><span>🥇 מדליית זהב (5 פרקים)</span><span class="legend-pts">35</span></div>
-        <div class="legend-row"><span>💎 מדליית פלטינה (10 פרקים)</span><span class="legend-pts">50</span></div>
+        <div class="legend-row"><span>🥉 מדליית ארד (3 פרקים ביום)</span><span class="legend-pts">10</span></div>
+        <div class="legend-row"><span>🥈 מדליית כסף (6 פרקים)</span><span class="legend-pts">20</span></div>
+        <div class="legend-row"><span>🥇 מדליית זהב (9 פרקים)</span><span class="legend-pts">35</span></div>
+        <div class="legend-row"><span>💎 מדליית פלטינה (12 פרקים)</span><span class="legend-pts">50</span></div>
         <div class="legend-row"><span>🎯 10 מדליות מאותו סוג (×4)</span><span class="legend-pts">100</span></div>
         <div class="legend-row"><span>🧠 שינון: 5/10/15/20/25 פרקים</span><span class="legend-pts">80/200/300/400/500</span></div>
         <div class="legend-row"><span>🧠 שינון: כל 5 פרקים נוספים</span><span class="legend-pts">+100</span></div>
@@ -448,34 +448,34 @@ if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classLis
 /* ── Medal definitions ── */
 const MEDALS = [
   {
-    level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minChaps:1, bonus:10,
+    level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minChaps:3, bonus:10,
     color:'#CD7F32', bg:'#FFF8F0', textColor:'#7A4A00',
-    achievement:'למדת פרק משנה ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
-    achievementEn:'You studied a chapter of Mishnah in one day! Every small step in Torah is the beginning of a great journey.',
+    achievement:'למדת 3 פרקי משנה ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
+    achievementEn:'You studied 3 chapters of Mishnah in one day! Every small step in Torah is the beginning of a great journey.',
     quote:'לֹא עָלֶיךָ הַמְּלָאכָה לִגְמֹר\nוְלֹא אַתָּה בֶן חוֹרִין לִבָּטֵל מִמֶּנָּה',
     ref:'אבות ב׳:ט״ז'
   },
   {
-    level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minChaps:3, bonus:20,
+    level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minChaps:6, bonus:20,
     color:'#909098', bg:'#F8F8FF', textColor:'#404055',
-    achievement:'למדת 3 פרקי משנה ביום אחד! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
-    achievementEn:'You studied 3 chapters of Mishnah in one day! Your devotion brings blessing to your soul and to all of Israel.',
+    achievement:'למדת 6 פרקי משנה ביום אחד! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
+    achievementEn:'You studied 6 chapters of Mishnah in one day! Your devotion brings blessing to your soul and to all of Israel.',
     quote:'שְׁנַיִם שֶׁיּוֹשְׁבִין וְיֵשׁ בֵּינֵיהֶם דִּבְרֵי תוֹרָה\nשְׁכִינָה שְׁרוּיָה בֵינֵיהֶם',
     ref:'אבות ג׳:ב׳'
   },
   {
-    level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minChaps:5, bonus:35,
+    level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minChaps:9, bonus:35,
     color:'#C8A800', bg:'#FFFBF0', textColor:'#6A5500',
-    achievement:'למדת 5 פרקי משנה ביום אחד! הישג מרשים. אתה בנתיב של גדולי ישראל.',
-    achievementEn:'You studied 5 chapters of Mishnah in one day! An impressive achievement. You walk in the path of the greats.',
+    achievement:'למדת 9 פרקי משנה ביום אחד! הישג מרשים. אתה בנתיב של גדולי ישראל.',
+    achievementEn:'You studied 9 chapters of Mishnah in one day! An impressive achievement. You walk in the path of the greats.',
     quote:'וֶהֱוֵי מִתְאַבֵּק בַּעֲפַר רַגְלֵיהֶם\nוְשׁוֹתֶה בְצָמָא אֶת דִּבְרֵיהֶם',
     ref:'אבות א׳:ד׳'
   },
   {
-    level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minChaps:10, bonus:50,
+    level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minChaps:12, bonus:50,
     color:'#5A9E68', bg:'#F0F8FF', textColor:'#18441F',
-    achievement:'למדת 10 פרקי משנה ביום אחד! הישג יוצא מהכלל. עמלך במשנה הוא אוצר אמיתי שאין כמוהו.',
-    achievementEn:'You studied 10 chapters of Mishnah in one day! An extraordinary achievement. Your toil in Mishnah is a true treasure beyond compare.',
+    achievement:'למדת 12 פרקי משנה ביום אחד! הישג יוצא מהכלל. עמלך במשנה הוא אוצר אמיתי שאין כמוהו.',
+    achievementEn:'You studied 12 chapters of Mishnah in one day! An extraordinary achievement. Your toil in Mishnah is a true treasure beyond compare.',
     quote:'אֵין מְלַוִּין לוֹ לְאָדָם בִּשְׁעַת פְּטִירָתוֹ\nלֹא כֶסֶף וְלֹא זָהָב — אֶלָּא תוֹרָה',
     ref:'אבות ו׳:ט׳'
   }

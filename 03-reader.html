@@ -919,6 +919,7 @@ function openPicker() {
     '<div class="chap-picker-title">' + (_pkEn ? ('Chapter — ' + _tName) : ('בחר פרק — ' + _tName)) + '</div>' +
     '<div class="chap-grid" id="chapGrid"></div>' +
     '<a class="picker-close" href="02-selection.html" style="text-decoration:none;display:block;text-align:center;">' + (_pkEn ? 'Other tractate ▾' : 'מסכת אחרת ▾') + '</a>' +
+    '<button class="picker-close" onclick="setMyChapter()" style="color:#C07A00;border-color:#E0C080;">' + (_pkEn ? '⭐ Set as "My chapter"' : '⭐ קבע כ״הפרק שלי״') + '</button>' +
     '<button class="picker-close" onclick="closePicker()">' + (_pkEn ? 'Close' : 'סגור') + '</button>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -942,6 +943,12 @@ function openPicker() {
   if (activeCell) activeCell.scrollIntoView({ block: 'center' });
 }
 
+function setMyChapter() {
+  S.set('tehillim_my_chapter', curId());
+  closePicker();
+  const t = curTractateObj();
+  showToast(_rLang()==='en' ? '⭐ Set as your chapter' : '⭐ נקבע כ״הפרק שלי״: ' + (t?t.he:'') + ' ' + toGematria(chapNum));
+}
 function closePicker() {
   const p = document.getElementById('chapPicker');
   if (p) p.remove();
@@ -1853,10 +1860,10 @@ function retryMissed() {
 
 /* ── Medal system ── */
 const MEDALS_DEF = [
-  { level:'platinum', label:'פלטינה', emoji:'💎', minChaps:10, color:'#5A9E68', bonus:50 },
-  { level:'gold',     label:'זהב',    emoji:'🥇', minChaps: 5, color:'#C8A800', bonus:35 },
-  { level:'silver',   label:'כסף',    emoji:'🥈', minChaps: 3, color:'#909098', bonus:20 },
-  { level:'bronze',   label:'ארד',    emoji:'🥉', minChaps: 1, color:'#CD7F32', bonus:10 },
+  { level:'platinum', label:'פלטינה', emoji:'💎', minChaps:12, color:'#5A9E68', bonus:50 },
+  { level:'gold',     label:'זהב',    emoji:'🥇', minChaps: 9, color:'#C8A800', bonus:35 },
+  { level:'silver',   label:'כסף',    emoji:'🥈', minChaps: 6, color:'#909098', bonus:20 },
+  { level:'bronze',   label:'ארד',    emoji:'🥉', minChaps: 3, color:'#CD7F32', bonus:10 },
 ];
 const MEDAL_RANK = { bronze:1, silver:2, gold:3, platinum:4 };
 
