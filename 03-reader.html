@@ -590,7 +590,7 @@ function renderVerses(verses, commData) {
     }
   }
 
-  const commLabel = commentaryType === 'rashi' ? 'רש"י' : 'מצודת דוד';
+  const commLabel = commentaryType === 'tosafot' ? 'תוספות יו"ט' : 'ברטנורא';
   const savedVerses = S.get(SAVED_KEY) || [];
   // שמור פסוקים מסוננים למיפוי
   const _versesToRender = filteredVerses;
@@ -1721,7 +1721,7 @@ function showMedalPopup(m) {
       '<span class="medal-popup-emoji">' + m.emoji + '</span>' +
       '<div class="medal-popup-title">מדליה חדשה!</div>' +
       '<div class="medal-popup-name" style="color:' + m.color + '">מדליית ' + m.label + '</div>' +
-      '<div class="medal-popup-desc">צברת ' + m.minMin + '+ דקות קריאת תהילים היום 🎉</div>' +
+      '<div class="medal-popup-desc">צברת ' + m.minMin + '+ דקות לימוד משנה היום 🎉</div>' +
       '<div class="medal-popup-btns">' +
         '<button class="medal-popup-close" onclick="closeMedalPopup()">המשך קריאה</button>' +
         '<button class="medal-popup-cert" style="background:' + m.color + '" onclick="viewMedalCert(\'' + m.level + '\')">צפה בתעודה ✨</button>' +

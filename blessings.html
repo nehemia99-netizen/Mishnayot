@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-משניון — ברכות ותפילות</title>
+<title>משניון — ברכות ותפילות</title>
+<script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="bottomnav.js?v=2.2.0"></script>
 <style>
@@ -35,6 +36,7 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .blessing-item.open .blessing-arrow{transform:rotate(90deg);}
 .blessing-body{display:none;padding:0 16px 16px;font-size:15px;color:var(--text);line-height:1.9;font-family:'David Libre','David','Times New Roman',serif;}
 .blessing-item.open .blessing-body{display:block;}
+.group-header{padding:11px 16px 9px;font-size:12px;font-weight:800;color:var(--text-muted);letter-spacing:.4px;background:var(--surface);border-bottom:.5px solid var(--border);}
 </style>
 <script>
 /* ── dark mode pre-render ── */
@@ -59,37 +61,39 @@ try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.d
 
   <div class="blessing-list">
 
-    <!-- b1: לפני קריאת תהילים -->
+    <div class="group-header">📖 לימוד משנה</div>
+    <!-- b1: לפני לימוד משנה -->
     <div class="blessing-item" id="b1">
       <div class="blessing-header" onclick="toggleBlessing('b1')">
-        <span class="blessing-title">לפני קריאת תהילים</span>
+        <span class="blessing-title">לפני לימוד משנה</span>
         <span class="blessing-arrow">›</span>
       </div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁיְּהֵא חָשׁוּב וּמְקֻבָּל וְנָעִים לְפָנֶיךָ מִקְרָא מִזְמוֹרֵי תְהִלִּים שֶׁאֲנִי קוֹרֵא, כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם. וּכְשֵׁם שֶׁלֹּא הִגִּיעַ אֵלָיו דִּבַּת מְשַׁנְּאָיו, כֵּן לֹא תַגִּיעַ עָלֵינוּ דִּבַּת שׂוֹנְאֵינוּ. וּבִזְכוּת מִזְמוֹרֵי תְהִלִּים שֶׁאֲנוּ קוֹרְאִים תַּצִּילֵנוּ מֵרוּחוֹת רָעוֹת וּמִמַּזִּיקִים, וּמִכָּל צָרָה וְצוּקָה, וּתְקַבֵּל תְּפִלּוֹתֵינוּ בְּרַחֲמִים וּבְרָצוֹן. אָמֵן.
+      <div class="blessing-body">לְשֵׁם יִחוּד קֻדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּיהּ, הֲרֵינִי בָּא לִלְמֹד מִשְׁנָה לִשְׁמָהּ.<br><br>יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁתָּכִין לְבָבִי וְתָאִיר עֵינַי בְּתַלְמוּד תּוֹרָתֶךָ, וְתִתֶּן בְּלִבִּי בִּינָה לְהָבִין וּלְהַשְׂכִּיל, לִשְׁמֹעַ לִלְמֹד וּלְלַמֵּד, לִשְׁמֹר וְלַעֲשׂוֹת. וְיִהְיוּ דִּבְרֵי הַמִּשְׁנָה שֶׁאֲנִי לוֹמֵד חֲשׁוּבִים וּמְקֻבָּלִים לְפָנֶיךָ, וְזַכֵּנִי שֶׁתְּהֵא תּוֹרָתְךָ אֻמָּנוּתִי. אָמֵן.
         <div style="padding-top:12px;text-align:center;">
-          <button onclick="goDailyChapter()" style="width:100%;padding:13px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 קרא פרק היום ←</button>
+          <button onclick="goDailyChapter()" style="width:100%;padding:13px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 למד משנה היום ←</button>
         </div>
       </div>
     </div>
 
-    <!-- b2: אחרי קריאת תהילים -->
+    <!-- b2: אחרי לימוד משנה (חותם המשנה) -->
     <div class="blessing-item" id="b2">
       <div class="blessing-header" onclick="toggleBlessing('b2')">
-        <span class="blessing-title">אחרי קריאת תהילים</span>
+        <span class="blessing-title">אחרי לימוד משנה</span>
         <span class="blessing-arrow">›</span>
       </div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁמִּזְמוֹרֵי תְהִלִּים שֶׁקָּרָאתִי יִהְיוּ כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם בְּעַצְמוֹ. וְיַעֲלוּ לְפָנֶיךָ כְּרֵיחַ נִיחוֹחַ וִיכַפְּרוּ עַל כָּל עֲוֹנוֹתַי וּפְשָׁעַי, וְיִהְיֶה לֵב מַלְכֻיּוֹת פָּנוּי לְטוֹבָה לְיִשְׂרָאֵל, וּתְמַלֵּא כָּל מִשְׁאֲלוֹת לְבָבֵנוּ לְטוֹבָה. אָמֵן.</div>
+      <div class="blessing-body">רַבִּי חֲנַנְיָא בֶּן עֲקַשְׁיָא אוֹמֵר: רָצָה הַקָּדוֹשׁ בָּרוּךְ הוּא לְזַכּוֹת אֶת יִשְׂרָאֵל, לְפִיכָךְ הִרְבָּה לָהֶם תּוֹרָה וּמִצְוֹת, שֶׁנֶּאֱמַר: ה' חָפֵץ לְמַעַן צִדְקוֹ יַגְדִּיל תּוֹרָה וְיַאְדִּיר.<br><br><span style="font-size:12px;color:var(--text-muted)">— מכות ג׳:ט״ז · הנאמר בסיום לימוד משנה</span></div>
     </div>
 
-    <!-- b8: יהי רצון החיד"א -->
+    <!-- b8: יהי רצון אחרי לימוד משנה -->
     <div class="blessing-item" id="b8">
       <div class="blessing-header" onclick="toggleBlessing('b8')">
-        <span class="blessing-title">יהי רצון של החיד"א (אחרי הקריאה)</span>
+        <span class="blessing-title">יהי רצון (אחרי לימוד משנה)</span>
         <span class="blessing-arrow">›</span>
       </div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, הַבּוֹחֵר בְּדָוִד עַבְדּוֹ וּבְזַרְעוֹ אַחֲרָיו, וְהַבּוֹחֵר בְּשִׁירוֹת וְתִשְׁבָּחוֹת, שֶׁתֵּפֶן בְּרַחֲמִים אֶל קְרִיאַת מִזְמוֹרֵי תְהִלִּים שֶׁאֶקְרָא, כְּאִלּוּ אֲמָרָם דָּוִד מֶלֶךְ יִשְׂרָאֵל בְּעַצְמוֹ, זְכוּתוֹ יָגֵן עָלֵינוּ.<br><br>וְיַעֲמוֹד לָנוּ זְכוּת פְּסוּקֵי מִזְמוֹרֵי תְהִלִּים וּזְכוּת תֵּבוֹתֵיהֶם וְאוֹתִיּוֹתֵיהֶם וּנְקֻדּוֹתֵיהֶם וְטַעֲמֵיהֶם, וְהַשֵּׁמוֹת הַיּוֹצְאִים מֵהֶם מֵרָאשֵׁי תֵּבוֹת וּמִסּוֹפֵי תֵּבוֹת, לְכַפֵּר פְּשָׁעֵינוּ וַעֲוֹנוֹתֵינוּ וְחַטֹּאתֵינוּ, וּלְזַמֵּר עָרִיצִים וּלְהַכְרִית כָּל הַחוֹחִים וְהַקּוֹצִים הַסּוֹבְבִים אֶת הַשּׁוֹשַׁנָּה הָעֶלְיוֹנָה, וּלְחַבֵּר אֵשֶׁת נְעוּרִים עִם דּוֹדָהּ בְּאַהֲבָה וְאַחֲוָה וְרֵעוּת.<br><br>וּמִשָּׁם יִמָּשֵׁךְ לָנוּ שֶׁפַע לְנֶפֶשׁ רוּחַ וּנְשָׁמָה לְטַהֲרֵנוּ מֵעֲוֹנוֹתֵינוּ וְלִסְלוֹחַ חַטֹּאתֵינוּ וּלְכַפֵּר פְּשָׁעֵינוּ, כְּמוֹ שֶׁסָּלַחְתָּ לְדָוִד שֶׁאָמַר מִזְמוֹרִים אֵלּוּ לְפָנֶיךָ.<br><br>וְאַל תִּקָּחֵנוּ מֵהָעוֹלָם הַזֶּה קוֹדֶם זְמַנֵּנוּ, עַד מְלֹאת שְׁנוֹתֵינוּ — בָּהֶם שִׁבְעִים שָׁנָה — בְּאוֹפֶן שֶׁנּוּכַל לְתַקֵּן אֶת אֲשֶׁר שִׁחַתְנוּ. וּזְכוּת דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם יָגֵן עָלֵינוּ. אָמֵן סֶלָה.<br><br><span style="font-size:12px;color:var(--text-muted)">— "יהי רצון" של מרן החיד"א, רבי חיים יוסף דוד אזולאי זצ"ל</span></div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁתְּהֵא הַמִּשְׁנָה הַזֹּאת שֶׁלָּמַדְתִּי חֲשׁוּבָה וּמְקֻבֶּלֶת לְפָנֶיךָ, וְתַעֲלֶה לְךָ לְרָצוֹן כְּקָרְבָּן, וּזְכוּת הַתַּנָּאִים הַקְּדוֹשִׁים יַעֲמֹד לִי וּלְכָל יִשְׂרָאֵל.<br><br>וְזַכֵּנִי לִלְמֹד וּלְלַמֵּד, לִשְׁמֹר וְלַעֲשׂוֹת וּלְקַיֵּם אֶת כָּל דִּבְרֵי תַלְמוּד תּוֹרָתֶךָ בְּאַהֲבָה. וְהָאֵר עֵינַי בְּתוֹרָתֶךָ, וְדַבֵּק לִבִּי בְּמִצְוֹתֶיךָ, וְיַחֵד לְבָבִי לְאַהֲבָה וּלְיִרְאָה אֶת שְׁמֶךָ. אָמֵן.</div>
     </div>
 
+    <div class="group-header">🗓️ לימוד יומי</div>
     <!-- b10: פרקי אבות -->
     <div class="blessing-item" id="b10">
       <div class="blessing-header" onclick="toggleBlessing('b10')">
@@ -108,6 +112,33 @@ try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.d
       </div>
     </div>
 
+    <!-- b11: מצווה יומית רמב"ם -->
+    <div class="blessing-item" id="b11">
+      <div class="blessing-header" onclick="toggleBlessing('b11')">
+        <span class="blessing-title">📚 מצווה יומית — הרמב"ם</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div id="rambamDailyInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border-radius:8px;border-right:3px solid var(--primary);">מצוות הרמב"ם — סיבוב חודשי</div>
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px;text-align:center;" id="rambamRef"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;text-align:center;" id="rambamName"></div>
+        <div id="rambamText" style="line-height:1.9;font-family:'David Libre','Times New Roman',serif;text-align:right;color:var(--text);"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:.5px solid var(--border);">
+          <div style="display:flex;gap:6px;">
+            <button onclick="navRambam(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">‹ קודם</button>
+            <button onclick="resetRambamToday()" style="background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:11px;padding:5px 10px;border-radius:14px;cursor:pointer;font-family:inherit;">📅 היום</button>
+            <button onclick="navRambam(1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">הבא ›</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button onclick="changeRambamFont(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">−</button>
+            <span id="rambamFontVal" style="font-size:11px;color:var(--text-muted);min-width:28px;text-align:center;">15px</span>
+            <button onclick="changeRambamFont(+1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="group-header">🙏 ברכות ותפילות</div>
     <!-- b3: מי שברך לחולים -->
     <div class="blessing-item" id="b3">
       <div class="blessing-header" onclick="toggleBlessing('b3')">
@@ -160,32 +191,6 @@ try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.d
         <span class="blessing-arrow">›</span>
       </div>
       <div class="blessing-body" style="line-height:2;font-family:'David Libre','Times New Roman',serif;">"שְׁמַע בְּנִי מוּסַר אָבִיךָ, וְאַל תִּטֹּשׁ תּוֹרַת אִמֶּךָ".<br><br>תִּתְנַהֵג תָּמִיד לְדַבֵּר כָּל דְּבָרֶיךָ בְּנַחַת, לְכָל אָדָם וּבְכָל עֵת, וּבַזֶּה תִּנָּצֵל מִן הַכַּעַס, שֶׁהִיא מִדָּה רָעָה לְהַחְטִיא בְּנֵי אָדָם. וְכֵן אָמְרוּ רַבּוֹתֵינוּ ז"ל: כָּל הַכּוֹעֵס – כָּל מִינֵי גֵיהִנּוֹם שׁוֹלְטִים בּוֹ, שֶׁנֶּאֱמַר: "וְהָסֵר כַּעַס מִלִּבֶּךָ, וְהַעֲבֵר רָעָה מִבְּשָׂרֶךָ". וְאֵין "רָעָה" אֶלָּא גֵיהִנּוֹם, שֶׁנֶּאֱמַר: "וְגַם רָשָׁע לְיוֹם רָעָה".<br><br>וְכַאֲשֶׁר תִּנָּצֵל מִן הַכַּעַס, תַּעֲלֶה עַל לִבְּךָ מִדַּת הָעֲנָוָה, שֶׁהִיא מִדָּה טוֹבָה מִכָּל מִדּוֹת טוֹבוֹת, שֶׁנֶּאֱמַר: "עֵקֶב עֲנָוָה, יִרְאַת ה'". וּבַעֲבוּר הָעֲנָוָה, תַּעֲלֶה עַל לִבְּךָ מִדַּת הַיִּרְאָה, כִּי תִתֵּן אֶל לִבְּךָ תָּמִיד: מֵאַיִן בָּאתָ, וּלְאַן אַתָּה הוֹלֵךְ; וְשֶׁאַתָּה רִמָּה וְתוֹלֵעָה בְּחַיֶּיךָ, וְאַף כִּי בְּמוֹתָךְ; וְלִפְנֵי מִי אַתָּה עָתִיד לִתֵּן דִּין וְחֶשְׁבּוֹן – לִפְנֵי מֶלֶךְ הַכָּבוֹד, שֶׁנֶּאֱמַר: "הִנֵּה הַשָּׁמַיִם וּשְׁמֵי הַשָׁמַיִם לֹא יְכַלְכְּלוּךָ", אַף כִּי לִבּוֹת בְּנֵי אָדָם. וְנֶאֱמַר: "הֲלֹא אֵת הַשָׁמַיִם וְאֵת הָאָרֶץ אֲנִי מָלֵא, נְאֻם ה'". וְכַאֲשֶׁר תַּחֲשֹׁב אֶת כָּל אֵלֶּה, תִּירָא מִבּוֹרְאֶךָ וְתִשָּׁמֵר מִן הַחֵטְא. וּבַמִּדוֹת הָאֵלֶּה תִּהְיֶה שָׂמֵחַ בְּחֶלְקֶךָ.<br><br>וְכַאֲשֶׁר תִּתְנַהֵג בְּמִדַּת הָעֲנָוָה לְהִתְבּוֹשֵׁשׁ מִכָּל אָדָם, וּלְהִתְפַּחֵד מִמֶּנּוּ וּמִן הַחֵטְא – אָז תִּשְׁרֶה עָלֶיךָ רוּחַ הַשְּׁכִינָה, וְזִיו כְּבוֹדָהּ, וְחַיֵּי עוֹלָם הַבָּא.<br><br>וְעַתָּה, בְּנִי, דַע וּרְאֵה כִּי הַמִּתְגָּאֶה בְּלִבּוֹ עַל הַבְּרִיוֹת – מוֹרֵד הוּא בְּמַלְכוּת שָׁמַיִם, כִּי מִתְפָּאֵר הוּא בִּלְבוּשׁ מַלְכוּת שָׁמַיִם, שֶׁנֶּאֱמַר: "ה' מָלָךְ גֵּאוּת לָבֵשׁ". וּבַמֶּה יִתְגָּאֶה לֵב הָאָדָם? אִם בְּעֹשֶׁר – "ה' מוֹרִישׁ וּמַעֲשִׁיר". וְאִם בְּכָבוֹד – הֲלֹא לֵאלֹהִים הוּא, שֶׁנֶּאֱמַר: "וְהָעֹשֶׁר וְהַכָּבוֹד מִלְפָנֶיךָ". וְאִם מִתְפָּאֵר בְּחָכְמָה: "מֵסִיר שָׂפָה לְנֶאֱמָנִים, וְטַעַם זְקֵנִים יִקַּח". נִמְצָא: הַכֹּל שָׁוֶה לִפְנֵי הַמָּקוֹם, כִּי בְאַפּוֹ מַשְׁפִּיל גֵּאִים, וּבִרְצוֹנוֹ מַגְבִּיהַ שְׁפָלִים. לָכֵן הַשְׁפֵּל עַצְמְךָ, וִינַשְּׂאֲךָ הַמָּקוֹם.<br><br>עַל כֵּן אֲפָרֵשׁ לְךָ אֵיךְ תִּתְנַהֵג בְּמִדַּת הָעֲנָוָה, לָלֶכֶת בָּהּ תָּמִיד: כָּל דְּבָרֶיךָ יִהְיוּ בְּנַחַת, וְרֹאשְׁךָ כָּפוּף; וְעֵינֶיךָ יַבִּיטוּ לְמַטָּה לָאָרֶץ, וְלִבְּךָ לְמַעְלָה; וְאַל תַּבִּיט בִּפְנֵי אָדָם בְּדַבֶּרְךָ עִמּוֹ. וְכָל אָדָם יִהְיֶה גָּדוֹל מִמְּךָ בְּעֵינֶיךָ: אִם חָכָם אוֹ עָשִׁיר הוּא – עָלֶיךָ לְכַבְּדוֹ. וְאִם רָשׁ הוּא, וְאַתָּה עָשִׁיר אוֹ חָכָם מִמֶּנּוּ – חֲשֹׁב בְּלִבְּךָ כִּי אַתָּה חַיָּב מִמֶּנּוּ, וְהוּא זַכַּאי מִמְּךָ. שֶׁאִם הוּא חוֹטֵא – הוּא שׁוֹגֵג, וְאַתָּה מֵזִיד.<br><br>בְּכָל דְּבָרֶיךָ וּמַעֲשֶׂיךָ וּמַחְשְׁבוֹתֶיךָ, וּבְכָל עֵת – חֲשׁוֹב בְּלִבְּךָ כְּאִלּוּ אַתָּה עוֹמֵד לִפְנֵי הַקָּדוֹשׁ בָּרוּךְ הוּא, וּשְׁכִינָתוֹ עָלֶיךָ, כִּי כְּבוֹדוֹ מָלֵא הָעוֹלָם. וּדְבָרֶיךָ יִהְיוּ בְּאֵימָה וּבְיִרְאָה, כְּעֶבֶד לִפְנֵי רַבּוֹ. וְתִתְבַּיֵּשׁ מִכָּל אָדָם. וְאִם יִקְרָאֲךָ אִישׁ – אַל תַּעֲנֵהוּ בְּקוֹל רָם, רַק בְּנַחַת כְּעוֹמֵד לִפְנֵי רַבּוֹ.<br><br>וֶהֱוֵי זָהִיר לִקְרוֹת בַּתּוֹרָה תָּמִיד, אֲשֶׁר תּוּכַל לְקַיְּמָהּ. וְכַאֲשֶׁר תָּקוּם מִן הַסֵּפֶר – תְּחַפֵּשׂ בַּאֲשֶׁר לָמַדְתָּ אִם יֵשׁ בּוֹ דָבָר אֲשֶׁר תּוּכַל לְקַיְּמוֹ. וּתְפַשְׁפֵּשׁ בְּמַעֲשֶׂיךָ בַּבֹּקֶר וּבָעֶרֶב, וּבָזֶה יִהְיוּ כָּל יָמֶיךָ בִּתְשׁוּבָה.<br><br>וְהָסֵר כָּל דִּבְרֵי הָעוֹלָם מִלִּבְּךָ בְּעֵת הַתְּפִלָּה, וְהָכֵן לִבְּךָ לִפְנֵי הַמָּקוֹם בָּרוּךְ הוּא. וְטַהֵר רַעְיוֹנֶיךָ, וַחֲשֹׁב הַדִּבּוּר קֹדֶם שֶׁתּוֹצִיאֶנּוּ מִפִּיךָ. וְכֵן תַּעֲשֶׂה כָּל יְמֵי חַיֵּי הֶבְלֶךָ בְּכָל דָּבָר וְדָבָר, וְלֹא תֶחֱטָא. וּבָזֶה יִהְיוּ דְּבָרֶיךָ וּמַעֲשֶׂיךָ וּמַחְשְׁבוֹתֶיךָ יְשָׁרִים; וּתְפִלָּתְךָ תִּהְיֶה זַכָּה וּבָרָה וּנְקִיָּה, וּמְכֻוֶּנֶת וּמְקֻבֶּלֶת לִפְנֵי הַמָּקוֹם בָּרוּךְ הוּא, שֶׁנֶּאֱמַר: "תָּכִין לִבָּם – תַּקְשִׁיב אָזְנֶךָ".<br><br>תִּקְרָא הָאִגֶּרֶת הַזֹּאת פַּעַם אַחַת בְּשָׁבוּעַ וְלֹא תִפְחֹת, לְקַיְּמָהּ וְלָלֶכֶת בָּהּ תָּמִיד אַחַר הַשֵּׁם יִתְבָּרַךְ. לְמַעַן תַּצְלִיחַ בְּכָל דְּרָכֶיךָ, וְתִזְכֶּה לָעוֹלָם הַבָּא הַצָּפוּן לַצַּדִּיקִים. וּבְכָל יוֹם שֶׁתִּקְרָאֶנָּה – יַעֲנוּךָ מִן הַשָּׁמַיִם כַּאֲשֶׁר יַעֲלֶה עַל לִבְּךָ לִשְׁאֹל, עַד עוֹלָם.<br><br><strong>אָמֵן סֶלָה.</strong><br><br><span style="font-size:12px;color:var(--text-muted)">— כְּתָבָהּ רַבֵּנוּ מֹשֶׁה בֶּן נַחְמָן (הָרַמְבַּ"ן) לִבְנוֹ, ספרד, ~1275</span></div>
-    </div>
-
-    <!-- b11: מצווה יומית רמב"ם -->
-    <div class="blessing-item" id="b11">
-      <div class="blessing-header" onclick="toggleBlessing('b11')">
-        <span class="blessing-title">📚 מצווה יומית — הרמב"ם</span>
-        <span class="blessing-arrow">›</span>
-      </div>
-      <div class="blessing-body">
-        <div id="rambamDailyInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border-radius:8px;border-right:3px solid var(--primary);">מצוות הרמב"ם — סיבוב חודשי</div>
-        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px;text-align:center;" id="rambamRef"></div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;text-align:center;" id="rambamName"></div>
-        <div id="rambamText" style="line-height:1.9;font-family:'David Libre','Times New Roman',serif;text-align:right;color:var(--text);"></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:.5px solid var(--border);">
-          <div style="display:flex;gap:6px;">
-            <button onclick="navRambam(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">‹ קודם</button>
-            <button onclick="resetRambamToday()" style="background:var(--primary-light);border:.5px solid var(--primary);color:var(--primary);font-size:11px;padding:5px 10px;border-radius:14px;cursor:pointer;font-family:inherit;">📅 היום</button>
-            <button onclick="navRambam(1)" style="background:transparent;border:.5px solid var(--border);border-radius:14px;padding:5px 12px;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:inherit;">הבא ›</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px;">
-            <button onclick="changeRambamFont(-1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">−</button>
-            <span id="rambamFontVal" style="font-size:11px;color:var(--text-muted);min-width:28px;text-align:center;">15px</span>
-            <button onclick="changeRambamFont(+1)" style="background:transparent;border:.5px solid var(--border);border-radius:50%;width:26px;height:26px;color:var(--text-sec);font-size:14px;cursor:pointer;font-family:inherit;line-height:1;padding:0;">+</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- b9: אשר יצר -->
@@ -376,10 +381,16 @@ function changeRambamFont(delta) {
 function navRambam(dir){_rambamIdx=Math.max(0,Math.min(612,_rambamIdx+dir));renderRambam();}
 function resetRambamToday(){const d=_getRambamForDay();_rambamIdx=d.type==='Positive'?d.num-1:247+d.num;renderRambam();}
 
-/* ── קרא פרק היום ── */
+/* ── למד את המשנה היומית ── */
 function goDailyChapter() {
-  const day = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,1)) / 86400000);
-  location.href = '03-reader.html?chap=' + ((day % 150) + 1);
+  try {
+    if (typeof Corpus !== 'undefined' && Corpus.mishnahYomit) {
+      const y = Corpus.mishnahYomit();
+      location.href = '03-reader.html?chap=' + encodeURIComponent(y.first.chapId);
+      return;
+    }
+  } catch(e) {}
+  location.href = '03-reader.html'; // נפילה רכה לקורא ברירת המחדל
 }
 
 /* ── init: פתח דרך URL param ── */

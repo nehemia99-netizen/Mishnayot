@@ -141,8 +141,9 @@ html.dark .leave-btn:active{background:#2A1010;}
 html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 .toast.show{opacity:1;}
 </style>
+<script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.86" defer></script>
+<script src="i18n.js?v=2.2.87" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -248,7 +249,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
         <div class="mission-bar-wrap"><div class="mission-bar" id="missionBar" style="width:0%"></div></div>
         <div class="mission-nums">
           <span class="done" id="missionDone">0 פרקים הושלמו</span>
-          <span class="total" id="missionTotal">מתוך 150</span>
+          <span class="total" id="missionTotal">מתוך 525</span>
         </div>
         <div id="missionActions" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
           <button class="invite-btn" style="background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);" onclick="openChallengeBuilder()" data-i18n="group.new_challenge_btn">➕ אתגר חדש</button>
@@ -263,27 +264,18 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
         <div style="text-align:center;margin-bottom:14px;"><div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 10px;"></div><div style="font-size:16px;font-weight:700;color:var(--text);" data-i18n="group.new_challenge_title">🎯 אתגר חדש לקבוצה</div></div>
         <label class="form-label" data-i18n="group.challenge_type">סוג האתגר</label>
         <select class="form-input" id="challType" onchange="onChallTypeChange()">
-          <option value="book" data-i18n="group.type_book">ספר שלם מתוך 5 ספרי תהילים</option>
-          <option value="all" data-i18n="group.type_all">כל ה-150 פרקים</option>
+          <option value="book" data-i18n="group.type_book">סדר שלם מתוך 6 סדרי המשנה</option>
+          <option value="tractate" data-i18n="group.type_tractate">מסכת שלמה</option>
+          <option value="all" data-i18n="group.type_all">כל 525 הפרקים</option>
           <option value="day" data-i18n="group.type_day">המשנה היומית (לפי לוח עברי)</option>
-          <option value="range" data-i18n="group.type_range">טווח פרקים מותאם</option>
         </select>
         <div id="challBookRow">
-          <label class="form-label" data-i18n="group.book_label">בחר ספר</label>
-          <select class="form-input" id="challBook">
-            <option value="1-41" data-i18n="group.book_a">ספר א׳ (1-41)</option>
-            <option value="42-72" data-i18n="group.book_b">ספר ב׳ (42-72)</option>
-            <option value="73-89" data-i18n="group.book_c">ספר ג׳ (73-89)</option>
-            <option value="90-106" data-i18n="group.book_d">ספר ד׳ (90-106)</option>
-            <option value="107-150" data-i18n="group.book_e">ספר ה׳ (107-150)</option>
-          </select>
+          <label class="form-label" data-i18n="group.book_label">בחר סדר</label>
+          <select class="form-input" id="challBook"></select>
         </div>
-        <div id="challRangeRow" style="display:none;">
-          <label class="form-label" data-i18n="group.range_label">מספרי פרקים (מ-עד)</label>
-          <div style="display:flex;gap:8px;">
-            <input class="form-input" id="challFrom" type="number" min="1" max="150" placeholder="מ-" style="flex:1;margin-bottom:0;">
-            <input class="form-input" id="challTo" type="number" min="1" max="150" placeholder="עד-" style="flex:1;margin-bottom:0;">
-          </div>
+        <div id="challTractateRow" style="display:none;">
+          <label class="form-label" data-i18n="group.tractate_label">בחר מסכת</label>
+          <select class="form-input" id="challTractate"></select>
         </div>
         <label class="form-label" style="margin-top:12px;" data-i18n="group.deadline">תאריך יעד (אופציונלי)</label>
         <input class="form-input" id="challDeadline" type="date">
@@ -297,7 +289,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
       <div style="background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px calc(24px + 70px + env(safe-area-inset-bottom,0px));max-height:88vh;overflow-y:auto;">
         <div style="text-align:center;margin-bottom:14px;"><div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 10px;"></div><div style="font-size:16px;font-weight:700;color:var(--text);" data-i18n="group.pick_chunk_title">📌 בחר נתח לעצמך</div></div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;text-align:center;" data-i18n="group.chunk_instructions">לחץ על פרקים כדי "לקחת" אותם. פרק שנלקח על ידי חבר אחר — לא ניתן לקחת.</div>
-        <div id="chunkGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;font-size:12px;direction:ltr;"></div>
+        <div id="chunkGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12px;direction:rtl;"></div>
         <button class="form-submit" onclick="closeChunkPicker()" style="margin-top:14px;" data-i18n="group.save_btn">שמור</button>
       </div>
     </div>
@@ -741,34 +733,59 @@ window.kickMember = async function(uid, name) {
   } catch(e) { toast('⚠️ שגיאה: '+(e.code||e.message)); }
 };
 
-/* ── Challenge logic (same as before) ── */
+/* ── Challenge logic (Mishnah hierarchy; chapters are string ids like "Berakhot.2") ── */
 function _chKey() { const g=S.get('tehillim_group'); return g&&g.code?'tehillim_group_challenge_'+g.code:null; }
 function loadGroupChallenge() { const k=_chKey(); return k?S.get(k):null; }
 function saveGroupChallenge(ch) { const k=_chKey(); if(k)S.set(k,ch); }
 
-function getDailyChapsForToday() {
-  const M={1:[1,9],2:[10,17],3:[18,22],4:[23,28],5:[29,34],6:[35,38],7:[39,43],8:[44,48],9:[49,54],10:[55,59],11:[60,65],12:[66,68],13:[69,71],14:[72,76],15:[77,78],16:[79,82],17:[83,87],18:[88,89],19:[90,96],20:[97,103],21:[104,105],22:[106,107],23:[108,112],24:[113,118],25:[119,119],26:[120,134],27:[135,139],28:[140,144],29:[145,150],30:[145,150]};
-  let day=1;
-  try{const s=new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{day:'numeric'}).format(new Date());const n=parseInt(s.replace(/[^\d]/g,''));if(n>=1&&n<=30)day=n;}catch(e){}
-  const r=M[day]||M[1];const out=[];for(let i=r[0];i<=r[1];i++)out.push(i);return out;
+function _gToGem(n){
+  const sp={15:'ט"ו',16:'ט"ז'};if(sp[n])return sp[n];
+  const h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],m=['','ק','ר','ש','ת'];
+  let r='',x=n;
+  if(x>=100){r+=m[Math.floor(x/100)];x%=100;}
+  if(x>=10){r+=t[Math.floor(x/10)];x%=10;}
+  r+=h[x];
+  return r.length===1?r+'׳':r.slice(0,-1)+'"'+r.slice(-1);
+}
+function chapLabelG(id){
+  const p=Corpus.parseChapId(id);if(!p)return id;
+  const t=Corpus.getTractate(p.tractate);
+  return (t?t.he:p.tractate)+' '+_gToGem(p.perek);
+}
+function orderChapIds(orderId){
+  const o=Corpus.getOrder(orderId);if(!o)return[];
+  const out=[];o.tractates.forEach(tid=>{const t=Corpus.getTractate(tid);for(let p=1;p<=t.length;p++)out.push(Corpus.chapId(tid,p));});return out;
+}
+function tractateChapIds(tid){
+  const t=Corpus.getTractate(tid);if(!t)return[];
+  const out=[];for(let p=1;p<=t.length;p++)out.push(Corpus.chapId(tid,p));return out;
 }
 function chapsForType(type,extra){
-  if(type==='all'){const o=[];for(let i=1;i<=150;i++)o.push(i);return o;}
-  if(type==='book'){const p=(extra||'1-41').split('-').map(Number);const o=[];for(let i=p[0];i<=p[1];i++)o.push(i);return o;}
-  if(type==='day')return getDailyChapsForToday();
-  if(type==='range'){const o=[];for(let i=extra[0];i<=extra[1];i++)if(i>=1&&i<=150)o.push(i);return o;}
+  if(type==='all')return Corpus.flatChapters().map(c=>c.id);
+  if(type==='book')return orderChapIds(extra||Corpus.orders[0].id);
+  if(type==='tractate')return tractateChapIds(extra||Corpus.tractates[0].id);
+  if(type==='day'){const y=Corpus.mishnahYomit();const ids=[y.first.chapId];if(y.second.chapId!==y.first.chapId)ids.push(y.second.chapId);return ids;}
   return[];
 }
-window.openChallengeBuilder=()=>{document.getElementById('challBuilder').style.display='flex';};
+function _populateChallSelects(){
+  const ob=document.getElementById('challBook');
+  if(ob && !ob.options.length) ob.innerHTML=Corpus.orders.map(o=>'<option value="'+o.id+'">סדר '+o.he+' ('+orderChapIds(o.id).length+' פרקים)</option>').join('');
+  const tb=document.getElementById('challTractate');
+  if(tb && !tb.options.length){
+    let h='';Corpus.orders.forEach(o=>{h+='<optgroup label="סדר '+o.he+'">';o.tractates.forEach(tid=>{const t=Corpus.getTractate(tid);h+='<option value="'+tid+'">'+t.he+' ('+t.length+' פרקים)</option>';});h+='</optgroup>';});
+    tb.innerHTML=h;
+  }
+}
+window.openChallengeBuilder=()=>{_populateChallSelects();document.getElementById('challBuilder').style.display='flex';};
 window.closeChallengeBuilder=()=>{document.getElementById('challBuilder').style.display='none';};
-window.onChallTypeChange=()=>{const t=document.getElementById('challType').value;document.getElementById('challBookRow').style.display=t==='book'?'':'none';document.getElementById('challRangeRow').style.display=t==='range'?'':'none';};
+window.onChallTypeChange=()=>{const t=document.getElementById('challType').value;document.getElementById('challBookRow').style.display=t==='book'?'':'none';document.getElementById('challTractateRow').style.display=t==='tractate'?'':'none';};
 window.createGroupChallenge=function(){
   const type=document.getElementById('challType').value;let chapters=[],title='';
-  if(type==='book'){const b=document.getElementById('challBook').value;chapters=chapsForType('book',b);const L={'1-41':'ספר א׳','42-72':'ספר ב׳','73-89':'ספר ג׳','90-106':'ספר ד׳','107-150':'ספר ה׳'};title=L[b]||'סדר מהמשנה';}
-  else if(type==='all'){chapters=chapsForType('all');title='כל ה-150 פרקים';}
+  if(type==='book'){const b=document.getElementById('challBook').value;chapters=chapsForType('book',b);const o=Corpus.getOrder(b);title='סדר '+(o?o.he:'');}
+  else if(type==='tractate'){const tid=document.getElementById('challTractate').value;chapters=chapsForType('tractate',tid);const t=Corpus.getTractate(tid);title='מסכת '+(t?t.he:'');}
+  else if(type==='all'){chapters=chapsForType('all');title='כל 525 הפרקים';}
   else if(type==='day'){chapters=chapsForType('day');title='המשנה היומית';}
-  else if(type==='range'){const f=parseInt(document.getElementById('challFrom').value)||1;const t2=parseInt(document.getElementById('challTo').value)||f;if(t2<f){toast('⚠️ טווח לא חוקי');return;}chapters=chapsForType('range',[f,t2]);title='פרקים '+f+'-'+t2;}
-  if(!chapters.length){toast('⚠️ בחר טווח חוקי');return;}
+  if(!chapters.length){toast('⚠️ בחר אתגר חוקי');return;}
   const deadline=document.getElementById('challDeadline').value||null;
   saveGroupChallenge({id:'ch_'+Date.now().toString(36),type,chapters,title,deadline,createdAt:Date.now(),createdBy:MY_ID,chunks:{}});
   closeChallengeBuilder();toast('🎯 אתגר נוצר: '+title);renderGroupChallenge();
@@ -776,22 +793,22 @@ window.createGroupChallenge=function(){
 window.openChunkPicker=function(){
   const ch=loadGroupChallenge();if(!ch)return;
   const mine=(ch.chunks&&ch.chunks[MY_ID])||[];
-  const taken={};for(const uid in(ch.chunks||{}))for(const c of(ch.chunks[uid]||[]))taken[c]=uid;
-  document.getElementById('chunkGrid').innerHTML=ch.chapters.map(n=>{
-    const isMine=mine.indexOf(n)!==-1;const byOther=taken[n]&&taken[n]!==MY_ID;
+  const taken={};for(const uid in(ch.chunks||{}))for(const c of(ch.chunks[uid]||[]))taken[String(c)]=uid;
+  document.getElementById('chunkGrid').innerHTML=ch.chapters.map(id=>{
+    const isMine=mine.indexOf(id)!==-1;const byOther=taken[id]&&taken[id]!==MY_ID;
     const bg=isMine?'#3B8C14':byOther?'#ccc':'var(--surface)';
     const color=isMine?'#fff':byOther?'#666':'var(--text)';
     const extra=byOther?'opacity:.55;cursor:not-allowed;':'cursor:pointer;';
-    return `<div data-chap="${n}" onclick="toggleChunk(${n})" style="background:${bg};color:${color};border:.5px solid ${bg};padding:6px 2px;text-align:center;border-radius:6px;font-weight:600;${extra}">${n}</div>`;
+    return `<div data-chap="${id}" onclick="toggleChunk('${id}')" style="background:${bg};color:${color};border:.5px solid ${bg};padding:6px 4px;text-align:center;border-radius:6px;font-weight:600;font-size:10px;word-break:keep-all;${extra}">${chapLabelG(id)}</div>`;
   }).join('');
   document.getElementById('chunkPicker').style.display='flex';
 };
 window.closeChunkPicker=()=>{document.getElementById('chunkPicker').style.display='none';renderGroupChallenge();};
-window.toggleChunk=function(n){
+window.toggleChunk=function(id){
   const ch=loadGroupChallenge();if(!ch)return;
   ch.chunks=ch.chunks||{};ch.chunks[MY_ID]=ch.chunks[MY_ID]||[];
-  for(const uid in ch.chunks)if(uid!==MY_ID&&(ch.chunks[uid]||[]).indexOf(n)!==-1){toast('⚠️ הפרק כבר נלקח על ידי חבר אחר');return;}
-  const i=ch.chunks[MY_ID].indexOf(n);if(i===-1)ch.chunks[MY_ID].push(n);else ch.chunks[MY_ID].splice(i,1);
+  for(const uid in ch.chunks)if(uid!==MY_ID&&(ch.chunks[uid]||[]).indexOf(id)!==-1){toast('⚠️ הפרק כבר נלקח על ידי חבר אחר');return;}
+  const i=ch.chunks[MY_ID].indexOf(id);if(i===-1)ch.chunks[MY_ID].push(id);else ch.chunks[MY_ID].splice(i,1);
   saveGroupChallenge(ch);openChunkPicker();
 };
 function renderGroupChallenge(members){
@@ -805,11 +822,12 @@ function renderGroupChallenge(members){
   const pickBtn=document.getElementById('pickChunksBtn');
   const memArr=members||[];
   const allDone=new Set();
-  memArr.forEach(m=>(m.chapsDone||[]).forEach(c=>allDone.add(+c)));
-  try{JSON.parse(localStorage.getItem('tehillim_readings')||'[]').filter(r=>!r.partial).forEach(r=>allDone.add(+r.chap));}catch(e){}
+  memArr.forEach(m=>(m.chapsDone||[]).forEach(c=>allDone.add(String(c))));
+  try{JSON.parse(localStorage.getItem('tehillim_readings')||'[]').filter(r=>!r.partial).forEach(r=>allDone.add(String(r.chap)));}catch(e){}
+  const totalCorpus=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525);
   if(!ch){
-    titleEl.textContent='🎯 אתגר קבוצתי';subEl.textContent='אין אתגר פעיל. כל חבר יכול ליצור אתגר.';totalEl.textContent='מתוך 150';
-    const pct=Math.min(100,Math.round(allDone.size/150*100));
+    titleEl.textContent='🎯 אתגר קבוצתי';subEl.textContent='אין אתגר פעיל. כל חבר יכול ליצור אתגר.';totalEl.textContent='מתוך '+totalCorpus;
+    const pct=Math.min(100,Math.round(allDone.size/totalCorpus*100));
     pctEl.textContent=pct+'%';barEl.style.width=pct+'%';doneEl.textContent=allDone.size+' פרקים הושלמו';
     if(pickBtn)pickBtn.style.display='none';return;
   }
@@ -817,7 +835,7 @@ function renderGroupChallenge(members){
   const myChunks=(ch.chunks&&ch.chunks[MY_ID])||[];
   subEl.textContent=(myChunks.length?'אתה לקחת '+myChunks.length+' פרקים':'לא לקחת נתח עדיין')+(ch.deadline?' · יעד: '+ch.deadline:'');
   totalEl.textContent='מתוך '+ch.chapters.length;
-  let done=0;for(const c of ch.chapters)if(allDone.has(c))done++;
+  let done=0;for(const c of ch.chapters)if(allDone.has(String(c)))done++;
   const pct=Math.min(100,Math.round(done/ch.chapters.length*100));
   pctEl.textContent=pct+'%';barEl.style.width=pct+'%';doneEl.textContent=done+' פרקים הושלמו';
   if(pickBtn)pickBtn.style.display='';

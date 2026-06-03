@@ -320,29 +320,29 @@ function showMaalotToast(meta) {
    ════════════════════════════════════════════════════════════ */
 const CHALLENGES = {
   daily: [
-    { id:'d_3chaps',  title:'קרא 3 פרקים היום',    titleEn:'Read 3 chapters today',        icon:'📖', reward:10, target:3,  metric:'todayChapters' },
-    { id:'d_10min',   title:'10 דקות קריאה היום',  titleEn:'10 minutes of reading today',  icon:'⏱',  reward:8,  target:10, metric:'todayMinutes' },
-    { id:'d_one',     title:'קרא לפחות פרק אחד',   titleEn:'Read at least one chapter',    icon:'✅', reward:5,  target:1,  metric:'todayChapters' },
-    { id:'d_morning', title:'קריאה לפני 10 בבוקר', titleEn:'Read before 10 AM',            icon:'🌅', reward:12, target:1,  metric:'morningChapters' },
-    { id:'d_night',   title:'קריאה אחרי 22:00',    titleEn:'Read after 10 PM',             icon:'🌙', reward:12, target:1,  metric:'nightChapters' }
+    { id:'d_3chaps',  title:'למד 3 פרקים היום',    titleEn:'Study 3 chapters today',       icon:'📖', reward:10, target:3,  metric:'todayChapters' },
+    { id:'d_10min',   title:'10 דקות לימוד היום',  titleEn:'10 minutes of study today',    icon:'⏱',  reward:8,  target:10, metric:'todayMinutes' },
+    { id:'d_one',     title:'למד לפחות פרק אחד',   titleEn:'Study at least one chapter',   icon:'✅', reward:5,  target:1,  metric:'todayChapters' },
+    { id:'d_morning', title:'לימוד לפני 10 בבוקר', titleEn:'Study before 10 AM',           icon:'🌅', reward:12, target:1,  metric:'morningChapters' },
+    { id:'d_night',   title:'לימוד אחרי 22:00',    titleEn:'Study after 10 PM',            icon:'🌙', reward:12, target:1,  metric:'nightChapters' }
   ],
   weekly: [
     { id:'w_avot',    title:'סיים את מסכת אבות',       titleEn:'Finish Pirkei Avot',           icon:'📜', reward:50,  target:6,  metric:'weekAvot' },
     { id:'w_15chaps', title:'15 פרקים השבוע',          titleEn:'15 chapters this week',        icon:'📚', reward:35,  target:15, metric:'weekChapters' },
-    { id:'w_5days',   title:'קרא ב-5 ימים השבוע',     titleEn:'Read on 5 days this week',     icon:'📅', reward:40,  target:5,  metric:'weekActiveDays' },
-    { id:'w_60min',   title:'60 דקות קריאה השבוע',    titleEn:'60 minutes of reading this week',icon:'⏰',reward:30, target:60, metric:'weekMinutes' }
+    { id:'w_5days',   title:'למד ב-5 ימים השבוע',     titleEn:'Study on 5 days this week',    icon:'📅', reward:40,  target:5,  metric:'weekActiveDays' },
+    { id:'w_60min',   title:'60 דקות לימוד השבוע',    titleEn:'60 minutes of study this week',icon:'⏰',reward:30, target:60, metric:'weekMinutes' }
   ],
   monthly: [
-    { id:'m_30days',       title:'קרא בכל יום של החודש',           titleEn:'Read every day this month',          icon:'🗓', reward:200, target:28,  metric:'monthActiveDays' },
+    { id:'m_30days',       title:'למד בכל יום של החודש',           titleEn:'Study every day this month',         icon:'🗓', reward:200, target:28,  metric:'monthActiveDays' },
     { id:'m_100ch',        title:'100 פרקים החודש',                 titleEn:'100 chapters this month',            icon:'💯', reward:120, target:100, metric:'monthChapters' },
-    { id:'m_4hours',       title:'4 שעות קריאה החודש',             titleEn:'4 hours of reading this month',      icon:'⌛', reward:100, target:240, metric:'monthMinutes' },
+    { id:'m_4hours',       title:'4 שעות לימוד החודש',             titleEn:'4 hours of study this month',        icon:'⌛', reward:100, target:240, metric:'monthMinutes' },
     { id:'m_berakhot',     title:'סיים את מסכת ברכות החודש',       titleEn:'Finish Berakhot this month',         icon:'📗', reward:80,  target:9,   metric:'monthBerakhot' },
     { id:'m_zeraim',       title:'40 פרקים בסדר זרעים החודש',      titleEn:'40 chapters in Seder Zeraim',        icon:'📘', reward:80,  target:40,  metric:'monthZeraim' },
     { id:'m_15days_row',   title:'15 ימים רצופים החודש',           titleEn:'15-day streak this month',           icon:'🔥', reward:150, target:15,  metric:'currentStreak' },
     { id:'m_avot_all',     title:'למד את כל 6 פרקי אבות',          titleEn:'Study all 6 chapters of Avot',       icon:'⭐', reward:90,  target:6,   metric:'monthAvotChaps' },
     { id:'m_50min_day',    title:'יום אחד עם 50 דקות',             titleEn:'One day with 50 minutes',            icon:'💪', reward:70,  target:1,   metric:'monthMaxDayMins50' },
-    { id:'m_motzashabat',  title:'קריאה במוצאי שבת',               titleEn:'Read on Saturday night',             icon:'✨', reward:35,  target:1,   metric:'monthMotzashabat' },
-    { id:'m_rosh_chodesh', title:'קריאה בראש חודש',                 titleEn:'Read on Rosh Chodesh',               icon:'🌙', reward:40,  target:1,   metric:'monthRoshChodesh' }
+    { id:'m_motzashabat',  title:'לימוד במוצאי שבת',               titleEn:'Study on Saturday night',            icon:'✨', reward:35,  target:1,   metric:'monthMotzashabat' },
+    { id:'m_rosh_chodesh', title:'לימוד בראש חודש',                 titleEn:'Study on Rosh Chodesh',              icon:'🌙', reward:40,  target:1,   metric:'monthRoshChodesh' }
   ]
 };
 
@@ -498,17 +498,17 @@ const BADGES = [
   { id:'avot',     icon:'📜', title:'מסכת אבות',     desc:'סיימת את מסכת אבות',       check: ctx => coversTractate(ctx.uniqueRead, 'PirkeiAvot'), reward:120 },
   { id:'berakhot', icon:'🙏', title:'מסכת ברכות',    desc:'סיימת את מסכת ברכות',      check: ctx => coversTractate(ctx.uniqueRead, 'Berakhot'),   reward:80 },
   // זמן
-  { id:'time_60',   icon:'⏰', title:'שעה ראשונה',   desc:'60 דקות קריאה מצטברות',   check: ctx => ctx.totalMinutes >= 60,    reward:30 },
-  { id:'time_600',  icon:'🏅', title:'10 שעות',       desc:'600 דקות קריאה מצטברות',  check: ctx => ctx.totalMinutes >= 600,   reward:80 },
-  { id:'time_1500', icon:'🏆', title:'25 שעות',       desc:'1,500 דקות קריאה',         check: ctx => ctx.totalMinutes >= 1500,  reward:150 },
-  { id:'time_3000', icon:'👑', title:'50 שעות',       desc:'3,000 דקות קריאה',         check: ctx => ctx.totalMinutes >= 3000,  reward:300 },
+  { id:'time_60',   icon:'⏰', title:'שעה ראשונה',   desc:'60 דקות לימוד מצטברות',   check: ctx => ctx.totalMinutes >= 60,    reward:30 },
+  { id:'time_600',  icon:'🏅', title:'10 שעות',       desc:'600 דקות לימוד מצטברות',  check: ctx => ctx.totalMinutes >= 600,   reward:80 },
+  { id:'time_1500', icon:'🏆', title:'25 שעות',       desc:'1,500 דקות לימוד',         check: ctx => ctx.totalMinutes >= 1500,  reward:150 },
+  { id:'time_3000', icon:'👑', title:'50 שעות',       desc:'3,000 דקות לימוד',         check: ctx => ctx.totalMinutes >= 3000,  reward:300 },
   // רצפים
-  { id:'streak_7',  icon:'🔥', title:'שבוע רצוף',    desc:'7 ימים רצופים של קריאה', check: ctx => ctx.longestStreak >= 7,    reward:60 },
+  { id:'streak_7',  icon:'🔥', title:'שבוע רצוף',    desc:'7 ימים רצופים של לימוד', check: ctx => ctx.longestStreak >= 7,    reward:60 },
   { id:'streak_30', icon:'💥', title:'חודש רצוף',    desc:'30 ימים רצופים',           check: ctx => ctx.longestStreak >= 30,   reward:200 },
   { id:'streak_100',icon:'⚡', title:'100 ימים רצוף', desc:'100 ימים רצופים — מדהים!', check: ctx => ctx.longestStreak >= 100,  reward:600 },
   // שעות יום
-  { id:'morning_5', icon:'🌅', title:'משכים קום',    desc:'5 קריאות לפני 7:00',       check: ctx => ctx.morningCount >= 5,     reward:40 },
-  { id:'night_5',   icon:'🌙', title:'תפילת לילה',   desc:'5 קריאות אחרי 22:00',      check: ctx => ctx.nightCount >= 5,       reward:40 },
+  { id:'morning_5', icon:'🌅', title:'משכים קום',    desc:'5 לימודים לפני 7:00',      check: ctx => ctx.morningCount >= 5,     reward:40 },
+  { id:'night_5',   icon:'🌙', title:'לימוד לילה',   desc:'5 לימודים אחרי 22:00',     check: ctx => ctx.nightCount >= 5,       reward:40 },
   // 10 מדליות מכל סוג - 2.0.7
   { id:'medals_bronze_10',   icon:'🥉', title:'10 מדליות ארד',    desc:'10 פרקים עם מדליית ארד',    check: ctx => (ctx.medalsCount && ctx.medalsCount.bronze>=10),   reward:100 },
   { id:'medals_silver_10',   icon:'🥈', title:'10 מדליות כסף',    desc:'10 פרקים עם מדליית כסף',    check: ctx => (ctx.medalsCount && ctx.medalsCount.silver>=10),   reward:100 },

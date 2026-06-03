@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-משניון — מחולל רצף</title>
+<title>משניון — מחולל רצף</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--primary-border:#BBD6BB;--surface:#F5F5F3;--green:#3B8C14;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--primary-border:#2E5E34;--surface:#272727;--green:#5DBF35;}
@@ -23,23 +23,32 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 .preset-chip:active{background:var(--primary-light);color:var(--primary);border-color:var(--primary);}
 .preset-chip.clear{color:#B03020;}
 
-/* Chapter grid */
-.grid-wrap{padding:8px 12px 6px;flex:1;}
-.grid-hint{font-size:11px;color:var(--text-muted);margin-bottom:8px;text-align:center;}
+/* Hierarchy */
+.tree-wrap{padding:6px 12px;flex:1;overflow-y:auto;}
+.tree-hint{font-size:11px;color:var(--text-muted);margin:4px 2px 10px;text-align:center;line-height:1.5;}
 
-.chap-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;}
-.cc{position:relative;aspect-ratio:1;border-radius:8px;border:.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s;user-select:none;}
+.order-section{border:.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;background:var(--card);}
+.order-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.order-name{font-size:14px;font-weight:700;color:var(--text);}
+.order-count{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;}
+.ord-chev{display:inline-block;transition:transform .2s;}
+.order-section.open .ord-chev{transform:rotate(90deg);}
+.order-body{padding:0 10px 8px;}
+
+.tractate-row{display:flex;align-items:center;justify-content:space-between;padding:9px 6px;cursor:pointer;border-top:.5px solid var(--border);-webkit-tap-highlight-color:transparent;}
+.tractate-name{font-size:13px;color:var(--text);font-weight:600;}
+.tractate-meta{font-size:10px;color:var(--text-muted);}
+
+.tractate-tools{display:flex;justify-content:flex-start;padding:2px 4px 6px;}
+.add-tractate-btn{font-size:11px;color:var(--primary);background:var(--primary-light);border:.5px solid var(--primary-border);border-radius:14px;padding:4px 10px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.add-tractate-btn:active{opacity:.7;}
+
+.perek-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:0 4px 6px;}
+.cc{position:relative;aspect-ratio:1;border-radius:8px;border:.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s;user-select:none;font-size:12px;color:var(--text);}
 .cc:active{opacity:.7;}
-.cc-gem{font-size:10px;font-weight:600;color:var(--text);line-height:1;}
-.cc-num{font-size:8px;color:var(--text-muted);line-height:1;margin-top:1px;}
-.cc.done{background:rgba(59,140,20,.08);border-color:rgba(59,140,20,.3);}
-.cc.done .cc-gem{color:var(--green);}
-
-/* Selected state */
-.cc.sel{background:var(--primary);border-color:var(--primary);}
-.cc.sel .cc-gem{color:#fff;}
-.cc.sel .cc-num{color:rgba(255,255,255,.7);}
-.cc-order{position:absolute;top:1px;left:2px;font-size:7px;font-weight:800;color:rgba(255,255,255,.9);line-height:1;}
+.cc.done{background:rgba(59,140,20,.08);border-color:rgba(59,140,20,.3);color:var(--green);font-weight:600;}
+.cc.sel{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700;}
+.cc-order{position:absolute;top:1px;left:3px;font-size:8px;font-weight:800;color:#fff;line-height:1;background:rgba(0,0,0,.25);border-radius:6px;padding:0 3px;}
 
 /* Bottom panel */
 .bottom-panel{border-top:.5px solid var(--border);background:var(--card);padding:10px 14px 24px;flex-shrink:0;}
@@ -54,11 +63,12 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 .start-btn:not(:disabled):active{opacity:.85;}
 
 /* Toast */
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(24,95,165,.92);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;z-index:99;}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(58,125,68,.95);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;z-index:99;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
+<script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.86" defer></script>
+<script src="i18n.js?v=2.2.87" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -73,24 +83,21 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
   </div>
 
   <div class="presets">
-    <div class="preset-chip" onclick="presetAll()" data-i18n="seq.all_psalms">📜 כל התהילים</div>
+    <div class="preset-chip" onclick="presetYomit()" data-i18n="seq.yomit">📅 משנה יומית</div>
     <div class="preset-chip" onclick="presetFavs()" data-i18n="seq.favs">❤️ מועדפים</div>
-    <div class="preset-chip" onclick="presetToday()" data-i18n="seq.today">📅 של היום</div>
-    <div class="preset-chip" onclick="presetFirst50()">א–נ</div>
-    <div class="preset-chip" onclick="presetMid50()">נא–ק</div>
-    <div class="preset-chip" onclick="presetLast50()">קא–קנ</div>
+    <div class="preset-chip" onclick="presetAvot()" data-i18n="seq.avot">✡ פרקי אבות</div>
     <div class="preset-chip clear" onclick="clearAll()" data-i18n="seq.clear">✕ נקה</div>
   </div>
 
-  <div class="grid-wrap">
-    <div class="grid-hint" data-i18n="seq.hint">לחץ על פרק להוסיפו לרצף · לחץ שנית להסירו</div>
-    <div class="chap-grid" id="chapGrid"></div>
+  <div class="tree-wrap">
+    <div class="tree-hint" data-i18n="seq.hint">בחר סדר ← מסכת, ולחץ על פרק להוסיפו לרצף · לחץ שנית להסירו</div>
+    <div id="ordersContainer"></div>
   </div>
 
   <div class="bottom-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <div class="seq-label" style="margin-bottom:0;" data-i18n="seq.order">סדר הקריאה:</div>
-      <button id="clearAllBtn" onclick="clearAll()" style="display:none;font-size:12px;color:#B03020;background:rgba(176,48,32,.08);border:.5px solid rgba(176,48,32,.3);border-radius:14px;padding:4px 10px;cursor:pointer;font-family:inherit;">✕ בטל הכל</button>
+      <div class="seq-label" style="margin-bottom:0;" data-i18n="seq.order">סדר הלימוד:</div>
+      <button id="clearAllBtn" onclick="clearAll()" style="display:none;font-size:12px;color:#B03020;background:rgba(176,48,32,.08);border:.5px solid rgba(176,48,32,.3);border-radius:14px;padding:4px 10px;cursor:pointer;font-family:inherit;" data-i18n="seq.cancel_all">✕ בטל הכל</button>
     </div>
     <div class="seq-strip" id="seqStrip">
       <span class="seq-empty" data-i18n="seq.empty">טרם נבחרו פרקים</span>
@@ -108,7 +115,7 @@ const S = {
 };
 
 function toGem(n) {
-  const sp = {15:'ט"ו',16:'ט"ז',115:'קט"ו',116:'קט"ז'};
+  const sp = {15:'ט"ו',16:'ט"ז'};
   if (sp[n]) return sp[n];
   const h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'];
   const t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'];
@@ -120,132 +127,191 @@ function toGem(n) {
   return r.length===1?r+'׳':r.slice(0,-1)+'"'+r.slice(-1);
 }
 
-/* ── State ── */
-let sequence = []; // ordered array of chapter numbers
+/* ── State: ordered array of chapId strings ("Berakhot.2") ── */
+let sequence = [];
 
-/* ── Today's reading (daily Tehillim schedule) ── */
-const MONTHLY = {
-  1:{from:1,to:9},2:{from:10,to:17},3:{from:18,to:22},4:{from:23,to:28},5:{from:29,to:34},
-  6:{from:35,to:38},7:{from:39,to:43},8:{from:44,to:48},9:{from:49,to:54},10:{from:55,to:59},
-  11:{from:60,to:65},12:{from:66,to:68},13:{from:69,to:71},14:{from:72,to:76},15:{from:77,to:78},
-  16:{from:79,to:82},17:{from:83,to:87},18:{from:88,to:89},19:{from:90,to:96},20:{from:97,to:103},
-  21:{from:104,to:105},22:{from:106,to:107},23:{from:108,to:112},24:{from:113,to:118},
-  25:{from:119,to:119},26:{from:120,to:134},27:{from:135,to:139},28:{from:140,to:144},
-  29:{from:145,to:150},30:{from:145,to:150}
-};
-function getHebDay() {
-  try {
-    const s = new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{day:'numeric'}).format(new Date());
-    const n = parseInt(s.replace(/[^\d]/g,''));
-    return (n >= 1 && n <= 30) ? n : 1;
-  } catch(e) { return 1; }
-}
-
-/* ── Done today set ── */
+/* ── Done-today set (string chapIds) ── */
 const todayKey = localDateStr();
-const hist     = S.get('tehillim_history') || {};
-const doneToday = new Set(Object.keys(hist).filter(k => hist[k] && hist[k].lastDate === todayKey).map(Number));
+const rawDb    = S.get('tehillim_readings') || [];
+const readDb   = Array.isArray(rawDb) ? rawDb : Object.values(rawDb || {});
+const doneToday = new Set(readDb.filter(r => r.date === todayKey && !r.partial).map(r => String(r.chap)));
 
-/* ── Build grid ── */
-function buildGrid() {
-  const grid = document.getElementById('chapGrid');
-  let html = '';
-  for (let n = 1; n <= 150; n++) {
-    const isD  = doneToday.has(n);
-    const selIdx = sequence.indexOf(n);
-    const isSel  = selIdx !== -1;
-    html += '<div class="cc' + (isD ? ' done' : '') + (isSel ? ' sel' : '') + '" id="cc' + n + '" onclick="toggleChap(' + n + ')">' +
-      (isSel ? '<span class="cc-order">' + (selIdx + 1) + '</span>' : '') +
-      '<span class="cc-gem">' + toGem(n) + '</span>' +
-      '<span class="cc-num">' + n + '</span>' +
-    '</div>';
-  }
-  grid.innerHTML = html;
+/* ── Favorites (string chapIds) ── */
+function favIds() {
+  const f = S.get('tehillim_favs');
+  if (Array.isArray(f)) return f.map(String);
+  return [];
 }
 
-/* ── Toggle chapter selection ── */
-function toggleChap(n) {
-  const idx = sequence.indexOf(n);
+/* ── DOM-safe id for a chapId (dots are illegal mid-selector) ── */
+function cellId(chapId) { return 'cell_' + chapId.replace(/\./g, '_'); }
+
+/* ── Hebrew label for a chapId ── */
+function chapLabel(chapId) {
+  const p = Corpus.parseChapId(chapId); if (!p) return chapId;
+  const t = Corpus.getTractate(p.tractate);
+  return (t ? t.he : p.tractate) + ' ' + toGem(p.perek);
+}
+
+/* ── Build the order/tractate accordion ── */
+function buildOrders() {
+  const c = document.getElementById('ordersContainer');
+  let html = '';
+  Corpus.orders.forEach(o => {
+    html += '<div class="order-section" id="sec_' + o.id + '">';
+    html += '<div class="order-header" onclick="toggleOrder(\'' + o.id + '\')">'
+          + '<span class="order-name">סדר ' + o.he + '</span>'
+          + '<span class="order-count">' + o.tractates.length + ' מסכתות <span class="ord-chev">▸</span></span></div>';
+    html += '<div class="order-body" id="ord_' + o.id + '" style="display:none">';
+    o.tractates.forEach(tid => {
+      const t = Corpus.getTractate(tid);
+      html += '<div class="tractate-row" onclick="toggleTractate(\'' + tid + '\')">'
+            + '<span class="tractate-name">' + t.he + '</span>'
+            + '<span class="tractate-meta">' + t.length + ' פרקים</span></div>';
+      html += '<div id="trwrap_' + tid + '" style="display:none">'
+            + '<div class="tractate-tools"><button class="add-tractate-btn" onclick="addTractate(\'' + tid + '\')" data-i18n="seq.add_tractate">+ כל המסכת</button></div>'
+            + '<div class="perek-grid" id="tr_' + tid + '"></div></div>';
+    });
+    html += '</div></div>';
+  });
+  c.innerHTML = html;
+}
+
+window.toggleOrder = function(id) {
+  const body = document.getElementById('ord_' + id);
+  const sec  = document.getElementById('sec_' + id);
+  const open = (body.style.display === 'none');
+  body.style.display = open ? 'block' : 'none';
+  if (sec) sec.classList.toggle('open', open);
+};
+
+window.toggleTractate = function(tid) {
+  const wrap = document.getElementById('trwrap_' + tid);
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  const grid = document.getElementById('tr_' + tid);
+  if (!grid.getAttribute('data-built')) {
+    grid.innerHTML = perekCells(tid);
+    grid.setAttribute('data-built', '1');
+  }
+  wrap.style.display = 'block';
+  refreshCells(); // reflect any already-queued chapters on the freshly-built cells
+};
+
+function perekCells(tid) {
+  const t = Corpus.getTractate(tid);
+  let h = '';
+  for (let p = 1; p <= t.length; p++) {
+    const id = Corpus.chapId(tid, p);
+    const isD = doneToday.has(id);
+    h += '<div class="cc' + (isD ? ' done' : '') + '" id="' + cellId(id) + '" onclick="toggleChap(\'' + id + '\')">'
+       + '<span class="cc-num">' + toGem(p) + '</span></div>';
+  }
+  return h;
+}
+
+/* ── Refresh sel-state + order numbers on all rendered cells ── */
+function refreshCells() {
+  document.querySelectorAll('.cc').forEach(el => {
+    const order = el.querySelector('.cc-order');
+    if (order) order.remove();
+    el.classList.remove('sel');
+  });
+  sequence.forEach((id, i) => {
+    const el = document.getElementById(cellId(id));
+    if (!el) return;
+    el.classList.add('sel');
+    const badge = document.createElement('span');
+    badge.className = 'cc-order';
+    badge.textContent = i + 1;
+    el.appendChild(badge);
+  });
+}
+
+/* ── Toggle a single chapter ── */
+window.toggleChap = function(id) {
+  const idx = sequence.indexOf(id);
   if (idx === -1) {
-    sequence.push(n);
-    showToast('פרק ' + toGem(n) + ' נוסף לרצף');
+    sequence.push(id);
+    showToast(chapLabel(id) + ' נוסף לרצף');
   } else {
     sequence.splice(idx, 1);
   }
-  buildGrid();
-  renderStrip();
-  updateUI();
-}
+  refreshCells(); renderStrip(); updateUI();
+};
 
-/* ── Remove from strip ── */
-function removeFromStrip(n) {
-  sequence = sequence.filter(x => x !== n);
-  buildGrid();
-  renderStrip();
-  updateUI();
-}
+/* ── Add a whole tractate (in order, skipping ones already queued) ── */
+window.addTractate = function(tid) {
+  const t = Corpus.getTractate(tid);
+  let added = 0;
+  for (let p = 1; p <= t.length; p++) {
+    const id = Corpus.chapId(tid, p);
+    if (sequence.indexOf(id) === -1) { sequence.push(id); added++; }
+  }
+  refreshCells(); renderStrip(); updateUI();
+  showToast(added ? ('נוספו ' + added + ' פרקים מ' + t.he) : ('כל פרקי ' + t.he + ' כבר ברצף'));
+};
 
-/* ── Render bottom strip ── */
+/* ── Remove from the bottom strip ── */
+window.removeFromStrip = function(id) {
+  sequence = sequence.filter(x => x !== id);
+  refreshCells(); renderStrip(); updateUI();
+};
+
 function renderStrip() {
   const strip = document.getElementById('seqStrip');
   if (!sequence.length) {
     strip.innerHTML = '<span class="seq-empty">טרם נבחרו פרקים</span>';
     return;
   }
-  strip.innerHTML = sequence.map(n =>
-    '<div class="seq-chip" onclick="removeFromStrip(' + n + ')" title="הסר">פרק ' + toGem(n) + '</div>'
+  strip.innerHTML = sequence.map(id =>
+    '<div class="seq-chip" onclick="removeFromStrip(\'' + id + '\')" title="הסר">' + chapLabel(id) + '</div>'
   ).join('');
-  // scroll to end to show latest
-  setTimeout(() => { strip.scrollLeft = strip.scrollWidth; }, 50);
+  setTimeout(() => { strip.scrollLeft = 0; }, 50); // RTL: newest appears at right
 }
 
-/* ── Update count badge & button ── */
 function updateUI() {
   const cnt = sequence.length;
   document.getElementById('countBadge').textContent = cnt + (cnt === 1 ? ' פרק' : ' פרקים');
-  document.getElementById('startBtn').disabled = cnt === 0;
-  document.getElementById('startBtn').textContent = cnt > 0
-    ? '▶ קרא ברצף — ' + cnt + ' פרקים'
-    : '▶ קרא ברצף';
-  // הצג/הסתר כפתור "בטל הכל"
+  const btn = document.getElementById('startBtn');
+  btn.disabled = cnt === 0;
+  btn.textContent = cnt > 0 ? ('▶ קרא ברצף — ' + cnt + ' פרקים') : '▶ קרא ברצף';
   document.getElementById('clearAllBtn').style.display = cnt > 1 ? '' : 'none';
 }
 
 /* ── Presets ── */
-function presetAll() {
-  sequence = Array.from({length:150}, (_,i) => i+1);
-  buildGrid(); renderStrip(); updateUI();
-  showToast('נבחרו כל 150 הפרקים');
-}
-function presetFavs() {
-  const favs = S.get('tehillim_favs');
-  // תומך בשני פורמטים: מערך [23,91] או אובייקט {chapters:{23:true}}
-  let arr = [];
-  if (Array.isArray(favs)) arr = favs.slice().sort((a,b)=>a-b);
-  else if (favs && favs.chapters) arr = Object.keys(favs.chapters).map(Number).filter(n=>favs.chapters[n]).sort((a,b)=>a-b);
+window.presetYomit = function() {
+  if (!Corpus.mishnahYomit) { showToast('המשנה היומית אינה זמינה'); return; }
+  const y = Corpus.mishnahYomit();
+  const ids = [y.first.chapId];
+  if (y.second.chapId !== y.first.chapId) ids.push(y.second.chapId);
+  ids.forEach(id => { if (sequence.indexOf(id) === -1) sequence.push(id); });
+  refreshCells(); renderStrip(); updateUI();
+  showToast('נוספה המשנה היומית');
+};
+
+window.presetFavs = function() {
+  const arr = favIds();
   if (!arr.length) { showToast('אין פרקים מועדפים עדיין'); return; }
-  sequence = arr;
-  buildGrid(); renderStrip(); updateUI();
+  arr.forEach(id => { if (sequence.indexOf(id) === -1) sequence.push(id); });
+  refreshCells(); renderStrip(); updateUI();
   showToast('נטענו ' + arr.length + ' מועדפים');
-}
-function presetToday() {
-  const day = getHebDay();
-  const r   = MONTHLY[day] || MONTHLY[1];
-  sequence  = Array.from({length: r.to - r.from + 1}, (_,i) => r.from + i);
-  buildGrid(); renderStrip(); updateUI();
-  showToast('פרקי היום: ' + toGem(r.from) + (r.from !== r.to ? '–' + toGem(r.to) : ''));
-}
-function presetFirst50()  { sequence = Array.from({length:50}, (_,i)=>i+1);    buildGrid(); renderStrip(); updateUI(); }
-function presetMid50()    { sequence = Array.from({length:50}, (_,i)=>i+51);   buildGrid(); renderStrip(); updateUI(); }
-function presetLast50()   { sequence = Array.from({length:50}, (_,i)=>i+101);  buildGrid(); renderStrip(); updateUI(); }
-function clearAll()       { sequence = []; buildGrid(); renderStrip(); updateUI(); }
+};
+
+window.presetAvot = function() {
+  addTractate('PirkeiAvot');
+};
+
+window.clearAll = function() {
+  sequence = [];
+  refreshCells(); renderStrip(); updateUI();
+};
 
 /* ── Start reading ── */
-function startReading() {
+window.startReading = function() {
   if (!sequence.length) return;
-  S.set('tehillim_playlist', { chaps: sequence, idx: 0, source: 'custom' });
-  location.href = '03-reader.html?chap=' + sequence[0] + '&mode=playlist';
-}
+  S.set('tehillim_playlist', { chaps: sequence.slice(), idx: 0, source: 'custom' });
+  location.href = '03-reader.html?chap=' + encodeURIComponent(sequence[0]) + '&mode=playlist';
+};
 
 /* ── Toast ── */
 let _toastTimer;
@@ -257,14 +323,13 @@ function showToast(msg) {
 }
 
 /* ── Init ── */
-function init() {
+(function init() {
   const s = S.get('tehillim_settings');
   if (s && s.darkMode) document.documentElement.classList.add('dark');
-  buildGrid();
+  buildOrders();
   renderStrip();
   updateUI();
-}
-init();
+})();
 </script>
 <script src="bottomnav.js?v=2.2.0"></script>
 </body>

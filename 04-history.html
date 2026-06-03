@@ -212,6 +212,8 @@ html.dark .sc-cell.shabbat{background:#0E2416;border-color:#54A463;}
 html.dark .cm-cell.read{background:#1A2810;}
 html.dark .cm-cell.mem{background:#1C1230;}
 html.dark .cm-cell.fav{background:#2A1010;}
+.cm-order-label{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--text-sec);margin:8px 0 2px;}
+.cm-order-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(15,1fr);gap:3px;}
 
 /* 5 books */
 .books-section{margin:8px 16px;padding:12px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);}
@@ -225,6 +227,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 .book-count-sm{font-size:11px;color:var(--text-muted);min-width:54px;text-align:left;}
 
 </style>
+<script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
@@ -345,7 +348,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
     <div class="chap-map-section">
       <div class="chap-map-header">
         <div class="chap-map-title" data-i18n="hist.chapters_map">📖 מפת הפרקים שלי</div>
-        <div class="chap-map-count"><span id="chapMapCount">0</span>/150 פרקים נקראו</div>
+        <div class="chap-map-count"><span id="chapMapCount">0</span>/525 פרקים נלמדו</div>
       </div>
       <div class="chap-map-legend">
         <span class="cml"><i class="cml-dot" style="background:#EBF5E5;border:1px solid #3B8C14;"></i><span data-i18n="hist.legend_read">נקרא</span></span>
@@ -400,11 +403,11 @@ html.dark .cm-cell.fav{background:#2A1010;}
 
       <div class="legend-box">
         <h4 data-i18n="hist.legend_box_title">📊 מקרא — איך צוברים מעלות?</h4>
-        <div class="legend-row"><span>📖 קריאת פרק שלם (בונוס)</span><span class="legend-pts">5</span></div>
-        <div class="legend-row"><span>⏱️ כל 10 שניות קריאה</span><span class="legend-pts">1</span></div>
+        <div class="legend-row"><span>📖 לימוד פרק שלם (בונוס)</span><span class="legend-pts">5</span></div>
+        <div class="legend-row"><span>⏱️ כל 10 שניות לימוד</span><span class="legend-pts">1</span></div>
         <div class="legend-row"><span>⭐ סימון פרק כ"למדתי בע״פ"</span><span class="legend-pts">10</span></div>
-        <div class="legend-row"><span>📚 סיום ספר שלם (אחד מ-5)</span><span class="legend-pts">100</span></div>
-        <div class="legend-row"><span>🌟 כל ה-150 פרקים</span><span class="legend-pts">500</span></div>
+        <div class="legend-row"><span>📚 סיום סדר שלם (אחד מ-6)</span><span class="legend-pts">100</span></div>
+        <div class="legend-row"><span>🌟 כל 525 הפרקים</span><span class="legend-pts">500</span></div>
         <div class="legend-row"><span>📅 סיום פרקי היום (לפי לוח עברי)</span><span class="legend-pts">50</span></div>
         <div class="legend-row"><span>🏆 השלמת אתגר</span><span class="legend-pts">5-200</span></div>
         <div class="legend-row"><span>🥉 מדליית ארד (5 דקות ביום)</span><span class="legend-pts">10</span></div>
@@ -445,34 +448,34 @@ const MEDALS = [
   {
     level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minMin:5, bonus:10,
     color:'#CD7F32', bg:'#FFF8F0', textColor:'#7A4A00',
-    achievement:'קראת 5 דקות תהילים ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
-    achievementEn:'You read Tehillim for 5 minutes in one day! Every small step in Torah is the beginning of a great journey.',
-    quote:'כִּי אִם בְּתוֹרַת ה׳ חֶפְצוֹ\nוּבְתוֹרָתוֹ יֶהְגֶּה יוֹמָם וָלָיְלָה',
-    ref:'תהילים א׳:ב׳'
+    achievement:'למדת 5 דקות משנה ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
+    achievementEn:'You studied Mishnah for 5 minutes in one day! Every small step in Torah is the beginning of a great journey.',
+    quote:'לֹא עָלֶיךָ הַמְּלָאכָה לִגְמֹר\nוְלֹא אַתָּה בֶן חוֹרִין לִבָּטֵל מִמֶּנָּה',
+    ref:'אבות ב׳:ט״ז'
   },
   {
     level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minMin:15, bonus:20,
     color:'#909098', bg:'#F8F8FF', textColor:'#404055',
-    achievement:'קראת 15 דקות תהילים! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
-    achievementEn:'You read Tehillim for 15 minutes! Your devotion brings blessing to your soul and to all of Israel.',
-    quote:'שָׂשׂ אָנֹכִי עַל אִמְרָתֶךָ\nכְּמוֹצֵא שָׁלָל רָב',
-    ref:'תהילים קי״ט:קס״ב'
+    achievement:'למדת 15 דקות משנה! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
+    achievementEn:'You studied Mishnah for 15 minutes! Your devotion brings blessing to your soul and to all of Israel.',
+    quote:'שְׁנַיִם שֶׁיּוֹשְׁבִין וְיֵשׁ בֵּינֵיהֶם דִּבְרֵי תוֹרָה\nשְׁכִינָה שְׁרוּיָה בֵינֵיהֶם',
+    ref:'אבות ג׳:ב׳'
   },
   {
     level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minMin:30, bonus:35,
     color:'#C8A800', bg:'#FFFBF0', textColor:'#6A5500',
-    achievement:'קראת 30 דקות! חצי שעה של תהילים — הישג מרשים. אתה בנתיב של גדולי ישראל.',
-    achievementEn:'You read for 30 minutes! Half an hour of Tehillim — an impressive achievement. You walk in the path of the greats.',
-    quote:'וַאֲנִי קִרְבַת אֱלֹהִים לִי טוֹב\nשַׁתִּי בַּה׳ אֲדֹנָי מַחְסִי',
-    ref:'תהילים ע״ג:כ״ח'
+    achievement:'למדת 30 דקות! חצי שעה של משנה — הישג מרשים. אתה בנתיב של גדולי ישראל.',
+    achievementEn:'You studied for 30 minutes! Half an hour of Mishnah — an impressive achievement. You walk in the path of the greats.',
+    quote:'וֶהֱוֵי מִתְאַבֵּק בַּעֲפַר רַגְלֵיהֶם\nוְשׁוֹתֶה בְצָמָא אֶת דִּבְרֵיהֶם',
+    ref:'אבות א׳:ד׳'
   },
   {
     level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minMin:45, bonus:50,
     color:'#5A9E68', bg:'#F0F8FF', textColor:'#18441F',
-    achievement:'קראת 45 דקות! הישג יוצא מהכלל. רצונך בתורת ה׳ הוא אוצר אמיתי שאין כמוהו.',
-    achievementEn:'You read for 45 minutes! An extraordinary achievement. Your desire for Torah is a true treasure beyond compare.',
-    quote:'טוֹב לִי תוֹרַת פִּיךָ\nמֵאַלְפֵי זָהָב וָכָסֶף',
-    ref:'תהילים קי״ט:ע״ב'
+    achievement:'למדת 45 דקות! הישג יוצא מהכלל. עמלך במשנה הוא אוצר אמיתי שאין כמוהו.',
+    achievementEn:'You studied for 45 minutes! An extraordinary achievement. Your toil in Mishnah is a true treasure beyond compare.',
+    quote:'אֵין מְלַוִּין לוֹ לְאָדָם בִּשְׁעַת פְּטִירָתוֹ\nלֹא כֶסֶף וְלֹא זָהָב — אֶלָּא תוֹרָה',
+    ref:'אבות ו׳:ט׳'
   }
 ];
 
@@ -587,23 +590,34 @@ function renderAchievementsTab() {
     document.getElementById('lvlBar').style.width = '100%';
   }
 
-  // === Chapter map (150 cells) ===
+  // === Chapter map (by order → chapters; chapIds are strings like "Berakhot.2") ===
   const readings = JSON.parse(localStorage.getItem('tehillim_readings')||'[]');
-  const uniqueRead = new Set(readings.filter(r=>!r.partial).map(r => +r.chap));
+  const uniqueRead = new Set(readings.filter(r=>!r.partial).map(r => String(r.chap)));
   const favsRaw = (function(){ try{return JSON.parse(localStorage.getItem('tehillim_favs')||'null');}catch(e){return null;}})();
   let favsSet = new Set();
-  if (Array.isArray(favsRaw)) favsRaw.forEach(n => favsSet.add(+n));
-  else if (favsRaw && favsRaw.chapters) Object.keys(favsRaw.chapters).forEach(n => { if (favsRaw.chapters[n]) favsSet.add(+n); });
+  if (Array.isArray(favsRaw)) favsRaw.forEach(id => favsSet.add(String(id)));
+  else if (favsRaw && favsRaw.chapters) Object.keys(favsRaw.chapters).forEach(id => { if (favsRaw.chapters[id]) favsSet.add(String(id)); });
   const memRaw = JSON.parse(localStorage.getItem('tehillim_mem')||'[]');
-  const memSet = new Set(Array.isArray(memRaw) ? memRaw.map(Number) : []);
+  const memSet = new Set(Array.isArray(memRaw) ? memRaw.map(String) : []);
 
+  const hasCorpus = (typeof Corpus !== 'undefined');
   let mapHtml = '';
-  for (let n = 1; n <= 150; n++) {
-    const cls = [];
-    if (uniqueRead.has(n)) cls.push('read');
-    if (memSet.has(n)) cls.push('mem');
-    if (favsSet.has(n)) cls.push('fav');
-    mapHtml += '<a class="cm-cell ' + cls.join(' ') + '" href="03-reader.html?chap=' + n + '">' + n + '</a>';
+  if (hasCorpus) {
+    Corpus.orders.forEach(o => {
+      mapHtml += '<div class="cm-order-label">סדר ' + o.he + '</div><div class="cm-order-grid">';
+      o.tractates.forEach(tid => {
+        const t = Corpus.getTractate(tid);
+        for (let p = 1; p <= t.length; p++) {
+          const id = Corpus.chapId(tid, p);
+          const cls = [];
+          if (uniqueRead.has(id)) cls.push('read');
+          if (memSet.has(id)) cls.push('mem');
+          if (favsSet.has(id)) cls.push('fav');
+          mapHtml += '<a class="cm-cell ' + cls.join(' ') + '" title="' + t.he + ' ' + p + '" href="03-reader.html?chap=' + encodeURIComponent(id) + '"></a>';
+        }
+      });
+      mapHtml += '</div>';
+    });
   }
   document.getElementById('chapMapGrid').innerHTML = mapHtml;
   document.getElementById('chapMapCount').textContent = uniqueRead.size;
@@ -611,27 +625,29 @@ function renderAchievementsTab() {
   // === Streak Calendar ===
   _renderStreakCalendar(readings);
 
-  // === 5 books ===
-  const booksDef = [
-    {name:'ספר א׳', from:1, to:41, color:'#3A7D44'},
-    {name:'ספר ב׳', from:42, to:72, color:'#3B8C14'},
-    {name:'ספר ג׳', from:73, to:89, color:'#7B2FF7'},
-    {name:'ספר ד׳', from:90, to:106, color:'#C07A00'},
-    {name:'ספר ה׳', from:107, to:150, color:'#C0392B'}
-  ];
+  // === 6 orders ===
+  const orderColors = {Zeraim:'#3A7D44',Moed:'#3B8C14',Nashim:'#7B2FF7',Nezikin:'#C07A00',Kodashim:'#C0392B',Tahorot:'#0E7C86'};
   let booksHtml = '';
-  booksDef.forEach(b => {
-    let cnt = 0;
-    for (let n = b.from; n <= b.to; n++) if (uniqueRead.has(n)) cnt++;
-    const total = b.to - b.from + 1;
-    const pct = Math.round(cnt / total * 100);
-    booksHtml += '<div class="book-row">' +
-      '<div class="book-dot-sm" style="background:' + b.color + ';"></div>' +
-      '<div class="book-name-sm">' + b.name + '</div>' +
-      '<div class="book-bar-wrap"><div class="book-bar" style="width:' + pct + '%;background:' + b.color + ';"></div></div>' +
-      '<div class="book-count-sm">' + cnt + '/' + total + '</div>' +
-      '</div>';
-  });
+  if (hasCorpus) {
+    Corpus.orders.forEach(o => {
+      let total = 0, cnt = 0;
+      o.tractates.forEach(tid => {
+        const t = Corpus.getTractate(tid);
+        for (let p = 1; p <= t.length; p++) {
+          total++;
+          if (uniqueRead.has(Corpus.chapId(tid, p))) cnt++;
+        }
+      });
+      const color = orderColors[o.id] || '#3A7D44';
+      const pct = total ? Math.round(cnt / total * 100) : 0;
+      booksHtml += '<div class="book-row">' +
+        '<div class="book-dot-sm" style="background:' + color + ';"></div>' +
+        '<div class="book-name-sm">' + o.he + '</div>' +
+        '<div class="book-bar-wrap"><div class="book-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+        '<div class="book-count-sm">' + cnt + '/' + total + '</div>' +
+        '</div>';
+    });
+  }
   document.getElementById('booksProgress').innerHTML = booksHtml;
 }
 
@@ -1231,11 +1247,11 @@ function renderAchievements() {
     .forEach(([,v]) => mins += v);
 
   const statsData = [
-    { num: doneCh.size,         lbl: '📖 פרקים נקראו'           },
+    { num: doneCh.size,         lbl: '📖 פרקים נלמדו'           },
     { num: '+' + pts,           lbl: '⭐ מעלות',    color:'#C07A00' },
-    { num: fmtMins(mins),       lbl: '⏱ זמן קריאה'               },
+    { num: fmtMins(mins),       lbl: '⏱ זמן לימוד'               },
     { num: mem.length,          lbl: '🧠 פרקים בע"פ'             },
-    { num: doneCh.size * 150 > 0 ? Math.round(doneCh.size / 150 * 100) + '%' : '0%',
+    { num: (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })(),
                                 lbl: '📊 מכסת המשנה', wide:false  },
     { num: visits.count || 0,  lbl: '📱 כניסות לאפליקציה', wide:true },
   ];
@@ -1368,17 +1384,17 @@ function buildShareText(level) {
   const m = MEDALS.find(x => x.level === level);
   const _sLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   if (_sLang === 'en') {
-    return m.emoji + ' I earned the ' + (m.en || m.label) + ' Medal for reading Tehillim!\n' +
+    return m.emoji + ' I earned the ' + (m.en || m.label) + ' Medal for studying Mishnah!\n' +
            'Bonus: +' + m.bonus + ' Maalot ⭐\n\n' +
            '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
-           '📲 Join Tehilon: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
-           '— Tehilon 📖';
+           '📲 Join Mishnayon: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
+           '— Mishnayon 📖';
   }
   return m.emoji + ' זכיתי במדליית ' + m.label + ' על לימוד משניות!\n' +
          'בונוס: +' + m.bonus + ' מעלות ⭐\n\n' +
          '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
-         '📲 הצטרף לתהילהון: ' + APP_URL + '\n' +
-         '— תהילהון 📖';
+         '📲 הצטרף למשניון: ' + APP_URL + '\n' +
+         '— משניון 📖';
 }
 
 // Mobile = Android / iPhone / iPad (navigator.share on desktop opens OS share sheet, not WhatsApp Web)
@@ -1428,7 +1444,7 @@ window.shareCert = async function(level) {
     if (IS_MOBILE && navigator.share) {
       /* ── נייד: גיליון שיתוף נייטיב (וואטסאפ, טלגרם, מייל…) ── */
       const _stLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
-      const _stTitle = _stLang === 'en' ? (m.en||m.label) + ' Medal — Tehilon' : 'מדליית ' + m.label + ' — תהילהון';
+      const _stTitle = _stLang === 'en' ? (m.en||m.label) + ' Medal — Mishnayon' : 'מדליית ' + m.label + ' — משניון';
       const shareData = { title: _stTitle, text: shareText };
       if (blob) {
         const file = new File([blob], 'מדלית-' + m.label + '.png', { type:'image/png' });

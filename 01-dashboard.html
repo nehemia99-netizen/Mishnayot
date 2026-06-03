@@ -561,7 +561,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.1.0 BETA</div>
+          <div class="app-version">גרסה 1.3.0 BETA</div>
         </div>
       </div>
     </div>
@@ -574,7 +574,7 @@ html.dark .lottery-trigger{opacity:.85;}
   </div>
 
   <div id="advancedModeBtn" style="padding:6px 16px 2px;">
-    <button id="modeToggleBtn" onclick="window.toggleMode()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid var(--primary);background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">📖 עבור לקריאה תמימה</button>
+    <button id="modeToggleBtn" onclick="window.toggleMode()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid var(--primary);background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">📖 עבור ללימוד לשמה</button>
   </div>
 
   <!-- Simple Mode: חיזוק פשוט -->
@@ -703,10 +703,10 @@ html.dark .lottery-trigger{opacity:.85;}
     <!-- כפתורי ברכה -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <button onclick="window.openBlessingDirect('b1')" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
-        <span style="font-size:16px;">🙏</span><span data-i18n="home.blessing_before">ברכה לפני<br>קריאה</span>
+        <span style="font-size:16px;">🙏</span><span data-i18n="home.blessing_before">ברכה לפני<br>לימוד</span>
       </button>
       <button onclick="window.openBlessingDirect('b2')" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
-        <span style="font-size:16px;">✨</span><span data-i18n="home.blessing_after">ברכה אחרי<br>קריאה</span>
+        <span style="font-size:16px;">✨</span><span data-i18n="home.blessing_after">ברכה אחרי<br>לימוד</span>
       </button>
     </div>
 
@@ -797,7 +797,7 @@ html.dark .lottery-trigger{opacity:.85;}
 
   <!-- כפתור קטן מוד תמימה — מוצג רק כשהמשתמש בחר להעביר לתחתית -->
   <div id="modeSmallBtn" style="display:none;text-align:center;padding:6px 0 2px;">
-    <button onclick="window.toggleMode()" style="font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:inherit;" data-i18n="home.mode_simple_small">📖 קריאה תמימה</button>
+    <button onclick="window.toggleMode()" style="font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:inherit;" data-i18n="home.mode_simple_small">📖 לימוד לשמה</button>
   </div>
 
   <div class="divider"></div>
@@ -811,7 +811,7 @@ html.dark .lottery-trigger{opacity:.85;}
 <div class="modal-overlay" id="blessingsModal" onclick="closeModalOut(event,'blessingsModal')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title"><span data-i18n="bless.title">🙏 ברכות קריאת תהילים</span><button class="modal-close" onclick="closeModal('blessingsModal')">✕</button></div>
+    <div class="modal-title"><span data-i18n="bless.title">🙏 ברכות ותפילות</span><button class="modal-close" onclick="closeModal('blessingsModal')">✕</button></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 16px 10px;border-bottom:.5px solid var(--border);">
       <span style="font-size:11px;color:var(--text-muted);" data-i18n="bless.font_size">גודל פונט:</span>
       <button onclick="changeBlessingFont(-1)" style="width:30px;height:30px;border-radius:8px;border:.5px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;font-family:inherit;color:var(--text);">−</button>
@@ -819,21 +819,21 @@ html.dark .lottery-trigger{opacity:.85;}
       <button onclick="changeBlessingFont(1)" style="width:30px;height:30px;border-radius:8px;border:.5px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;font-family:inherit;color:var(--text);">+</button>
     </div>
     <div class="blessing-item" id="b1">
-      <div class="blessing-header" onclick="toggleBlessing('b1')"><span class="blessing-title">לפני קריאת תהילים</span><span class="blessing-arrow">›</span></div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁיְּהֵא חָשׁוּב וּמְקֻבָּל וְנָעִים לְפָנֶיךָ מִקְרָא מִזְמוֹרֵי תְהִלִּים שֶׁאֲנִי קוֹרֵא, כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם. וּכְשֵׁם שֶׁלֹּא הִגִּיעַ אֵלָיו דִּבַּת מְשַׁנְּאָיו, כֵּן לֹא תַגִּיעַ עָלֵינוּ דִּבַּת שׂוֹנְאֵינוּ. וּבִזְכוּת מִזְמוֹרֵי תְהִלִּים שֶׁאֲנוּ קוֹרְאִים תַּצִּילֵנוּ מֵרוּחוֹת רָעוֹת וּמִמַּזִּיקִים, וּמִכָּל צָרָה וְצוּקָה, וּתְקַבֵּל תְּפִלּוֹתֵינוּ בְּרַחֲמִים וּבְרָצוֹן. אָמֵן.</div>
+      <div class="blessing-header" onclick="toggleBlessing('b1')"><span class="blessing-title">לפני לימוד משנה</span><span class="blessing-arrow">›</span></div>
+      <div class="blessing-body">לְשֵׁם יִחוּד קֻדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּיהּ, הֲרֵינִי בָּא לִלְמֹד מִשְׁנָה לִשְׁמָהּ.<br><br>יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁתָּכִין לְבָבִי וְתָאִיר עֵינַי בְּתַלְמוּד תּוֹרָתֶךָ, וְתִתֶּן בְּלִבִּי בִּינָה לְהָבִין וּלְהַשְׂכִּיל, לִשְׁמֹעַ לִלְמֹד וּלְלַמֵּד, לִשְׁמֹר וְלַעֲשׂוֹת. וְיִהְיוּ דִּבְרֵי הַמִּשְׁנָה שֶׁאֲנִי לוֹמֵד חֲשׁוּבִים וּמְקֻבָּלִים לְפָנֶיךָ, וְזַכֵּנִי שֶׁתְּהֵא תּוֹרָתְךָ אֻמָּנוּתִי. אָמֵן.</div>
     </div>
-    <!-- כפתור המשך קריאה אחרי ברכה לפני -->
+    <!-- כפתור המשך לימוד אחרי ברכה לפני -->
     <div id="blessingReadBtn" style="display:none;padding:8px 16px 12px;text-align:center;">
-      <button onclick="closeModal('blessingsModal');window.goToDailyChapter();" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 לפרק היומי ←</button>
+      <button onclick="closeModal('blessingsModal');window.goToDailyChapter();" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">📖 למשנה היומית ←</button>
     </div>
 
     <div class="blessing-item" id="b2">
-      <div class="blessing-header" onclick="toggleBlessing('b2')"><span class="blessing-title">אחרי קריאת תהילים</span><span class="blessing-arrow">›</span></div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁמִּזְמוֹרֵי תְהִלִּים שֶׁקָּרָאתִי יִהְיוּ כְּאִלּוּ אֲמָרָם דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם בְּעַצְמוֹ. וְיַעֲלוּ לְפָנֶיךָ כְּרֵיחַ נִיחוֹחַ וִיכַפְּרוּ עַל כָּל עֲוֹנוֹתַי וּפְשָׁעַי, וְיִהְיֶה לֵב מַלְכֻיּוֹת פָּנוּי לְטוֹבָה לְיִשְׂרָאֵל, וּתְמַלֵּא כָּל מִשְׁאֲלוֹת לְבָבֵנוּ לְטוֹבָה. אָמֵן.</div>
+      <div class="blessing-header" onclick="toggleBlessing('b2')"><span class="blessing-title">אחרי לימוד משנה</span><span class="blessing-arrow">›</span></div>
+      <div class="blessing-body">רַבִּי חֲנַנְיָא בֶּן עֲקַשְׁיָא אוֹמֵר: רָצָה הַקָּדוֹשׁ בָּרוּךְ הוּא לְזַכּוֹת אֶת יִשְׂרָאֵל, לְפִיכָךְ הִרְבָּה לָהֶם תּוֹרָה וּמִצְוֹת, שֶׁנֶּאֱמַר: ה' חָפֵץ לְמַעַן צִדְקוֹ יַגְדִּיל תּוֹרָה וְיַאְדִּיר.<br><br><span style="font-size:12px;color:var(--text-muted)">— מכות ג׳:ט״ז · הנאמר בסיום לימוד משנה</span></div>
     </div>
     <div class="blessing-item" id="b8">
-      <div class="blessing-header" onclick="toggleBlessing('b8')"><span class="blessing-title">יהי רצון של החיד"א (אחרי הקריאה)</span><span class="blessing-arrow">›</span></div>
-      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ, הַבּוֹחֵר בְּדָוִד עַבְדּוֹ וּבְזַרְעוֹ אַחֲרָיו, וְהַבּוֹחֵר בְּשִׁירוֹת וְתִשְׁבָּחוֹת, שֶׁתֵּפֶן בְּרַחֲמִים אֶל קְרִיאַת מִזְמוֹרֵי תְהִלִּים שֶׁאֶקְרָא, כְּאִלּוּ אֲמָרָם דָּוִד מֶלֶךְ יִשְׂרָאֵל בְּעַצְמוֹ, זְכוּתוֹ יָגֵן עָלֵינוּ.<br><br>וְיַעֲמוֹד לָנוּ זְכוּת פְּסוּקֵי מִזְמוֹרֵי תְהִלִּים וּזְכוּת תֵּבוֹתֵיהֶם וְאוֹתִיּוֹתֵיהֶם וּנְקֻדּוֹתֵיהֶם וְטַעֲמֵיהֶם, וְהַשֵּׁמוֹת הַיּוֹצְאִים מֵהֶם מֵרָאשֵׁי תֵּבוֹת וּמִסּוֹפֵי תֵּבוֹת, לְכַפֵּר פְּשָׁעֵינוּ וַעֲוֹנוֹתֵינוּ וְחַטֹּאתֵינוּ, וּלְזַמֵּר עָרִיצִים וּלְהַכְרִית כָּל הַחוֹחִים וְהַקּוֹצִים הַסּוֹבְבִים אֶת הַשּׁוֹשַׁנָּה הָעֶלְיוֹנָה, וּלְחַבֵּר אֵשֶׁת נְעוּרִים עִם דּוֹדָהּ בְּאַהֲבָה וְאַחֲוָה וְרֵעוּת.<br><br>וּמִשָּׁם יִמָּשֵׁךְ לָנוּ שֶׁפַע לְנֶפֶשׁ רוּחַ וּנְשָׁמָה לְטַהֲרֵנוּ מֵעֲוֹנוֹתֵינוּ וְלִסְלוֹחַ חַטֹּאתֵינוּ וּלְכַפֵּר פְּשָׁעֵינוּ, כְּמוֹ שֶׁסָּלַחְתָּ לְדָוִד שֶׁאָמַר מִזְמוֹרִים אֵלּוּ לְפָנֶיךָ, כְּמוֹ שֶׁנֶּאֱמַר: "גַּם ה' הֶעֱבִיר חַטָּאתְךָ לֹא תָמוּת".<br><br>וְאַל תִּקָּחֵנוּ מֵהָעוֹלָם הַזֶּה קוֹדֶם זְמַנֵּנוּ, עַד מְלֹאת שְׁנוֹתֵינוּ — בָּהֶם שִׁבְעִים שָׁנָה — בְּאוֹפֶן שֶׁנּוּכַל לְתַקֵּן אֶת אֲשֶׁר שִׁחַתְנוּ. וּזְכוּת דָּוִד הַמֶּלֶךְ עָלָיו הַשָּׁלוֹם יָגֵן עָלֵינוּ וּבַעֲדֵנוּ, שֶׁתַּאֲרִיךְ אַפְּךָ עַד שׁוּבֵנוּ אֵלֶיךָ בִּתְשׁוּבָה שְׁלֵמָה לְפָנֶיךָ.<br><br>וּמֵאוֹצַר מַתְּנַת חִנָּם חָנֵּנוּ, כְּדִכְתִיב: "וְחַנֹּתִי אֶת אֲשֶׁר אָחֹן וְרִחַמְתִּי אֶת אֲשֶׁר אֲרַחֵם". וּכְשֵׁם שֶׁאָנוּ אוֹמְרִים לְפָנֶיךָ שִׁירָה בָּעוֹלָם הַזֶּה, כָּךְ נִזְכֶּה לוֹמַר לְפָנֶיךָ ה' אֱלֹהֵינוּ שִׁיר וּשְׁבָחָה לָעוֹלָם הַבָּא. וְעַל יְדֵי אֲמִירַת תְּהִלִּים תִּתְעוֹרֵר חֲבַצֶּלֶת הַשָּׁרוֹן וְלָשִׁיר בְּקוֹל נָעִים בְּגִילַת וְרַנֵּן כְּבוֹד הַלְּבָנוֹן נִתַּן לָהּ, הוֹד וְהָדָר בְּבֵית אֱלֹהֵינוּ בִּמְהֵרָה בְיָמֵינוּ. אָמֵן סֶלָה.<br><br><span style="font-size:12px;color:var(--text-muted)">— "יהי רצון" של מרן החיד"א, רבי חיים יוסף דוד אזולאי זצ"ל</span></div>
+      <div class="blessing-header" onclick="toggleBlessing('b8')"><span class="blessing-title">יהי רצון (אחרי לימוד משנה)</span><span class="blessing-arrow">›</span></div>
+      <div class="blessing-body">יְהִי רָצוֹן מִלְּפָנֶיךָ ה' אֱלֹהַי וֵאלֹהֵי אֲבוֹתַי, שֶׁתְּהֵא הַמִּשְׁנָה הַזֹּאת שֶׁלָּמַדְתִּי חֲשׁוּבָה וּמְקֻבֶּלֶת לְפָנֶיךָ, וְתַעֲלֶה לְךָ לְרָצוֹן כְּקָרְבָּן, וּזְכוּת הַתַּנָּאִים הַקְּדוֹשִׁים יַעֲמֹד לִי וּלְכָל יִשְׂרָאֵל.<br><br>וְזַכֵּנִי לִלְמֹד וּלְלַמֵּד, לִשְׁמֹר וְלַעֲשׂוֹת וּלְקַיֵּם אֶת כָּל דִּבְרֵי תַלְמוּד תּוֹרָתֶךָ בְּאַהֲבָה. וְהָאֵר עֵינַי בְּתוֹרָתֶךָ, וְדַבֵּק לִבִּי בְּמִצְוֹתֶיךָ, וְיַחֵד לְבָבִי לְאַהֲבָה וּלְיִרְאָה אֶת שְׁמֶךָ. אָמֵן.</div>
     </div>
     <div class="blessing-item" id="b10">
       <div class="blessing-header" onclick="toggleBlessing('b10')"><span class="blessing-title">📜 פרקי אבות — <span id="avotChapLabel" style="color:var(--text-muted);font-weight:400;">יומי</span></span><span class="blessing-arrow">›</span></div>
@@ -1112,7 +1112,7 @@ function _applySimpleMode() {
       btn.style.border = '1px solid #C0392B';
       btn.parentElement.style.textAlign = 'left';
     } else {
-      btn.textContent = (typeof i18n!=='undefined'?i18n.t('home.mode_simple'):'📖 עבור לקריאה תמימה');
+      btn.textContent = (typeof i18n!=='undefined'?i18n.t('home.mode_simple'):'📖 עבור ללימוד לשמה');
       btn.style.width = '100%';
       btn.style.padding = '10px';
       btn.style.borderRadius = '12px';
@@ -1237,7 +1237,7 @@ function _showModeButtonPopup() {
   d.id = 'modePopupOverlay';
   d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center;';
   const title     = _lang === 'en' ? '🎉 40 Chapters!' : '🎉 40 פרקים!';
-  const subtitle  = _lang === 'en' ? 'You\'re an experienced reader. Would you like to move the "Simple Reading" button to the bottom of the page?' : 'אתה כבר רגיל למסלול האתגרי. האם להעביר את כפתור "קריאה תמימה" לתחתית הדף?';
+  const subtitle  = _lang === 'en' ? 'You\'re an experienced learner. Would you like to move the "Lishmah study" button to the bottom of the page?' : 'אתה כבר רגיל למסלול האתגרי. האם להעביר את כפתור "לימוד לשמה" לתחתית הדף?';
   const btnMove   = _lang === 'en' ? 'Yes, move to bottom' : 'כן, העבר לתחתית';
   const btnKeep   = _lang === 'en' ? 'Keep at top' : 'השאר למעלה';
   d.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-width:390px;width:100%;text-align:center;">
@@ -1274,7 +1274,7 @@ window.toggleMode = function() {
   s.simpleMode = (s.simpleMode !== false) ? false : true;
   S.set('tehillim_settings', s);
   _applySimpleMode();
-  showToast(s.simpleMode ? 'קריאה פשוטה 📖' : 'מסלול אתגרי 🏆');
+  showToast(s.simpleMode ? 'לימוד לשמה 📖' : 'מסלול אתגרי 🏆');
   // אם עברנו לאתגרי וה-nav לא הוזרק עדיין — reload אחד (לא לולאה כי reload עצמו יזריק)
   if (!s.simpleMode && !document.getElementById('_bnav')) {
     setTimeout(() => location.reload(), 400);

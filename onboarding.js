@@ -125,8 +125,8 @@ function render() {
       const isEn = lang === 'en';
       modeEl.innerHTML = `
         <button id="_onb_m_simple" style="padding:14px 14px 12px;border-radius:16px;border:2.5px solid #3A7D44;background:#EAF2EA;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#3A7D44;text-align:right;line-height:1.5;">
-          <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">📖</span>${isEn ? 'Simple Reading' : 'קריאה תמימה'}</div>
-          <div style="font-size:12px;font-weight:400;color:#555;margin-top:3px;">${isEn ? 'Just open and read, without distractions or settings.' : 'רק לפתוח ולקרוא, בלי הסחות דעת ובלי הגדרות.'}</div>
+          <div><span style="font-size:20px;vertical-align:middle;margin-left:6px;">📖</span>${isEn ? 'Lishmah Study' : 'לימוד לשמה'}</div>
+          <div style="font-size:12px;font-weight:400;color:#555;margin-top:3px;">${isEn ? 'Just open and learn, without distractions or settings.' : 'רק לפתוח וללמוד, בלי הסחות דעת ובלי הגדרות.'}</div>
           <div style="font-size:11px;font-weight:400;color:#3A7D44;margin-top:5px;font-style:italic;line-height:1.4;">"הֲפֹךְ בָּהּ וַהֲפֹךְ בָּהּ דְּכֹלָּא בָהּ"<br><span style="color:#888;">(אבות ה', כ"ב)</span></div>
         </button>
         <button id="_onb_m_full" style="padding:14px 14px 12px;border-radius:16px;border:2px solid #ddd;background:#f9f9f9;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#333;text-align:right;line-height:1.5;">
