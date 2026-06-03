@@ -50,14 +50,18 @@ function updateGamStrip(){
     }
   } catch(e) {}
   const s = Gamification.getStats();
+  // רמה לפי המקסימום של שני מקורות הניקוד (זהה לעמוד ההישגים) — מונע אי-עקביות
+  let _effTotal = s.total || 0;
+  try { const _sc = S.get('tehillim_score') || {}; let _sum = 0; Object.values(_sc.daily || {}).forEach(v => { _sum += (+v || 0); }); _effTotal = Math.round(Math.max(_effTotal, _sum)); } catch(e){}
+  const _lvlObj = (Gamification.levelOf && _effTotal !== (s.total||0)) ? Gamification.levelOf(_effTotal) : s.level;
   const li=document.getElementById('gamLevelIcon');
   const ln=document.getElementById('gamLevelName');
   const sn=document.getElementById('gamStreakNum');
   const mn=document.getElementById('gamMemNum');
   const pf=document.getElementById('gamProgFill');
-  if(li)li.textContent=s.level.curr.icon;
+  if(li)li.textContent=_lvlObj.curr.icon;
   const _dashLang=(typeof i18n!=='undefined')?i18n.getCurrentLang():'he';
-  if(ln)ln.textContent=(_dashLang==='en'&&s.level.curr.en)?s.level.curr.en:s.level.curr.key;
+  if(ln)ln.textContent=(_dashLang==='en'&&_lvlObj.curr.en)?_lvlObj.curr.en:_lvlObj.curr.key;
   if(sn){
     sn.textContent=s.streak;
     // צבע בוהק כשיש רצף
@@ -90,7 +94,7 @@ function updateGamStrip(){
     }
   }
   if(mn)mn.textContent=s.memorized;
-  if(pf)pf.style.width=s.level.pct+'%';
+  if(pf)pf.style.width=(_lvlObj.pct||0)+'%';
   // בדוק milestone streak
   _checkStreakMilestone(s.streak);
 }
@@ -561,7 +565,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.29 BETA</div>
+          <div class="app-version">גרסה 1.5.30 BETA</div>
         </div>
       </div>
     </div>
@@ -2933,6 +2937,7 @@ function openAbout() {
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 const _app = getApps().find(a=>a.name==='dash-comm') || initializeApp({
   apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
   authDomain:"mishnayot-71073.firebaseapp.com",
@@ -2942,6 +2947,15 @@ const _app = getApps().find(a=>a.name==='dash-comm') || initializeApp({
   appId:"1:445059664136:web:fec8a4f338fd326d3b04bd"
 },'dash-comm');
 const _db = getFirestore(_app);
+const _auth = getAuth(_app);
+// קריאות הקהילה דורשות התחברות (כללי Firestore) — התחבר אנונימית כמו בעמוד הקהילה
+let _authReady = new Promise(res => {
+  try {
+    onAuthStateChanged(_auth, u => { if (u) res(u); });
+    if (_auth.currentUser) res(_auth.currentUser);
+    else signInAnonymously(_auth).catch(()=>res(null));
+  } catch(e) { res(null); }
+});
 const HEB=['','א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ז׳','ח׳','ט׳','י׳','י״א','י״ב','י״ג','י״ד','ט״ו','ט״ז','י״ז','י״ח','י״ט','כ׳','כ״א','כ״ב','כ״ג','כ״ד','כ״ה','כ״ו','כ״ז','כ״ח','כ״ט','ל׳','ל״א','ל״ב','ל״ג','ל״ד','ל״ה','ל״ו','ל״ז','ל״ח','ל״ט','מ׳','מ״א','מ״ב','מ״ג','מ״ד','מ״ה','מ״ו','מ״ז','מ״ח','מ״ט','נ׳','נ״א','נ״ב','נ״ג','נ״ד','נ״ה','נ״ו','נ״ז','נ״ח','נ״ט','ס׳','ס״א','ס״ב','ס״ג','ס״ד','ס״ה','ס״ו','ס״ז','ס״ח','ס״ט','ע׳','ע״א','ע״ב','ע״ג','ע״ד','ע״ה','ע״ו','ע״ז','ע״ח','ע״ט','פ׳','פ״א','פ״ב','פ״ג','פ״ד','פ״ה','פ״ו','פ״ז','פ״ח','פ״ט','צ׳','צ״א','צ״ב','צ״ג','צ״ד','צ״ה','צ״ו','צ״ז','צ״ח','צ״ט','ק׳','ק״א','ק״ב','ק״ג','ק״ד','ק״ה','ק״ו','ק״ז','ק״ח','ק״ט','ק״י','קי״א','קי״ב','קי״ג','קי״ד','קט״ו','קט״ז','קי״ז','קי״ח','קי״ט','ק״כ','קכ״א','קכ״ב','קכ״ג','קכ״ד','קכ״ה','קכ״ו','קכ״ז','קכ״ח','קכ״ט','ק״ל','קל״א','קל״ב','קל״ג','קל״ד','קל״ה','קל״ו','קל״ז','קל״ח','קל״ט','ק״מ','קמ״א','קמ״ב','קמ״ג','קמ״ד','קמ״ה','קמ״ו','קמ״ז','קמ״ח','קמ״ט','ק״נ'];
 
 function _dashChapLabel(id){
@@ -2954,6 +2968,7 @@ function _dashChapLabel(id){
   return 'פרק '+(HEB[+id]||id);
 }
 window.loadDashCommunity = async function loadDashCommunity(){
+  try { await Promise.race([_authReady, new Promise(r=>setTimeout(r,4000))]); } catch(e){}
   // פרקים חמים
   try{
     const cs=await getDocs(query(collection(_db,'chapReads'),orderBy('count','desc'),limit(5)));

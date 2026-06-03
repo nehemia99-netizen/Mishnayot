@@ -87,10 +87,10 @@ html.dark #memBtn{color:#9B6FE0;}
 .qc-back{background:var(--surface);color:var(--text);border:.5px solid var(--border)!important;}
 
 /* ── Shinun (memorization) mode ── */
-.shinun-bar{display:none;gap:6px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:wrap;}
+.shinun-bar{display:none;gap:6px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:wrap;justify-content:center;}
 html.dark .shinun-bar{background:#1C1235;border-bottom-color:#4A3080;}
 .shinun-bar.open{display:flex;}
-.shinun-lvl{flex:1 1 28%;min-width:88px;padding:7px 6px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
+.shinun-lvl{flex:0 1 30%;min-width:88px;max-width:33%;padding:7px 6px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
 .rt-word{cursor:pointer;border-bottom:1px dotted #B79BE8;-webkit-tap-highlight-color:transparent;}
 .rt-word.revealed{border-bottom:none;color:var(--primary);}
 html.dark .shinun-lvl{border-color:#5B3090;color:#9B6FE0;}
@@ -271,8 +271,8 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     <button class="shinun-lvl"        id="slvl5" onclick="setShinunLevel(5)" data-i18n="read.shinun_rashei">🔡<br>ראשי תיבות</button>
     <button class="shinun-lvl"        id="slvl6" onclick="setShinunLevel(6)" data-i18n="read.shinun_blanks">⬚<br>השלמת מילים</button>
     <button class="shinun-lvl"        id="slvl3" onclick="setShinunLevel(3)" data-i18n="read.shinun_hint">💡<br>רמז ראשון</button>
-    <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
     <button class="shinun-lvl"        id="slvl7" onclick="setShinunLevel(7)" data-i18n="read.shinun_flash">⚡<br>בקיאות</button>
+    <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
   </div>
   <div class="shinun-score-banner" id="shinunBanner"></div>
 
@@ -1990,9 +1990,14 @@ function renderShinunVerses(verses, level) {
         `</div>`;
     }
 
+    // הקלטה עצמית זמינה במצבי "רמז ראשון" ו"מבחן" — מקליטים, ואז חושפים תוך כדי האזנה
+    const recActions = (level === 3 || level === 4)
+      ? `<div class="verse-actions"><button class="verse-rec-btn" id="rec_${i+1}" onclick="toggleRec(${i+1},this)" oncontextmenu="return delRec(${i+1},this)" title="הקלט את עצמך אומר את המשנה">🎙️</button></div>`
+      : '';
     html += `<div class="verse">` +
       (showVerseNums ? `<span class="verse-num">${toGematria(i+1)}</span>` : '') +
       `<div class="verse-content">${inner}</div>` +
+      recActions +
       `</div>`;
   });
 
@@ -2000,6 +2005,7 @@ function renderShinunVerses(verses, level) {
   ta.innerHTML = html;
   ta.scrollTop = 0;
   resetReadProgress();
+  try { setTimeout(refreshRecButtons, 0); } catch(e){}
 }
 
 /* Level 2 — reveal covered ending */
