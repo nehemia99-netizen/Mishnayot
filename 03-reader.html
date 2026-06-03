@@ -172,6 +172,8 @@ body.reader-shinun .verse-rec-btn{display:flex;}
 .toast{position:fixed;bottom:57px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:100;white-space:nowrap;pointer-events:none;}
 html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 .toast.show{opacity:1;}
+.toast.big{bottom:auto;top:46%;font-size:16px;font-weight:700;padding:18px 24px;border-radius:18px;max-width:300px;white-space:normal;text-align:center;line-height:1.6;box-shadow:0 10px 36px rgba(0,0,0,.32);background:var(--primary);color:#fff;}
+html.dark .toast.big{background:var(--primary);color:#fff;}
 
 /* Chapter select modal overlay */
 .chap-picker{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
@@ -1505,12 +1507,14 @@ function _rLang() {
 }
 
 let toastTmr;
-function showToast(msg) {
+function showToast(msg, opts) {
+  opts = opts || {};
   const t = document.getElementById('toast');
   t.textContent = msg;
+  t.classList.toggle('big', !!opts.big);
   t.classList.add('show');
   clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => t.classList.remove('show'), 2200);
+  toastTmr = setTimeout(() => { t.classList.remove('show'); t.classList.remove('big'); }, opts.dur || 2200);
 }
 
 /* ── Next button label helper ── */
@@ -1810,7 +1814,7 @@ function toggleShinunMode() {
   if (shinunActive) {
     // אין לסמן אוטומטית "ידעתי בע״פ" עם הכניסה למצב שינון — זהו תרגול בלבד
     setShinunLevel(1);
-    showToast(_rLang()==='en' ? '🧠 Memorization mode — 4 levels + 🎙️ record yourself on each Mishnah' : '🧠 מצב שינון — 4 שלבי הסתרה + 🎙️ הקלט את עצמך לכל משנה');
+    showToast(_rLang()==='en' ? '🧠 Memorization mode is on — 4 hide levels, plus a 🎙️ button on each Mishnah to record yourself and play it back' : '🧠 מצב שינון פעיל — 4 שלבי הסתרה, ולצד כל משנה כפתור 🎙️ להקליט את עצמך ולהשמיע', { big:true, dur:5500 });
   } else {
     shinunLevel = 1;
     // Restore normal view
