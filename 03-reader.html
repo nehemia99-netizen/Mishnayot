@@ -87,11 +87,10 @@ html.dark #memBtn{color:#9B6FE0;}
 .qc-back{background:var(--surface);color:var(--text);border:.5px solid var(--border)!important;}
 
 /* ── Shinun (memorization) mode ── */
-.shinun-bar{display:none;gap:5px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.shinun-bar::-webkit-scrollbar{display:none;}
+.shinun-bar{display:none;gap:6px;padding:8px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;flex-wrap:wrap;}
 html.dark .shinun-bar{background:#1C1235;border-bottom-color:#4A3080;}
 .shinun-bar.open{display:flex;}
-.shinun-lvl{flex:0 0 auto;min-width:62px;padding:7px 8px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
+.shinun-lvl{flex:1 1 28%;min-width:88px;padding:7px 6px;border-radius:10px;border:1px solid #C8B0F0;background:var(--card);font-size:11px;font-weight:600;color:#7B2FF7;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.3;}
 .rt-word{cursor:pointer;border-bottom:1px dotted #B79BE8;-webkit-tap-highlight-color:transparent;}
 .rt-word.revealed{border-bottom:none;color:var(--primary);}
 html.dark .shinun-lvl{border-color:#5B3090;color:#9B6FE0;}
@@ -1619,6 +1618,7 @@ let shinunActive = false;
 let shinunLevel  = 1;
 let _shinunVerses = [];
 let _testResults  = {};
+let _v4State      = {};     // מצב חשיפת משפטים במבחן (level 4)
 let _reviewSet    = null;   // אינדקסי משניות שנבחנים כעת (null = כל הפרק)
 let _passNum      = 0;      // 0 = מעבר ראשון; 1+ = לולאת חזרה
 
@@ -1843,6 +1843,7 @@ function setShinunLevel(lvl) {
 function renderShinunVerses(verses, level) {
   _shinunVerses = verses;
   _testResults  = {};
+  _v4State      = {};
   const ta = document.getElementById('textArea');
 
   if (level === 1) {
@@ -1880,8 +1881,8 @@ function renderShinunVerses(verses, level) {
 
     } else if (level === 4) {
       inner = `<div class="verse-wrap tappable" id="vw${i}" onclick="revealVerse4(${i})">` +
-        `<div class="verse-hidden-label" id="vhl${i}">משנה ${toGematria(i+1)} — הקש לגלות 👆</div>` +
-        `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;">${v}</span>` +
+        `<div class="verse-hidden-label" id="vhl${i}">משנה ${toGematria(i+1)} — הקש לגלות משפט אחר משפט 👆</div>` +
+        `<span class="verse-text" id="vt${i}" style="font-size:${fontSize}px;display:none;"></span>` +
         `</div>`;
 
     } else if (level === 5) {
@@ -1966,16 +1967,38 @@ function _seededHide(n, count, seed) {
 }
 
 /* Level 4 — reveal + self-assess */
+// פיצול משנה למשפטים (לפי נקודה / נקודתיים) — בלי lookbehind לתאימות Safari
+function _splitSentences(t) {
+  t = (t || '').trim();
+  const out = []; let cur = '';
+  for (let k = 0; k < t.length; k++) {
+    const ch = t[k]; cur += ch;
+    if ((ch === '.' || ch === ':' || ch === '׃') && (k + 1 >= t.length || t[k+1] === ' ')) {
+      const s = cur.trim(); if (s) out.push(s); cur = '';
+    }
+  }
+  const tail = cur.trim(); if (tail) out.push(tail);
+  return out.length ? out : [t];
+}
 function revealVerse4(idx) {
   const vw  = document.getElementById('vw' + idx);
   const vt  = document.getElementById('vt' + idx);
   const vhl = document.getElementById('vhl' + idx);
-  if (!vt || vt.style.display !== 'none') return; // already revealed
-  vhl.style.display = 'none';
-  vt.style.display  = 'block';
+  if (!vt) return;
+  let st = _v4State[idx];
+  if (!st) { st = _v4State[idx] = { sents: _splitSentences(_shinunVerses[idx]), shown: 0 }; }
+  if (vhl && vhl.style.display !== 'none') { vhl.style.display = 'none'; vt.style.display = 'block'; }
+  if (st.shown < st.sents.length) st.shown++;
+  const more = st.shown < st.sents.length;
+  vt.innerHTML = '<span class="verse-text" style="font-size:' + fontSize + 'px">' +
+    st.sents.slice(0, st.shown).join(' ') +
+    (more ? ' <span style="color:var(--text-muted);font-size:13px;">… הקש למשפט הבא</span>' : '') +
+    '</span>';
+  if (more) return; // עוד יש משפטים — אל תציג הערכה עדיין
+  // כל המשפטים נחשפו — עצור הקשה והצג הערכה
   vw.onclick = null;
   vw.classList.remove('tappable');
-  // Assess buttons
+  if (document.getElementById('ar' + idx)) return;
   const row = document.createElement('div');
   row.className = 'assess-row';
   row.id = 'ar' + idx;
