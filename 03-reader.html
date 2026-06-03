@@ -201,7 +201,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
       <div class="chap-title" id="chapTitle">טוען...</div>
       <div class="chap-ref" id="chapRef"></div>
     </div>
-    <span class="topbar-spacer"></span>
+    <button class="back-btn" onclick="navigateRandom()" title="משנה אקראית — דלג לפרק שטרם נלמד" style="font-family:inherit;cursor:pointer;">🎲 אקראי</button>
   </div>
 
   <!-- Action toolbar — 2 rows of buttons -->
@@ -218,9 +218,9 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   <div class="navbar">
     <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" title="פרק קודם" data-i18n-title="read.prev_chap">▶</button>
     <div class="nav-center">
-      <div style="display:flex;gap:6px;align-items:center;">
-        <div class="chap-num-display" id="chapNumDisp" onclick="openPicker()" style="cursor:pointer;padding:4px 12px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">בחר פרק ▾</div>
-        <div class="chap-num-display" id="mishnahJumpBtn" onclick="openMishnahPicker()" title="קפוץ למשנה" style="cursor:pointer;padding:4px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);">משנה ▾</div>
+      <div style="display:flex;gap:7px;align-items:center;width:100%;justify-content:center;">
+        <div class="chap-num-display" id="chapNumDisp" onclick="openPicker()" style="cursor:pointer;padding:8px 18px;border-radius:10px;background:var(--card);border:.5px solid var(--border);font-size:14px;font-weight:600;">בחר פרק ▾</div>
+        <div class="chap-num-display" id="mishnahJumpBtn" onclick="openMishnahPicker()" title="קפוץ למשנה" style="cursor:pointer;padding:8px 16px;border-radius:10px;background:var(--card);border:.5px solid var(--border);font-size:14px;font-weight:600;">משנה ▾</div>
       </div>
       <div class="mode-badge" id="modeBadge" style="display:none"></div>
     </div>
