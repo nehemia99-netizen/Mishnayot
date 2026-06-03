@@ -156,9 +156,12 @@ html.dark .dedication-banner{background:linear-gradient(135deg,#15291B,#0E1E14);
 .verse-mem-btn{width:30px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;opacity:.28;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s,transform .15s;font-family:system-ui,sans-serif;color:var(--text);}
 .verse-mem-btn.marked{opacity:1;color:#7B2FF7;}
 .verse-mem-btn.marked.pop{animation:bkPop .3s ease;}
-.verse-rec-btn{width:30px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:15px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;opacity:.28;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s;font-family:system-ui,sans-serif;}
-.verse-rec-btn.has-rec{opacity:1;}
-.verse-rec-btn.recording{opacity:1;animation:recPulse 1s infinite;}
+.verse-actions{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;}
+.verse-actions > button{height:27px !important;}
+.verse-rec-btn{width:30px;height:27px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:15px;display:none;align-items:center;justify-content:center;opacity:.5;-webkit-tap-highlight-color:transparent;flex-shrink:0;transition:opacity .2s;font-family:system-ui,sans-serif;}
+body.reader-shinun .verse-rec-btn{display:flex;}
+.verse-rec-btn.has-rec{opacity:1;color:#2E7D32;}
+.verse-rec-btn.recording{opacity:1;color:#C0392B;animation:recPulse 1s infinite;}
 @keyframes recPulse{0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes bkPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 
@@ -631,16 +634,18 @@ function renderVerses(verses, commData, preserveScroll) {
       '<span class="verse-text" style="font-size:' + fontSize + 'px">' + stripCantillation(v) + '</span>' +
       commHtml +
       '</div>' +
-      '<button class="verse-mem-btn' + (isMemV ? ' marked' : '') + '" ' +
-        'onclick="toggleMemVerse(' + (realIdx+1) + ',this)" ' +
-        'title="ידעתי משנה זו בעל פה">' + (isMemV ? '★' : '☆') + '</button>' +
-      '<button class="verse-rec-btn" id="rec_' + (realIdx+1) + '" ' +
-        'onclick="toggleRec(' + (realIdx+1) + ',this)" ' +
-        'oncontextmenu="return delRec(' + (realIdx+1) + ',this)" ' +
-        'title="הקלט את עצמך אומר את המשנה (לחיצה ארוכה למחיקה)">🎙️</button>' +
-      '<button class="verse-bk-btn' + (isSaved ? ' saved' : '') + '" ' +
-        'onclick="toggleSaveVerse(' + (realIdx+1) + ',this)" ' +
-        'title="שמור פסוק">🔖</button>' +
+      '<div class="verse-actions">' +
+        '<button class="verse-mem-btn' + (isMemV ? ' marked' : '') + '" ' +
+          'onclick="toggleMemVerse(' + (realIdx+1) + ',this)" ' +
+          'title="ידעתי משנה זו בעל פה">' + (isMemV ? '★' : '☆') + '</button>' +
+        '<button class="verse-bk-btn' + (isSaved ? ' saved' : '') + '" ' +
+          'onclick="toggleSaveVerse(' + (realIdx+1) + ',this)" ' +
+          'title="שמור פסוק">🔖</button>' +
+        '<button class="verse-rec-btn" id="rec_' + (realIdx+1) + '" ' +
+          'onclick="toggleRec(' + (realIdx+1) + ',this)" ' +
+          'oncontextmenu="return delRec(' + (realIdx+1) + ',this)" ' +
+          'title="הקלט את עצמך אומר את המשנה">🎙️</button>' +
+      '</div>' +
       '</div>';
   }).join('') +
   '<div id="bottomSentinel" style="height:2px;width:100%;"></div>';
@@ -1700,7 +1705,7 @@ window.addEventListener('pagehide', _ttsStop);
 /* ══════════════════════════════════════════
    הקלטה עצמית של משניות (MediaRecorder + IndexedDB)
 ══════════════════════════════════════════ */
-let _recDB = null, _recActive = null, _recMR = null, _recChunks = [], _recStream = null, _recAudio = null;
+let _recDB = null, _recActive = null, _recMR = null, _recChunks = [], _recStream = null, _recAudio = null, _recCancelled = false;
 function _recOpenDB() {
   return new Promise((resolve, reject) => {
     if (_recDB) return resolve(_recDB);
@@ -1747,37 +1752,40 @@ async function toggleRec(verseNum, btn) {
     _recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     _recMR = new MediaRecorder(_recStream);
     _recChunks = [];
-    _recActive = verseNum;
+    _recActive = verseNum; _recCancelled = false;
     _recMR.ondataavailable = e => { if (e.data && e.data.size) _recChunks.push(e.data); };
     _recMR.onstop = async () => {
+      const cancelled = _recCancelled;
+      if (_recStream) { _recStream.getTracks().forEach(t=>t.stop()); _recStream=null; }
+      _recMR=null; _recActive=null; _recCancelled=false;
+      if (cancelled) { showToast(_rLang()==='en'?'✕ Recording cancelled':'✕ ההקלטה בוטלה'); refreshRecButtons(); return; }
       try {
         const blob = new Blob(_recChunks, { type: (_recChunks[0] && _recChunks[0].type) || 'audio/webm' });
         if (blob.size > 0) { await _recPut(_recKey(verseNum), blob); showToast(_rLang()==='en'?'🎙️ Recording saved':'🎙️ ההקלטה נשמרה'); }
       } catch(e){ showToast('שגיאה בשמירת ההקלטה'); }
-      if (_recStream) { _recStream.getTracks().forEach(t=>t.stop()); _recStream=null; }
-      _recMR=null; _recActive=null;
       refreshRecButtons();
     };
     _recMR.start();
     btn.classList.add('recording'); btn.classList.remove('has-rec'); btn.textContent='⏹';
-    showToast(_rLang()==='en'?'🔴 Recording… tap again to stop':'🔴 מקליט… לחץ שוב לעצירה');
+    showToast(_rLang()==='en'?'🔴 Recording… tap=save · long-press=cancel':'🔴 מקליט… לחיצה=שמירה · לחיצה ארוכה=ביטול');
   } catch(e) { showToast(_rLang()==='en'?'Microphone permission denied':'אין הרשאת מיקרופון'); _recActive=null; _recMR=null; }
 }
 function _recStopAndSave() { if (_recMR) { try { _recMR.stop(); } catch(e){} } }
+function _recCancel() { if (_recMR) { _recCancelled = true; try { _recMR.stop(); } catch(e){} } }
 
+// לחיצה ארוכה / קליק-ימני על הכפתור: בזמן הקלטה=ביטול, אם יש הקלטה=מחיקה
 async function delRec(verseNum, btn) {
-  // לחיצה ימנית / לחיצה ארוכה — מחיקת הקלטה
+  if (_recActive === verseNum && _recMR) { _recCancel(); return false; }
   if (!btn.classList.contains('has-rec')) return false;
   try { await _recDelete(_recKey(verseNum)); showToast(_rLang()==='en'?'🗑 Recording deleted':'🗑 ההקלטה נמחקה'); refreshRecButtons(); } catch(e){}
   return false; // מנע תפריט הקשר
 }
-// לחיצה ארוכה במגע = מחיקה
 (function _recLongPress(){
   let t=null;
   document.addEventListener('touchstart', e=>{
-    const b=e.target.closest && e.target.closest('.verse-rec-btn.has-rec');
+    const b=e.target.closest && e.target.closest('.verse-rec-btn');
     if(!b) return;
-    t=setTimeout(()=>{ const vn=b.id.replace('rec_',''); delRec(parseInt(vn,10), b); t=null; }, 650);
+    t=setTimeout(()=>{ const vn=parseInt(b.id.replace('rec_',''),10); delRec(vn, b); t=null; }, 600);
   }, {passive:true});
   document.addEventListener('touchend', ()=>{ if(t){ clearTimeout(t); t=null; } }, {passive:true});
 })();
@@ -1789,6 +1797,7 @@ function toggleShinunMode() {
   const bar = document.getElementById('shinunBar');
   btn.classList.toggle('active', shinunActive);
   bar.classList.toggle('open', shinunActive);
+  document.body.classList.toggle('reader-shinun', shinunActive); // הצג כפתורי הקלטה רק במצב שינון
   document.getElementById('shinunBanner').style.display = 'none';
   _ttsStop();
 
