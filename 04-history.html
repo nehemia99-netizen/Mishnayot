@@ -204,16 +204,18 @@ html.dark .sc-cell.shabbat{background:#0E2416;border-color:#54A463;}
 .chap-map-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:10px;color:var(--text-muted);}
 .cml{display:flex;align-items:center;gap:4px;}
 .cml-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
-.chap-map-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;}
-.cm-cell{aspect-ratio:1;border-radius:3px;border:.5px solid var(--border);background:var(--surface);font-size:8.5px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:none;}
+.chap-map-grid{display:block;}
+.cm-cell{aspect-ratio:1;border-radius:3px;border:.5px solid var(--border);background:var(--surface);font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:none;}
 .cm-cell.read{background:#EBF5E5;border-color:#3B8C14;color:#3B8C14;font-weight:700;}
-.cm-cell.mem{background:#F4EEFF;border-color:#7B2FF7;color:#7B2FF7;}
+.cm-cell.mem{background:#F4EEFF;border-color:#7B2FF7;color:#7B2FF7;font-weight:700;}
 .cm-cell.fav{background:#FFE7E7;border-color:#C04040;color:#C04040;}
 html.dark .cm-cell.read{background:#1A2810;}
 html.dark .cm-cell.mem{background:#1C1230;}
 html.dark .cm-cell.fav{background:#2A1010;}
-.cm-order-label{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--text-sec);margin:8px 0 2px;}
-.cm-order-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(15,1fr);gap:3px;}
+.cm-order-label{font-size:11px;font-weight:700;color:var(--text-sec);margin:10px 0 4px;}
+.cm-tract{display:flex;gap:6px;align-items:center;margin-bottom:4px;}
+.cm-tract-name{font-size:10px;color:var(--text-sec);width:64px;flex-shrink:0;text-align:right;line-height:1.15;}
+.cm-tract-cells{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;flex:1;}
 
 /* 5 books */
 .books-section{margin:8px 16px;padding:12px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);}
@@ -410,10 +412,10 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div class="legend-row"><span>🌟 כל 525 הפרקים</span><span class="legend-pts">500</span></div>
         <div class="legend-row"><span>📅 סיום פרקי היום (לפי לוח עברי)</span><span class="legend-pts">50</span></div>
         <div class="legend-row"><span>🏆 השלמת אתגר</span><span class="legend-pts">5-200</span></div>
-        <div class="legend-row"><span>🥉 מדליית ארד (5 דקות ביום)</span><span class="legend-pts">10</span></div>
-        <div class="legend-row"><span>🥈 מדליית כסף (15 דקות)</span><span class="legend-pts">20</span></div>
-        <div class="legend-row"><span>🥇 מדליית זהב (30 דקות)</span><span class="legend-pts">35</span></div>
-        <div class="legend-row"><span>💎 מדליית פלטינה (45 דקות)</span><span class="legend-pts">50</span></div>
+        <div class="legend-row"><span>🥉 מדליית ארד (פרק ביום)</span><span class="legend-pts">10</span></div>
+        <div class="legend-row"><span>🥈 מדליית כסף (3 פרקים)</span><span class="legend-pts">20</span></div>
+        <div class="legend-row"><span>🥇 מדליית זהב (5 פרקים)</span><span class="legend-pts">35</span></div>
+        <div class="legend-row"><span>💎 מדליית פלטינה (10 פרקים)</span><span class="legend-pts">50</span></div>
         <div class="legend-row"><span>🎯 10 מדליות מאותו סוג (×4)</span><span class="legend-pts">100</span></div>
         <div class="legend-row"><span>🧠 שינון: 5/10/15/20/25 פרקים</span><span class="legend-pts">80/200/300/400/500</span></div>
         <div class="legend-row"><span>🧠 שינון: כל 5 פרקים נוספים</span><span class="legend-pts">+100</span></div>
@@ -446,34 +448,34 @@ if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classLis
 /* ── Medal definitions ── */
 const MEDALS = [
   {
-    level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minMin:5, bonus:10,
+    level:'bronze', label:'ארד', en:'Bronze', emoji:'🥉', minChaps:1, bonus:10,
     color:'#CD7F32', bg:'#FFF8F0', textColor:'#7A4A00',
-    achievement:'למדת 5 דקות משנה ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
-    achievementEn:'You studied Mishnah for 5 minutes in one day! Every small step in Torah is the beginning of a great journey.',
+    achievement:'למדת פרק משנה ביום אחד! כל צעד קטן בתורה הוא התחלה של מסע גדול.',
+    achievementEn:'You studied a chapter of Mishnah in one day! Every small step in Torah is the beginning of a great journey.',
     quote:'לֹא עָלֶיךָ הַמְּלָאכָה לִגְמֹר\nוְלֹא אַתָּה בֶן חוֹרִין לִבָּטֵל מִמֶּנָּה',
     ref:'אבות ב׳:ט״ז'
   },
   {
-    level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minMin:15, bonus:20,
+    level:'silver', label:'כסף', en:'Silver', emoji:'🥈', minChaps:3, bonus:20,
     color:'#909098', bg:'#F8F8FF', textColor:'#404055',
-    achievement:'למדת 15 דקות משנה! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
-    achievementEn:'You studied Mishnah for 15 minutes! Your devotion brings blessing to your soul and to all of Israel.',
+    achievement:'למדת 3 פרקי משנה ביום אחד! הדבקות שלך מביאה ברכה לנשמתך ולנשמות כלל ישראל.',
+    achievementEn:'You studied 3 chapters of Mishnah in one day! Your devotion brings blessing to your soul and to all of Israel.',
     quote:'שְׁנַיִם שֶׁיּוֹשְׁבִין וְיֵשׁ בֵּינֵיהֶם דִּבְרֵי תוֹרָה\nשְׁכִינָה שְׁרוּיָה בֵינֵיהֶם',
     ref:'אבות ג׳:ב׳'
   },
   {
-    level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minMin:30, bonus:35,
+    level:'gold', label:'זהב', en:'Gold', emoji:'🥇', minChaps:5, bonus:35,
     color:'#C8A800', bg:'#FFFBF0', textColor:'#6A5500',
-    achievement:'למדת 30 דקות! חצי שעה של משנה — הישג מרשים. אתה בנתיב של גדולי ישראל.',
-    achievementEn:'You studied for 30 minutes! Half an hour of Mishnah — an impressive achievement. You walk in the path of the greats.',
+    achievement:'למדת 5 פרקי משנה ביום אחד! הישג מרשים. אתה בנתיב של גדולי ישראל.',
+    achievementEn:'You studied 5 chapters of Mishnah in one day! An impressive achievement. You walk in the path of the greats.',
     quote:'וֶהֱוֵי מִתְאַבֵּק בַּעֲפַר רַגְלֵיהֶם\nוְשׁוֹתֶה בְצָמָא אֶת דִּבְרֵיהֶם',
     ref:'אבות א׳:ד׳'
   },
   {
-    level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minMin:45, bonus:50,
+    level:'platinum', label:'פלטינה', en:'Platinum', emoji:'💎', minChaps:10, bonus:50,
     color:'#5A9E68', bg:'#F0F8FF', textColor:'#18441F',
-    achievement:'למדת 45 דקות! הישג יוצא מהכלל. עמלך במשנה הוא אוצר אמיתי שאין כמוהו.',
-    achievementEn:'You studied for 45 minutes! An extraordinary achievement. Your toil in Mishnah is a true treasure beyond compare.',
+    achievement:'למדת 10 פרקי משנה ביום אחד! הישג יוצא מהכלל. עמלך במשנה הוא אוצר אמיתי שאין כמוהו.',
+    achievementEn:'You studied 10 chapters of Mishnah in one day! An extraordinary achievement. Your toil in Mishnah is a true treasure beyond compare.',
     quote:'אֵין מְלַוִּין לוֹ לְאָדָם בִּשְׁעַת פְּטִירָתוֹ\nלֹא כֶסֶף וְלֹא זָהָב — אֶלָּא תוֹרָה',
     ref:'אבות ו׳:ט׳'
   }
@@ -604,19 +606,20 @@ function renderAchievementsTab() {
   let mapHtml = '';
   if (hasCorpus) {
     Corpus.orders.forEach(o => {
-      mapHtml += '<div class="cm-order-label">סדר ' + o.he + '</div><div class="cm-order-grid">';
+      mapHtml += '<div class="cm-order-label">סדר ' + o.he + '</div>';
       o.tractates.forEach(tid => {
         const t = Corpus.getTractate(tid);
+        let cells = '';
         for (let p = 1; p <= t.length; p++) {
           const id = Corpus.chapId(tid, p);
           const cls = [];
           if (uniqueRead.has(id)) cls.push('read');
           if (memSet.has(id)) cls.push('mem');
           if (favsSet.has(id)) cls.push('fav');
-          mapHtml += '<a class="cm-cell ' + cls.join(' ') + '" title="' + t.he + ' ' + p + '" href="03-reader.html?chap=' + encodeURIComponent(id) + '"></a>';
+          cells += '<a class="cm-cell ' + cls.join(' ') + '" title="' + t.he + ' ' + p + '" href="03-reader.html?chap=' + encodeURIComponent(id) + '">' + p + '</a>';
         }
+        mapHtml += '<div class="cm-tract"><span class="cm-tract-name">' + t.he + '</span><div class="cm-tract-cells">' + cells + '</div></div>';
       });
-      mapHtml += '</div>';
     });
   }
   document.getElementById('chapMapGrid').innerHTML = mapHtml;
@@ -826,22 +829,24 @@ function renderToday() {
 
   const items = Object.values(chapMap).sort((a,b) => b.ts - a.ts);
 
-  // Color dots per book
-  const bookColor = n =>
-    n<=41?'#3A7D44': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+  // תווית וצבע לפי מזהה-מחרוזת (מסכת.פרק) ולפי הסדר
+  const _orderCol = {Zeraim:'#3A7D44',Moed:'#3B8C14',Nashim:'#7B2FF7',Nezikin:'#C07A00',Kodashim:'#C0392B',Tahorot:'#0E7C86'};
+  const chLabel = id => { if (typeof Corpus==='undefined') return String(id); const p=Corpus.parseChapId(String(id)); if(!p) return String(id); const t=Corpus.getTractate(p.tractate); return (t?t.he:p.tractate)+' · פרק '+toGem(p.perek); };
+  const chOrderHe = id => { if (typeof Corpus==='undefined') return ''; const p=Corpus.parseChapId(String(id)); if(!p) return ''; const t=Corpus.getTractate(p.tractate); const o=t&&Corpus.getOrder(t.order); return o?('סדר '+o.he):''; };
+  const bookColor = id => { if (typeof Corpus==='undefined') return '#3A7D44'; const p=Corpus.parseChapId(String(id)); if(!p) return '#3A7D44'; const t=Corpus.getTractate(p.tractate); return (t&&_orderCol[t.order])||'#3A7D44'; };
 
   let html = '';
   items.forEach(item => {
     const col = item.done ? bookColor(item.chap) : 'var(--text-muted)';
     html +=
-      '<a class="read-item" href="03-reader.html?chap=' + item.chap + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
+      '<a class="read-item" href="03-reader.html?chap=' + encodeURIComponent(item.chap) + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
         '<div class="read-left">' +
           '<div class="read-dot" style="background:' + col + '"></div>' +
           '<div>' +
-            '<div class="read-chap" style="color:' + col + '">פרק ' + toGem(item.chap) +
+            '<div class="read-chap" style="color:' + col + '">' + chLabel(item.chap) +
               (item.done ? ' <span style="color:var(--green);font-size:12px;">✓</span>' : ' <span style="font-size:11px;color:var(--text-muted);">חלקי</span>') +
             '</div>' +
-            '<div class="read-sub">פרק ' + item.chap + '</div>' +
+            '<div class="read-sub">' + chOrderHe(item.chap) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="read-right">' +
@@ -873,7 +878,7 @@ async function renderWeekHistory() {
   }
   db.forEach(r => {
     if (!r.partial && buckets[r.date]) {
-      buckets[r.date].chaps.add(+r.chap);
+      buckets[r.date].chaps.add(String(r.chap));
       buckets[r.date].secs += (r.secs||0);
     } else if (r.date && buckets[r.date]) {
       buckets[r.date].secs += (r.secs||0);
@@ -1285,7 +1290,7 @@ function renderMedals() {
 
   const _mLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   const _mLabel = m => (_mLang === 'en' && m.en) ? m.en : m.label;
-  const _mReq   = m => _mLang === 'en' ? m.minMin + '+ min/day' : m.minMin + '+ דק׳ ביום';
+  const _mReq   = m => _mLang === 'en' ? m.minChaps + '+ chapters/day' : m.minChaps + '+ פרקים ביום';
   const _mTimes = n => _mLang === 'en' ? '× ' + n + 'x' : '× ' + n + ' פעמים';
   let html = '';
   MEDALS.forEach(m => {
@@ -1336,7 +1341,7 @@ window.showCert = function(level) {
         '<span class="cert-emoji">' + m.emoji + '</span>' +
         '<div class="cert-label">' + (_cLang === 'en' ? 'Certificate of Honor' : 'תעודת הוקרה') + '</div>' +
         '<div class="cert-heading" style="color:' + m.color + '">' + (_cLang === 'en' ? _cLabel + ' Medal' : 'מדליית ' + m.label) + '</div>' +
-        '<div class="cert-sub">' + m.minMin + (_cLang === 'en' ? ' minutes of reading in one day' : ' דקות קריאה ביום אחד') + '</div>' +
+        '<div class="cert-sub">' + m.minChaps + (_cLang === 'en' ? ' chapters of Mishnah in one day' : ' פרקי משנה ביום אחד') + '</div>' +
       '</div>' +
 
       '<div class="cert-rule" style="background:' + m.color + '"></div>' +

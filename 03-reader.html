@@ -1619,19 +1619,20 @@ function _applyTtsVoice(u){
     const s = S.get('tehillim_settings') || {};
     const choice = s.ttsVoice || 'male';
     const he = _hebrewVoices();
-    let v = null, pitch = 1;
+    let v = null, pitch = 1, rate = 0.9;
     if (choice === 'male') {
       v = he.find(x => !_isFemaleVoiceName(x.name)) || he[0] || null;
-      pitch = 0.8; // גובה נמוך — נשמע גברי גם אם הקול ניטרלי
+      pitch = 0.5; rate = 0.86; // גובה נמוך מאוד — נשמע גברי גם כשהקול הזמין נשי (כמו Carmit)
     } else if (choice === 'female') {
       v = he.find(x => _isFemaleVoiceName(x.name)) || he[0] || null;
-      pitch = 1.18;
+      pitch = 1.25;
     } else {
       v = he.find(x => x.name === choice) || (speechSynthesis.getVoices()||[]).find(x => x.name === choice) || he[0] || null;
       pitch = 1;
     }
     if (v) u.voice = v;
     u.pitch = pitch;
+    u.rate = rate;
   } catch(e){}
 }
 // חימום רשימת הקולות (חלק מהדפדפנים טוענים אסינכרונית)
@@ -1852,17 +1853,26 @@ function retryMissed() {
 
 /* ── Medal system ── */
 const MEDALS_DEF = [
-  { level:'platinum', label:'פלטינה', emoji:'💎', minMin:45, color:'#5A9E68', bonus:50 },
-  { level:'gold',     label:'זהב',    emoji:'🥇', minMin:30, color:'#C8A800', bonus:35 },
-  { level:'silver',   label:'כסף',    emoji:'🥈', minMin:15, color:'#909098', bonus:20 },
-  { level:'bronze',   label:'ארד',    emoji:'🥉', minMin: 5, color:'#CD7F32', bonus:10 },
+  { level:'platinum', label:'פלטינה', emoji:'💎', minChaps:10, color:'#5A9E68', bonus:50 },
+  { level:'gold',     label:'זהב',    emoji:'🥇', minChaps: 5, color:'#C8A800', bonus:35 },
+  { level:'silver',   label:'כסף',    emoji:'🥈', minChaps: 3, color:'#909098', bonus:20 },
+  { level:'bronze',   label:'ארד',    emoji:'🥉', minChaps: 1, color:'#CD7F32', bonus:10 },
 ];
 const MEDAL_RANK = { bronze:1, silver:2, gold:3, platinum:4 };
 
+// מספר הפרקים השלמים שנלמדו היום (ייחודיים)
+function _todayChapCount() {
+  const today = localDateStr();
+  let db = [];
+  try { db = JSON.parse(localStorage.getItem('tehillim_readings') || '[]'); } catch(e) {}
+  const set = new Set();
+  (Array.isArray(db) ? db : Object.values(db||{})).forEach(r => { if (r.date === today && !r.partial) set.add(String(r.chap)); });
+  return set.size;
+}
+
 function checkAndShowMedal() {
-  const rd   = S.get('tehillim_reading') || {};
-  const todayMins = (rd.dailyMinutes || {})[localDateStr()] || 0;
-  const earned = MEDALS_DEF.find(m => todayMins >= m.minMin);
+  const todayChaps = _todayChapCount();
+  const earned = MEDALS_DEF.find(m => todayChaps >= m.minChaps);
   if (!earned) return;
 
   const todayStr = localDateStr();
@@ -1875,7 +1885,7 @@ function checkAndShowMedal() {
 
   // הוסף לרשומות המדליות
   const allEarned = S.get('tehillim_medals_earned') || [];
-  allEarned.push({ level: earned.level, date: todayStr, mins: todayMins, ts: Date.now() });
+  allEarned.push({ level: earned.level, date: todayStr, chaps: todayChaps, ts: Date.now() });
   S.set('tehillim_medals_earned', allEarned);
 
   // הענק מעלות בונוס
@@ -1897,7 +1907,7 @@ function showMedalPopup(m) {
       '<span class="medal-popup-emoji">' + m.emoji + '</span>' +
       '<div class="medal-popup-title">מדליה חדשה!</div>' +
       '<div class="medal-popup-name" style="color:' + m.color + '">מדליית ' + m.label + '</div>' +
-      '<div class="medal-popup-desc">צברת ' + m.minMin + '+ דקות לימוד משנה היום 🎉</div>' +
+      '<div class="medal-popup-desc">למדת ' + m.minChaps + '+ פרקי משנה היום 🎉</div>' +
       '<div class="medal-popup-btns">' +
         '<button class="medal-popup-close" onclick="closeMedalPopup()">המשך קריאה</button>' +
         '<button class="medal-popup-cert" style="background:' + m.color + '" onclick="viewMedalCert(\'' + m.level + '\')">צפה בתעודה ✨</button>' +
