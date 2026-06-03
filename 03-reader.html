@@ -137,6 +137,13 @@ html.dark .dedication-banner{background:linear-gradient(135deg,#15291B,#0E1E14);
 .commentary-bar{display:flex;gap:6px;padding:7px 16px;background:var(--surface);border-bottom:.5px solid var(--border);}
 .comm-type-btn{flex:1;padding:6px 10px;border-radius:20px;border:.5px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;color:var(--text-sec);font-family:system-ui,sans-serif;transition:background .15s;}
 .comm-type-btn.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary);font-weight:600;}
+.audio-bar{display:none;gap:6px;padding:8px 12px;background:#EAF3FF;border-bottom:.5px solid #B9D3F0;}
+html.dark .audio-bar{background:#0E2034;border-bottom-color:#274869;}
+.audio-bar.open{display:flex;}
+.audio-opt{flex:1;padding:7px 4px;border-radius:10px;border:1px solid #B9D3F0;background:var(--card);font-size:11px;font-weight:600;color:#1E6FB8;cursor:pointer;text-align:center;line-height:1.3;-webkit-tap-highlight-color:transparent;font-family:inherit;}
+html.dark .audio-opt{border-color:#274869;color:#7FB6E8;}
+.audio-opt.playing{background:#1E6FB8;color:#fff;border-color:#1E6FB8;}
+.audio-opt.stop{color:#B03020;border-color:#E0B0A8;}
 .verse-commentary{margin-top:8px;padding:9px 11px;background:var(--primary-light);border-radius:8px;border-right:3px solid var(--primary);font-size:13.5px;line-height:1.7;color:var(--text-sec);font-family:system-ui,sans-serif;}
 .comm-source{font-size:10px;color:var(--primary);font-weight:700;margin-bottom:4px;display:block;}
 .comm-loading{font-size:12px;color:var(--text-muted);font-style:italic;margin-top:8px;text-align:center;padding:6px;}
@@ -267,6 +274,14 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   <div class="commentary-bar" id="commBar" style="display:none">
     <button class="comm-type-btn active" id="commBtnBartenura" onclick="setCommType('bartenura')">ברטנורא</button>
     <button class="comm-type-btn" id="commBtnTosafot" onclick="setCommType('tosafot')">תוספות יו"ט</button>
+  </div>
+
+  <!-- Audio bar — הקראה / אמור אחריי / לולאה -->
+  <div class="audio-bar" id="audioBar">
+    <button class="audio-opt" id="aopt_read"   onclick="ttsStart('read')">▶<br>קרא ברצף</button>
+    <button class="audio-opt" id="aopt_repeat" onclick="ttsStart('repeat')">🗣️<br>אמור אחריי</button>
+    <button class="audio-opt" id="aopt_loop"   onclick="ttsStart('loop')">🔁<br>בלולאה</button>
+    <button class="audio-opt stop" onclick="_ttsStop()">⏹<br>עצור</button>
   </div>
 
   <!-- Text area -->
@@ -1646,7 +1661,7 @@ function recordMasteryScore(id, pct, perfectFirstPass){
 }
 
 /* ── הקראה קולית (Text-to-Speech) ── */
-let _ttsOn = false, _ttsIdx = 0;
+let _ttsOn = false, _ttsIdx = 0, _ttsMode = 'read', _ttsUnits = [], _ttsTimer = null, _ttsAnySpoke = false;
 function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
 function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
 // קולות עבריים זמינים במכשיר
@@ -1678,47 +1693,77 @@ function _applyTtsVoice(u){
 }
 // חימום רשימת הקולות (חלק מהדפדפנים טוענים אסינכרונית)
 try { if (typeof speechSynthesis !== 'undefined') { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function(){ speechSynthesis.getVoices(); }; } } catch(e){}
+function _ttsNoVoice(){ showToast(_rLang()==='en' ? '🔇 No Hebrew voice available on this device' : '🔇 אין קול עברי מותקן במכשיר זה'); }
 function _ttsStop(){
   _ttsOn = false;
+  if (_ttsTimer) { clearTimeout(_ttsTimer); _ttsTimer = null; }
   try { speechSynthesis.cancel(); } catch(e){}
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
   const b = document.getElementById('ttsBtn'); if(b) b.classList.remove('tts-on');
+  document.querySelectorAll('.audio-opt.playing').forEach(el=>el.classList.remove('playing'));
 }
+// 🔊 — פתח/סגור את סרגל האודיו (קרא / אמור אחריי / לולאה)
 function toggleTTS(){
   if (!_ttsSupported()){ showToast(_rLang()==='en'?'Speech not supported here':'הקראה קולית לא נתמכת במכשיר זה'); return; }
-  if (_ttsOn){ _ttsStop(); return; }
+  const bar = document.getElementById('audioBar');
+  const open = bar.classList.toggle('open');
+  document.getElementById('ttsBtn').classList.toggle('active', open);
+  if (!open) _ttsStop();
+}
+// התחל מצב אודיו: 'read' רצף · 'repeat' אמור-אחריי · 'loop' בלולאה
+function ttsStart(mode){
+  if (!_ttsSupported()){ _ttsNoVoice(); return; }
+  _ttsStop();
   const cached = S.get('mishnah_cache_' + curId());
   const verses = (cached && cached.he) ? cached.he : (_shinunVerses.length ? _shinunVerses : null);
   if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
-  _ttsOn = true; _ttsIdx = 0;
-  let _anySpoke = false;
-  const b = document.getElementById('ttsBtn'); if(b) b.classList.add('tts-on');
+  _ttsMode = mode;
+  _ttsUnits = [];
+  if (mode === 'repeat') {
+    verses.forEach((v, vi) => _splitSentences(v).forEach(s => _ttsUnits.push({ text:s, vIdx:vi })));
+  } else {
+    verses.forEach((v, vi) => _ttsUnits.push({ text:v, vIdx:vi }));
+  }
+  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false;
+  document.getElementById('ttsBtn').classList.add('tts-on');
+  document.querySelectorAll('.audio-opt').forEach(el=>el.classList.remove('playing'));
+  const optBtn = document.getElementById('aopt_' + mode); if (optBtn) optBtn.classList.add('playing');
   try { speechSynthesis.cancel(); } catch(e){}
-  const _noVoiceMsg = () => showToast(_rLang()==='en' ? '🔇 No Hebrew voice available on this device' : '🔇 אין קול עברי מותקן במכשיר זה');
-  (function speakNext(){
-    if (!_ttsOn || _ttsIdx >= verses.length){ _ttsStop(); return; }
-    const verseEls = document.querySelectorAll('#textArea .verse');
-    document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
-    const u = new SpeechSynthesisUtterance(_stripForTts(verses[_ttsIdx]));
-    u.lang = 'he-IL'; u.rate = 0.9;
-    _applyTtsVoice(u);
-    let _started = false;
-    u.onstart = function(){
-      _started = true; _anySpoke = true;
-      const el = verseEls[_ttsIdx];
-      if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
-    };
-    u.onend = function(){
-      // אם המשפט הראשון הסתיים מיד בלי שדיבר בפועל — אין קול עברי, עצור
-      if (!_started && !_anySpoke && _ttsIdx === 0){ _ttsStop(); _noVoiceMsg(); return; }
-      _ttsIdx++; speakNext();
-    };
-    u.onerror = function(){
-      if (!_anySpoke){ _ttsStop(); _noVoiceMsg(); return; }
-      _ttsIdx++; speakNext();
-    };
-    try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); _noVoiceMsg(); }
-  })();
+  showToast(mode==='repeat' ? '🗣️ אמור אחריי — חזור בקול אחרי כל משפט' : (mode==='loop' ? '🔁 הקראה בלולאה' : '▶ הקראה'), { dur: 3000 });
+  _ttsSpeakNext();
+}
+function _ttsSpeakNext(){
+  if (!_ttsOn) return;
+  if (_ttsIdx >= _ttsUnits.length) {
+    if (_ttsMode === 'loop') { _ttsIdx = 0; } else { _ttsStop(); return; }
+  }
+  const unit = _ttsUnits[_ttsIdx];
+  const verseEls = document.querySelectorAll('#textArea .verse');
+  document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
+  const u = new SpeechSynthesisUtterance(_stripForTts(unit.text));
+  u.lang = 'he-IL'; u.rate = 0.9;
+  _applyTtsVoice(u);
+  let _started = false;
+  u.onstart = function(){
+    _started = true; _ttsAnySpoke = true;
+    const el = verseEls[unit.vIdx];
+    if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+  };
+  u.onend = function(){
+    if (!_started && !_ttsAnySpoke && _ttsIdx === 0){ _ttsStop(); _ttsNoVoice(); return; }
+    _ttsIdx++;
+    if (_ttsMode === 'repeat') {
+      const pause = Math.max(1400, _stripForTts(unit.text).length * 45); // המתנה לחזרת המשתמש
+      _ttsTimer = setTimeout(function(){ if (_ttsOn) _ttsSpeakNext(); }, pause);
+    } else {
+      _ttsSpeakNext();
+    }
+  };
+  u.onerror = function(){
+    if (!_ttsAnySpoke){ _ttsStop(); _ttsNoVoice(); return; }
+    _ttsIdx++; _ttsSpeakNext();
+  };
+  try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); _ttsNoVoice(); }
 }
 window.addEventListener('pagehide', _ttsStop);
 
