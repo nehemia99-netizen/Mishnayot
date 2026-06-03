@@ -226,7 +226,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
   <div class="controls" id="controlsBar">
     <div class="font-controls">
       <button class="font-step-btn" onclick="changeFontSize(-1)">−</button>
-      <span class="font-size-val" id="fontSizeVal">18</span>
+      <span class="font-size-val" id="fontSizeVal">22</span>
       <button class="font-step-btn" onclick="changeFontSize(+1)">+</button>
     </div>
     <div class="scroll-toggle" onclick="toggleAutoScroll()">
@@ -397,7 +397,7 @@ if (MODE === 'playlist') {
   }
 }
 
-let fontSize   = typeof cfg.fontSize === 'number' ? cfg.fontSize : 18;
+let fontSize   = typeof cfg.fontSize === 'number' ? cfg.fontSize : 22;
 let autoScroll = false;
 let autoScrollRAF = null;
 let autoScrollDelayTimer = null;
@@ -1608,6 +1608,34 @@ function recordMasteryScore(id, pct, perfectFirstPass){
 let _ttsOn = false, _ttsIdx = 0;
 function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
 function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
+// קולות עבריים זמינים במכשיר
+function _hebrewVoices(){
+  try { return (speechSynthesis.getVoices()||[]).filter(v => /^(he|iw)/i.test(v.lang||'')); } catch(e){ return []; }
+}
+function _isFemaleVoiceName(name){ return /carmit|female|woman|girl|נקב|אישה|נשי/i.test(name||''); }
+// בחירת קול + גובה לפי ההגדרה (ברירת מחדל: קול גברי)
+function _applyTtsVoice(u){
+  try {
+    const s = S.get('tehillim_settings') || {};
+    const choice = s.ttsVoice || 'male';
+    const he = _hebrewVoices();
+    let v = null, pitch = 1;
+    if (choice === 'male') {
+      v = he.find(x => !_isFemaleVoiceName(x.name)) || he[0] || null;
+      pitch = 0.8; // גובה נמוך — נשמע גברי גם אם הקול ניטרלי
+    } else if (choice === 'female') {
+      v = he.find(x => _isFemaleVoiceName(x.name)) || he[0] || null;
+      pitch = 1.18;
+    } else {
+      v = he.find(x => x.name === choice) || (speechSynthesis.getVoices()||[]).find(x => x.name === choice) || he[0] || null;
+      pitch = 1;
+    }
+    if (v) u.voice = v;
+    u.pitch = pitch;
+  } catch(e){}
+}
+// חימום רשימת הקולות (חלק מהדפדפנים טוענים אסינכרונית)
+try { if (typeof speechSynthesis !== 'undefined') { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function(){ speechSynthesis.getVoices(); }; } } catch(e){}
 function _ttsStop(){
   _ttsOn = false;
   try { speechSynthesis.cancel(); } catch(e){}
@@ -1630,6 +1658,7 @@ function toggleTTS(){
     if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
     const u = new SpeechSynthesisUtterance(_stripForTts(verses[_ttsIdx]));
     u.lang = 'he-IL'; u.rate = 0.9;
+    _applyTtsVoice(u);
     u.onend   = function(){ _ttsIdx++; speakNext(); };
     u.onerror = function(){ _ttsIdx++; speakNext(); };
     try { speechSynthesis.speak(u); } catch(e){ _ttsStop(); }

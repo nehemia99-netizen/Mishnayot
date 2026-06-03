@@ -561,14 +561,14 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.4.0 BETA</div>
+          <div class="app-version">גרסה 1.5.0 BETA</div>
         </div>
       </div>
     </div>
     <div class="header-left">
       <div style="display:flex;align-items:center;gap:7px;">
         <div class="hebrew-date" id="hebrewDate">טוען...</div>
-        <button class="hdr-search-btn" onclick="location.href='02-selection.html?qs=1'" title="חיפוש מילה">🔍</button>
+        <button class="hdr-search-btn" onclick="openHomeSearch()" title="חיפוש משנה" data-i18n-title="home.search">🔍</button>
       </div>
     </div>
   </div>
@@ -695,7 +695,7 @@ html.dark .lottery-trigger{opacity:.85;}
       <a href="02-selection.html?simple=1" style="padding:18px 8px;border-radius:16px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;">
         <span style="font-size:24px;">📜</span><span data-i18n="sel.title">בחר פרק</span>
       </a>
-      <a href="02-selection.html?tab=3" style="padding:18px 8px;border-radius:16px;background:#F0E8E6;border:1.5px solid #C4A49E;color:#6E4942;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;">
+      <a href="02-selection.html?fav=1" style="padding:18px 8px;border-radius:16px;background:#F0E8E6;border:1.5px solid #C4A49E;color:#6E4942;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;">
         <span style="font-size:24px;">♡</span><span data-i18n="home.btn_favs">מועדפים</span>
       </a>
     </div>
@@ -737,7 +737,7 @@ html.dark .lottery-trigger{opacity:.85;}
     <div style="position:relative;">
       <a href="03-reader.html?mode=random" class="action-btn" id="randomBtn" onclick="return handleRandomClick(event)" style="position:relative;width:100%;box-sizing:border-box;background:#EFEBE0;border-color:#C3B594;color:#6B5A33;"><div class="action-icon">🎲</div><span data-i18n="home.btn_random">פרק אקראי</span></a>
     </div>
-    <a href="02-selection.html?tab=3" class="action-btn accent-red"><div class="action-icon" style="color:#9C6B62;">♡</div><span data-i18n="home.btn_favs">מועדפים</span></a>
+    <a href="02-selection.html?fav=1" class="action-btn accent-red"><div class="action-icon" style="color:#9C6B62;">♡</div><span data-i18n="home.btn_favs">מועדפים</span></a>
   </div>
 
   <!-- שורה 2: כפתורים בינוניים -->
@@ -807,6 +807,106 @@ html.dark .lottery-trigger{opacity:.85;}
     <span class="footer-copy">© 2026 משניון</span>
   </div>
 </div>
+
+<!-- חיפוש משנה -->
+<div class="modal-overlay" id="searchModal" onclick="closeModalOut(event,'searchModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><span data-i18n="home.search_title">🔍 חיפוש משנה</span><button class="modal-close" onclick="closeModal('searchModal')">✕</button></div>
+    <div style="padding:8px 16px 18px;">
+      <input id="homeSearchInput" type="search" inputmode="search" autocomplete="off"
+        placeholder="מסכת ופרק (למשל: אבות ה כא) או שם מסכת…"
+        oninput="renderHomeSearch()" onkeydown="if(event.key==='Enter')homeSearchGo()"
+        style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;font-family:inherit;outline:none;direction:rtl;box-sizing:border-box;" />
+      <div id="homeSearchResults" style="margin-top:10px;max-height:44vh;overflow-y:auto;"></div>
+      <a id="homeSearchSefaria" href="#" target="_blank" rel="noopener"
+        style="display:none;margin-top:10px;padding:11px;border-radius:12px;background:var(--primary-light);border:.5px solid var(--primary-border,#BBD6BB);color:var(--primary);font-size:13px;font-weight:600;text-align:center;text-decoration:none;"></a>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function _sGem(n){
+    var sp={15:'ט"ו',16:'ט"ז'};if(sp[n])return sp[n];
+    var h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],m=['','ק','ר','ש','ת'];
+    var r='',x=n;if(x>=100){r+=m[Math.floor(x/100)];x%=100;}if(x>=10){r+=t[Math.floor(x/10)];x%=10;}r+=h[x];
+    return r.length===1?r+'׳':r.slice(0,-1)+'"'+r.slice(-1);
+  }
+  function _heToNum(s){
+    s=(s||'').replace(/["'״׳]/g,'').trim();
+    if(!s) return 0;
+    if(/^\d+$/.test(s)) return parseInt(s,10);
+    var map={'א':1,'ב':2,'ג':3,'ד':4,'ה':5,'ו':6,'ז':7,'ח':8,'ט':9,'י':10,'כ':20,'ך':20,'ל':30,'מ':40,'ם':40,'נ':50,'ן':50,'ס':60,'ע':70,'פ':80,'ף':80,'צ':90,'ץ':90,'ק':100,'ר':200,'ש':300,'ת':400};
+    var n=0;for(var i=0;i<s.length;i++){var v=map[s[i]];if(v==null)return 0;n+=v;}return n;
+  }
+  function _results(q){
+    if(typeof Corpus==='undefined'||!q) return [];
+    var out=[], matched=null, rest='';
+    // התאמת מסכת בתחילת הביטוי (שם עברי), כולל שמות מרובי-מילים
+    Corpus.tractates.forEach(function(t){
+      if(q===t.he || q.indexOf(t.he+' ')===0){ if(!matched || t.he.length>matched.he.length){ matched=t; rest=q.slice(t.he.length).trim(); } }
+    });
+    if(matched){
+      var parts=rest.split(/\s+/).filter(Boolean);
+      var perek=parts[0]?_heToNum(parts[0]):0;
+      var mish =parts[1]?_heToNum(parts[1]):0;
+      if(perek>=1 && perek<=matched.length) out.push({type:'go',tractate:matched,perek:perek,mish:(mish>=1?mish:0)});
+      else out.push({type:'tractate',tractate:matched});
+    }
+    var ql=q.replace(/["'״׳]/g,'');
+    Corpus.tractates.forEach(function(t){
+      if(matched && t.id===matched.id) return;
+      if(t.he.indexOf(ql)!==-1 || t.id.toLowerCase().indexOf(q.toLowerCase())!==-1) out.push({type:'tractate',tractate:t});
+    });
+    return out.slice(0,12);
+  }
+  window._homeSearchResults=_results;
+  window.openHomeSearch=function(){
+    openModal('searchModal');
+    var inp=document.getElementById('homeSearchInput');
+    if(inp){ inp.value=''; setTimeout(function(){inp.focus();},120); }
+    renderHomeSearch();
+  };
+  window.openSearchRef=function(id,mish){ location.href='03-reader.html?chap='+encodeURIComponent(id)+(mish?('&mishnah='+mish):''); };
+  window.openSearchTractate=function(tid){ location.href='03-reader.html?chap='+encodeURIComponent(tid+'.1'); };
+  window.homeSearchGo=function(){
+    var q=(document.getElementById('homeSearchInput').value||'').trim();
+    var r=_results(q); if(!r.length) return;
+    if(r[0].type==='go') openSearchRef(Corpus.chapId(r[0].tractate.id,r[0].perek), r[0].mish);
+    else openSearchTractate(r[0].tractate.id);
+  };
+  window.renderHomeSearch=function(){
+    var box=document.getElementById('homeSearchResults');
+    var sef=document.getElementById('homeSearchSefaria');
+    if(!box) return;
+    var q=(document.getElementById('homeSearchInput').value||'').trim();
+    if(typeof Corpus==='undefined'){ box.innerHTML=''; return; }
+    if(!q){
+      box.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:18px;line-height:1.8;">הקלד שם מסכת, או מסכת ופרק<br>למשל: <b>ברכות ב</b> · <b>אבות ה כא</b></div>';
+      if(sef) sef.style.display='none'; return;
+    }
+    var res=_results(q), html='';
+    res.forEach(function(r){
+      var t=r.tractate, o=Corpus.getOrder(t.order), oHe=o?o.he:'';
+      if(r.type==='go'){
+        var label=t.he+' · פרק '+_sGem(r.perek)+(r.mish?(' · משנה '+_sGem(r.mish)):'');
+        html+='<div onclick="openSearchRef(\''+Corpus.chapId(t.id,r.perek)+'\','+(r.mish||0)+')" style="cursor:pointer;padding:13px 14px;border-radius:12px;background:var(--primary);color:#fff;font-weight:700;font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">📖 פתח: '+label+'</div>';
+      } else {
+        html+='<div onclick="openSearchTractate(\''+t.id+'\')" style="cursor:pointer;padding:11px 14px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">'+
+          '<span style="font-weight:600;color:var(--text);font-size:15px;">'+t.he+'</span>'+
+          '<span style="font-size:11px;color:var(--text-muted);">סדר '+oHe+' · '+t.length+' פרקים</span></div>';
+      }
+    });
+    if(!res.length) html='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:18px;">לא נמצאה מסכת תואמת — נסה חיפוש בכל המשנה למטה</div>';
+    box.innerHTML=html;
+    if(sef){
+      sef.style.display='block';
+      sef.textContent='🔎 חפש "'+q+'" בכל המשנה (ספריא) ←';
+      sef.href='https://www.sefaria.org/search?q='+encodeURIComponent(q)+'&tab=text&tsort=relevance&svar=1&ssort=relevance&filters=Mishnah';
+    }
+  };
+})();
+</script>
 
 <div class="modal-overlay" id="blessingsModal" onclick="closeModalOut(event,'blessingsModal')">
   <div class="modal-sheet">

@@ -217,14 +217,18 @@ function recordChapterRead(chapId) {
   return data.chaptersRead;
 }
 
-/* ─── פרקים שנשננו (למדתי בע״פ) ─── */
+/* ─── משניות שנשננו (למדתי בע״פ) — ספירה פר־משנה ─── */
 function syncMemorizedFromMems() {
-  // קורא מ-tehillim_mems (המקור) ומסנכרן
-  let mems = [];
-  try { mems = JSON.parse(localStorage.getItem('tehillim_mem')||'[]'); } catch(e){ mems = []; }
+  // המקור הוא tehillim_mem_m (משניות בודדות: "Berakhot.2:3"). כל משנה נספרת לחוד.
+  let memM = [];
+  try { memM = JSON.parse(localStorage.getItem('tehillim_mem_m')||'[]'); } catch(e){ memM = []; }
+  // נפילה רכה לנתונים ישנים (פר־פרק) אם אין עדיין סימוני משנה
+  if (!memM.length) {
+    try { memM = JSON.parse(localStorage.getItem('tehillim_mem')||'[]'); } catch(e){ memM = []; }
+  }
   const data = load();
-  data.memorized.chapters = mems.slice();
-  data.memorized.count = mems.length;
+  data.memorized.chapters = memM.slice();
+  data.memorized.count = memM.length;
   save(data);
   return data.memorized;
 }
@@ -515,20 +519,20 @@ const BADGES = [
   { id:'medals_gold_10',     icon:'🥇', title:'10 מדליות זהב',    desc:'10 פרקים עם מדליית זהב',    check: ctx => (ctx.medalsCount && ctx.medalsCount.gold>=10),     reward:100 },
   { id:'medals_platinum_10', icon:'💎', title:'10 מדליות פלטינה', desc:'10 פרקים עם מדליית פלטינה', check: ctx => (ctx.medalsCount && ctx.medalsCount.platinum>=10), reward:100 },
   // שינון - סדרה דינמית 5/10/15/20/25 (80/200/300/400/500), אז כל 5 עוד 100 (30=600 ... 150=3000)
-  { id:'mem_5',    icon:'🧠', title:'5 פרקים בעל פה',desc:'למדת 5 פרקים בעל פה',   check: ctx => ctx.memorized >= 5,     reward:80 },
-  { id:'mem_10',    icon:'🎯', title:'10 פרקים בעל פה',desc:'למדת 10 פרקים בעל פה',   check: ctx => ctx.memorized >= 10,     reward:200 },
-  { id:'mem_15',    icon:'✨', title:'15 פרקים בעל פה',desc:'למדת 15 פרקים בעל פה',   check: ctx => ctx.memorized >= 15,     reward:300 },
-  { id:'mem_20',    icon:'🎓', title:'20 פרקים בעל פה',desc:'למדת 20 פרקים בעל פה',   check: ctx => ctx.memorized >= 20,     reward:400 },
-  { id:'mem_25',    icon:'🌟', title:'25 פרקים בעל פה',desc:'למדת 25 פרקים בעל פה',   check: ctx => ctx.memorized >= 25,     reward:500 },
-  { id:'mem_30',   icon:'🏆', title:'30 פרקים בעל פה',desc:'למדת 30 פרקים בעל פה',  check: ctx => ctx.memorized >= 30,    reward:600 },
-  { id:'mem_35',   icon:'🏆', title:'35 פרקים בעל פה',desc:'למדת 35 פרקים בעל פה',  check: ctx => ctx.memorized >= 35,    reward:700 },
-  { id:'mem_40',   icon:'🏆', title:'40 פרקים בעל פה',desc:'למדת 40 פרקים בעל פה',  check: ctx => ctx.memorized >= 40,    reward:800 },
-  { id:'mem_45',   icon:'🏆', title:'45 פרקים בעל פה',desc:'למדת 45 פרקים בעל פה',  check: ctx => ctx.memorized >= 45,    reward:900 },
-  { id:'mem_50',   icon:'💎', title:'50 פרקים בעל פה',desc:'למדת 50 פרקים בעל פה',  check: ctx => ctx.memorized >= 50,    reward:1000 },
-  { id:'mem_55',   icon:'💎', title:'55 פרקים בעל פה',desc:'למדת 55 פרקים בעל פה',  check: ctx => ctx.memorized >= 55,    reward:1100 },
-  { id:'mem_60',   icon:'💎', title:'60 פרקים בעל פה',desc:'למדת 60 פרקים בעל פה',  check: ctx => ctx.memorized >= 60,    reward:1200 },
-  { id:'mem_65',   icon:'💎', title:'65 פרקים בעל פה',desc:'למדת 65 פרקים בעל פה',  check: ctx => ctx.memorized >= 65,    reward:1300 },
-  { id:'mem_70',   icon:'💎', title:'70 פרקים בעל פה',desc:'למדת 70 פרקים בעל פה',  check: ctx => ctx.memorized >= 70,    reward:1400 },
+  { id:'mem_5',    icon:'🧠', title:'5 משניות בעל פה',desc:'למדת 5 משניות בעל פה',   check: ctx => ctx.memorized >= 5,     reward:80 },
+  { id:'mem_10',    icon:'🎯', title:'10 משניות בעל פה',desc:'למדת 10 משניות בעל פה',   check: ctx => ctx.memorized >= 10,     reward:200 },
+  { id:'mem_15',    icon:'✨', title:'15 משניות בעל פה',desc:'למדת 15 משניות בעל פה',   check: ctx => ctx.memorized >= 15,     reward:300 },
+  { id:'mem_20',    icon:'🎓', title:'20 משניות בעל פה',desc:'למדת 20 משניות בעל פה',   check: ctx => ctx.memorized >= 20,     reward:400 },
+  { id:'mem_25',    icon:'🌟', title:'25 משניות בעל פה',desc:'למדת 25 משניות בעל פה',   check: ctx => ctx.memorized >= 25,     reward:500 },
+  { id:'mem_30',   icon:'🏆', title:'30 משניות בעל פה',desc:'למדת 30 משניות בעל פה',  check: ctx => ctx.memorized >= 30,    reward:600 },
+  { id:'mem_35',   icon:'🏆', title:'35 משניות בעל פה',desc:'למדת 35 משניות בעל פה',  check: ctx => ctx.memorized >= 35,    reward:700 },
+  { id:'mem_40',   icon:'🏆', title:'40 משניות בעל פה',desc:'למדת 40 משניות בעל פה',  check: ctx => ctx.memorized >= 40,    reward:800 },
+  { id:'mem_45',   icon:'🏆', title:'45 משניות בעל פה',desc:'למדת 45 משניות בעל פה',  check: ctx => ctx.memorized >= 45,    reward:900 },
+  { id:'mem_50',   icon:'💎', title:'50 משניות בעל פה',desc:'למדת 50 משניות בעל פה',  check: ctx => ctx.memorized >= 50,    reward:1000 },
+  { id:'mem_55',   icon:'💎', title:'55 משניות בעל פה',desc:'למדת 55 משניות בעל פה',  check: ctx => ctx.memorized >= 55,    reward:1100 },
+  { id:'mem_60',   icon:'💎', title:'60 משניות בעל פה',desc:'למדת 60 משניות בעל פה',  check: ctx => ctx.memorized >= 60,    reward:1200 },
+  { id:'mem_65',   icon:'💎', title:'65 משניות בעל פה',desc:'למדת 65 משניות בעל פה',  check: ctx => ctx.memorized >= 65,    reward:1300 },
+  { id:'mem_70',   icon:'💎', title:'70 משניות בעל פה',desc:'למדת 70 משניות בעל פה',  check: ctx => ctx.memorized >= 70,    reward:1400 },
 ];
 
 function coversRange(set, from, to) {

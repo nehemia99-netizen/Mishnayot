@@ -228,6 +228,16 @@ html.dark .google-btn{background:var(--surface);}
       </div>
       <div class="toggle" id="tHideCantillation" onclick="toggleHideCantillation()"><div class="toggle-knob"></div></div>
     </div>
+    <div class="row" id="rowTtsVoice">
+      <div class="row-left">
+        <span class="row-icon">🔊</span>
+        <div><div class="row-label" data-i18n="set.tts_voice">קול ההקראה</div><div class="row-sub" data-i18n="set.tts_voice_sub">הקול לכפתור ההקראה הקולית בקורא</div></div>
+      </div>
+      <select id="selTtsVoice" onchange="saveSettings()" class="sel">
+        <option value="male" data-i18n="set.tts_male">קול גברי (ברירת מחדל)</option>
+        <option value="female" data-i18n="set.tts_female">קול נשי</option>
+      </select>
+    </div>
     <div class="row" id="rowScrollSpeed">
       <div class="row-left">
         <span class="row-icon">🐢</span>
@@ -399,7 +409,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.4.0 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.0 BETA · © 2026</div>
 </div>
 
 <script>
@@ -443,8 +453,10 @@ function loadSettings() {
   if (s.myChapterBannerFreq) { const el=document.getElementById('selBannerFreq'); if(el) el.value=s.myChapterBannerFreq; }
 
   // Font size
-  const fs = typeof s.fontSize === 'number' ? s.fontSize : 18;
+  const fs = typeof s.fontSize === 'number' ? s.fontSize : 22;
   applyFontSize(fs);
+  // קול ההקראה — מילוי הרשימה ובחירת הערך השמור
+  populateTtsVoices();
   // Language buttons — הדגש את השפה הפעילה
   const activeLang = s.lang || 'he';
   const btnHe = document.getElementById('btnLangHe');
@@ -464,6 +476,26 @@ function loadSettings() {
   }
   _loadingSettings = false; // הטעינה הסתיימה — saveSettings() מותר שוב
 }
+
+/* ── מילוי רשימת קולות ההקראה (קולות עבריים במכשיר; נשי בסוף) ── */
+function populateTtsVoices() {
+  const sel = document.getElementById('selTtsVoice');
+  if (!sel) return;
+  const cur = (S.get('tehillim_settings') || {}).ttsVoice || 'male';
+  let voices = [];
+  try { voices = (speechSynthesis.getVoices() || []).filter(v => /^(he|iw)/i.test(v.lang || '')); } catch(e){}
+  const isFem = n => /carmit|female|woman|girl|נקב|אישה|נשי/i.test(n || '');
+  const males   = voices.filter(v => !isFem(v.name));
+  const females = voices.filter(v => isFem(v.name));
+  let opts = '<option value="male">קול גברי (ברירת מחדל)</option>';
+  males.forEach(v   => opts += '<option value="' + v.name + '">' + v.name + '</option>');
+  females.forEach(v => opts += '<option value="' + v.name + '">' + v.name + ' (נשי)</option>');
+  opts += '<option value="female">קול נשי</option>';
+  sel.innerHTML = opts;
+  sel.value = cur;
+  if (sel.value !== cur) sel.value = 'male'; // אם הקול שנשמר אינו זמין יותר
+}
+try { if (typeof speechSynthesis !== 'undefined') speechSynthesis.onvoiceschanged = populateTtsVoices; } catch(e){}
 
 /* ── Save settings ── */
 
@@ -512,6 +544,7 @@ function saveSettings() {
   s.hourlyRem     = document.getElementById('tRemHourly').classList.contains('on');
   s.medalAlert    = document.getElementById('tMedal').classList.contains('on');
   s.verseNums     = document.getElementById('tVerseNums').classList.contains('on');
+  { const _tv = document.getElementById('selTtsVoice'); if (_tv) s.ttsVoice = _tv.value; }
   // שמור leaderboard — אם גלוי: קרא מהטוגל. אם מוסתר: ברירת מחדל true.
   // שמור leaderboard תמיד — לא תלוי בנראות הסקשן
   const _tLeader = document.getElementById('tLeader');

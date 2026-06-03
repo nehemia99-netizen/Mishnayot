@@ -1203,7 +1203,7 @@ function renderAchievements() {
   const db      = S.get('tehillim_readings') || [];
   const sc      = S.get('tehillim_score')   || {};
   const rd      = S.get('tehillim_reading') || {};
-  const mem     = S.get('tehillim_mem')     || [];
+  const mem     = S.get('tehillim_mem_m')   || S.get('tehillim_mem') || []; // ספירת משניות בע״פ
   const visits  = S.get('tehillim_visits')  || { count:0 };
 
   const recs    = db.filter(r => r.date >= from && r.date <= to);
@@ -1250,7 +1250,7 @@ function renderAchievements() {
     { num: doneCh.size,         lbl: '📖 פרקים נלמדו'           },
     { num: '+' + pts,           lbl: '⭐ מעלות',    color:'#C07A00' },
     { num: fmtMins(mins),       lbl: '⏱ זמן לימוד'               },
-    { num: mem.length,          lbl: '🧠 פרקים בע"פ'             },
+    { num: mem.length,          lbl: '🧠 משניות בע"פ'            },
     { num: (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })(),
                                 lbl: '📊 מכסת המשנה', wide:false  },
     { num: visits.count || 0,  lbl: '📱 כניסות לאפליקציה', wide:true },

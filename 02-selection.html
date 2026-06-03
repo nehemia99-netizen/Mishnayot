@@ -462,6 +462,15 @@ html.dark .chap-cell.mem{background:#1C1230;}
     } catch(e){}
   })();
 
+  // פתיחה ישירה של לשונית המועדפים (?fav=1 / ?tab=1 / ?tab=fav מעמוד הבית)
+  (function openFavTab(){
+    try {
+      var qp = new URLSearchParams(location.search);
+      var t = qp.get('tab');
+      if (qp.get('fav') === '1' || t === '1' || t === 'fav' || t === '3') switchTab(1);
+    } catch(e){}
+  })();
+
 })();
 </script>
 </body>
