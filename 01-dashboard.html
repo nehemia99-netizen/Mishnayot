@@ -561,7 +561,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.28 BETA</div>
+          <div class="app-version">גרסה 1.5.29 BETA</div>
         </div>
       </div>
     </div>
@@ -2944,19 +2944,32 @@ const _app = getApps().find(a=>a.name==='dash-comm') || initializeApp({
 const _db = getFirestore(_app);
 const HEB=['','א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ז׳','ח׳','ט׳','י׳','י״א','י״ב','י״ג','י״ד','ט״ו','ט״ז','י״ז','י״ח','י״ט','כ׳','כ״א','כ״ב','כ״ג','כ״ד','כ״ה','כ״ו','כ״ז','כ״ח','כ״ט','ל׳','ל״א','ל״ב','ל״ג','ל״ד','ל״ה','ל״ו','ל״ז','ל״ח','ל״ט','מ׳','מ״א','מ״ב','מ״ג','מ״ד','מ״ה','מ״ו','מ״ז','מ״ח','מ״ט','נ׳','נ״א','נ״ב','נ״ג','נ״ד','נ״ה','נ״ו','נ״ז','נ״ח','נ״ט','ס׳','ס״א','ס״ב','ס״ג','ס״ד','ס״ה','ס״ו','ס״ז','ס״ח','ס״ט','ע׳','ע״א','ע״ב','ע״ג','ע״ד','ע״ה','ע״ו','ע״ז','ע״ח','ע״ט','פ׳','פ״א','פ״ב','פ״ג','פ״ד','פ״ה','פ״ו','פ״ז','פ״ח','פ״ט','צ׳','צ״א','צ״ב','צ״ג','צ״ד','צ״ה','צ״ו','צ״ז','צ״ח','צ״ט','ק׳','ק״א','ק״ב','ק״ג','ק״ד','ק״ה','ק״ו','ק״ז','ק״ח','ק״ט','ק״י','קי״א','קי״ב','קי״ג','קי״ד','קט״ו','קט״ז','קי״ז','קי״ח','קי״ט','ק״כ','קכ״א','קכ״ב','קכ״ג','קכ״ד','קכ״ה','קכ״ו','קכ״ז','קכ״ח','קכ״ט','ק״ל','קל״א','קל״ב','קל״ג','קל״ד','קל״ה','קל״ו','קל״ז','קל״ח','קל״ט','ק״מ','קמ״א','קמ״ב','קמ״ג','קמ״ד','קמ״ה','קמ״ו','קמ״ז','קמ״ח','קמ״ט','ק״נ'];
 
+function _dashChapLabel(id){
+  try{
+    if(typeof Corpus!=='undefined'){
+      const p=Corpus.parseChapId(String(id));
+      if(p){ const t=Corpus.getTractate(p.tractate); if(t) return t.he+' · פרק '+(HEB[p.perek]||p.perek); }
+    }
+  }catch(e){}
+  return 'פרק '+(HEB[+id]||id);
+}
 window.loadDashCommunity = async function loadDashCommunity(){
+  // פרקים חמים
   try{
     const cs=await getDocs(query(collection(_db,'chapReads'),orderBy('count','desc'),limit(5)));
     const hotEl=document.getElementById('dashHotList');
     if(hotEl)hotEl.innerHTML=cs.empty
       ?'<div style="padding:8px;color:var(--text-muted);font-size:12px;text-align:center">אין נתונים עדיין</div>'
       :cs.docs.map((d,i)=>{
-        const chapNum=+d.id;
-        return '<div class="community-row" onclick="openChap('+chapNum+')"><div>'
+        const id=String(d.id);
+        return '<div class="community-row" onclick="location.href=\'03-reader.html?chap='+encodeURIComponent(id)+'\'"><div>'
           +(i<2?'<span class="hot-badge">🔥 חם</span>':'')
-          +'<span class="chap-name"> פרק '+(HEB[chapNum]||d.id)+'</span></div>'
-          +'<span class="chap-count">'+(d.data().count||0).toLocaleString()+' קריאות</span></div>';
+          +'<span class="chap-name"> '+_dashChapLabel(id)+'</span></div>'
+          +'<span class="chap-count">'+(d.data().count||0).toLocaleString()+' לימודים</span></div>';
       }).join('');
+  }catch(e){ console.warn('hot chapters load error',e); const hotEl=document.getElementById('dashHotList'); if(hotEl)hotEl.innerHTML='<div style="padding:8px;color:var(--text-muted);font-size:12px;text-align:center">אין נתונים כרגע</div>'; }
+  // לוח מובילים
+  try{
     const ls=await getDocs(query(collection(_db,'leaderboard'),orderBy('score','desc'),limit(3)));
     const lbEl=document.getElementById('dashLeaderboard');
     if(lbEl){
@@ -2966,7 +2979,7 @@ window.loadDashCommunity = async function loadDashCommunity(){
         ?u.map((p,i)=>'<div class="user-row"><div class="avatar" style="background:'+(cl[i]?cl[i][0]:'#eee')+';color:'+(cl[i]?cl[i][1]:'#333')+';">'+(p.displayName||'?').split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div class="user-name">'+p.displayName+'</div><div class="user-score">⭐ '+(p.score||0).toLocaleString()+' זכויות</div></div>').join('')
         :'<div style="padding:8px;color:var(--text-muted);font-size:12px;">אין עדיין משתמשים</div>';
     }
-  }catch(e){console.warn('community load error',e);}
+  }catch(e){ console.warn('leaderboard load error',e); const lbEl=document.getElementById('dashLeaderboard'); if(lbEl)lbEl.innerHTML='<div style="padding:8px;color:var(--text-muted);font-size:12px;text-align:center">אין נתונים כרגע</div>'; }
 }
   if (typeof _syncPublicStats === 'function') _syncPublicStats();
 </script>

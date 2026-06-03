@@ -111,6 +111,7 @@ html.dark .group-header-card{background:linear-gradient(135deg,#16401E,#122E18);
 .section-label{font-size:11px;color:var(--text-muted);padding:12px 16px 5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
 </style>
 <script src="utils.js?v=2.2.0"></script>
+<script src="corpus.js?v=2.2.0"></script>
 <script src="i18n.js?v=2.2.86" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -286,6 +287,16 @@ function toGem2(n) {
   const ones=['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל','לא','לב','לג','לד','לה','לו','לז','לח','לט','מ','מא','מב','מג','מד','מה','מו','מז','מח','מט','נ','נא','נב','נג','נד','נה','נו','נז','נח','נט','ס','סא','סב','סג','סד','סה','סו','סז','סח','סט','ע','עא','עב','עג','עד','עה','עו','עז','עח','עט','פ','פא','פב','פג','פד','פה','פו','פז','פח','פט','צ','צא','צב','צג','צד','צה','צו','צז','צח','צט','ק','קא','קב','קג','קד','קה','קו','קז','קח','קט','קי','קיא','קיב','קיג','קיד','קטו','קטז','קיז','קיח','קיט','קכ','קכא','קכב','קכג','קכד','קכה','קכו','קכז','קכח','קכט','קל','קלא','קלב','קלג','קלד','קלה','קלו','קלז','קלח','קלט','קמ','קמא','קמב','קמג','קמד','קמה','קמו','קמז','קמח','קמט','קנ'];
   return ones[n] || String(n);
 }
+// תווית פרק חם: "Berakhot.2" → "ברכות פרק ב׳"
+function _hotChapLabel(id) {
+  try {
+    if (typeof Corpus !== 'undefined') {
+      const p = Corpus.parseChapId(String(id));
+      if (p) { const t = Corpus.getTractate(p.tractate); if (t) return t.he + ' · פרק ' + toGem2(p.perek); }
+    }
+  } catch(e) {}
+  return String(id);
+}
 function avatarColor(str) {
   const colors=['#3A7D44','#7A4A00','#6A1B9A','#2E7D32','#880E4F','#2F7D45','#F57F17','#00695C','#C62828','#37474F'];
   let h=0; for(const c of (str||'')) h=(h*31+c.charCodeAt(0))&0xffff;
@@ -372,12 +383,12 @@ async function loadCommunityData() {
     if (crSnap.empty) {
       document.getElementById('hotList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">עדיין אין נתוני קריאה 📖</div>';
     } else {
-      const chaps = crSnap.docs.map(d => ({ chap: parseInt(d.id), reads: d.data().count || 0 }));
+      const chaps = crSnap.docs.map(d => ({ chap: String(d.id), reads: d.data().count || 0 }));
       const max = chaps[0].reads || 1;
       document.getElementById('hotList').innerHTML = chaps.map((c,i) => `
-        <a class="chap-row" href="03-reader.html?chap=${c.chap}" style="text-decoration:none;display:flex;align-items:center;">
+        <a class="chap-row" href="03-reader.html?chap=${encodeURIComponent(c.chap)}" style="text-decoration:none;display:flex;align-items:center;">
           <span class="chap-rank">${i+1}</span>
-          <span class="chap-name">${i<2?'<span class="hot-badge">🔥</span>':''}פרק ${toGem2(c.chap)}</span>
+          <span class="chap-name">${i<2?'<span class="hot-badge">🔥</span>':''}${_hotChapLabel(c.chap)}</span>
           <div class="chap-bar-wrap"><div class="chap-bar" style="width:${Math.round(c.reads/max*100)}%"></div></div>
           <span class="chap-count">${c.reads.toLocaleString()} קריאות</span>
         </a>`).join('');
