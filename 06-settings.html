@@ -396,6 +396,18 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
+  <div class="group-label" data-i18n="set.share_recommend">שיתוף והמלצה</div>
+  <div class="group">
+    <div class="row" onclick="inviteFriend()" style="cursor:pointer;">
+      <div class="row-left"><span class="row-icon">📨</span><div class="row-label">הזמן חבר<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">שתפו את משניון וזכו ב-3 מעלות 🎁</div></div></div>
+      <span class="chevron">‹</span>
+    </div>
+    <div class="row" onclick="openSisterApp()" style="cursor:pointer;">
+      <div class="row-left"><span class="row-icon">📜</span><div class="row-label">לומדים גם תהילים?<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">נסו את תהילהון — אפליקציית האחות ✨</div></div></div>
+      <span class="chevron">‹</span>
+    </div>
+  </div>
+
   <div class="group" style="margin-bottom:8px;border-color:rgba(163,45,45,.18);">
     <div class="danger-row" onclick="resetData()">
       <span class="danger-label" data-i18n="set.reset_all">🗑 איפוס כל הנתונים</span>
@@ -403,7 +415,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.5.32 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.33 BETA · © 2026</div>
 </div>
 
 <script>
@@ -810,6 +822,32 @@ function resetData() {
 }
 
 /* ── Rate us / Terms of use (2.0.5) ── */
+// כתובת אפליקציית האחות (תהילהון) — TODO: לאמת כתובת סופית
+const SISTER_APP_URL = 'https://tehillon.vercel.app';
+function openSisterApp() {
+  window.open(SISTER_APP_URL, '_blank', 'noopener');
+}
+function inviteFriend() {
+  const url = 'https://mishnayot-alpha.vercel.app';
+  const msg = 'גיליתי אפליקציה מקסימה ללימוד ושינון משנה יומית — משניון 📖\nמצטרפים כאן: ' + url;
+  const grantBonus = function() {
+    try {
+      if (!localStorage.getItem('mishnayon_invite_bonus') && typeof Gamification !== 'undefined' && Gamification.addMaalot) {
+        Gamification.addMaalot(3, 'הזמנת חבר');
+        localStorage.setItem('mishnayon_invite_bonus', '1');
+        showSettingsToast('🎁 תודה ששיתפת! זוכית ב-3 מעלות');
+      } else {
+        showSettingsToast('תודה ששיתפת! 📨');
+      }
+    } catch (e) {}
+  };
+  if (navigator.share) {
+    navigator.share({ title: 'משניון', text: msg, url: url }).then(grantBonus).catch(function(){});
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    grantBonus();
+  }
+}
 function rateApp() {
   alert('דרוג האפליקציה יהיה זמין לאחר פרסום בחנויות.\n\nבינתיים — תודה שאתה משתמש במשניון!');
 }
