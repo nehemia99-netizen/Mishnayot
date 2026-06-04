@@ -461,7 +461,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gamification.js?v=1.5.39"></script>
+<script src="gamification.js?v=1.5.40"></script>
 <script>
 /* ── Storage ── */
 const S = {
@@ -697,7 +697,9 @@ function renderMemChallenge() {
     bMem.style.color = !isRead ? '#fff' : 'var(--text)';
   }
   const sub = document.getElementById('memChSub');
-  if (sub) sub.textContent = p.done + ' / ' + p.goal + ' ' + p.unit + ' השבוע' + (p.met ? ' — הושלם! 🎉' : '');
+  if (sub) sub.textContent = p.met
+    ? ('✓ הושלם! ' + p.done + ' ' + p.unit + ' השבוע 🎉')
+    : (p.done + ' מתוך ' + p.goal + ' ' + p.unit + ' השבוע');
   const pct = document.getElementById('memChPct'); if (pct) pct.textContent = p.pct + '%';
   const bar = document.getElementById('memChBar'); if (bar) bar.style.width = p.pct + '%';
   const icon = document.getElementById('memChIcon'); if (icon) icon.textContent = p.met ? '🏆' : '🎯';

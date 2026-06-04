@@ -701,7 +701,8 @@ function _readWeekUnique() {
   const seen = {};
   for (let i = 0; i < reads.length; i++) {
     const r = reads[i];
-    if (r && r.date && r.date >= wkStart) seen[String(r.chap)] = 1;
+    // רק פרקים שהושלמו (לא קריאה חלקית/גלישה) — תואם לספירת ההיסטוריה
+    if (r && r.date && r.date >= wkStart && !r.partial) seen[String(r.chap)] = 1;
   }
   return Object.keys(seen).length;
 }
