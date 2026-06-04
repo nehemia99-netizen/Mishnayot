@@ -461,7 +461,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gamification.js?v=1.5.40"></script>
+<script src="gamification.js?v=1.5.42"></script>
 <script>
 /* ── Storage ── */
 const S = {
@@ -705,7 +705,7 @@ function renderMemChallenge() {
   const icon = document.getElementById('memChIcon'); if (icon) icon.textContent = p.met ? '🏆' : '🎯';
   const meta = document.getElementById('memChMeta');
   if (meta) meta.textContent = p.met
-    ? 'כל הכבוד! עמדת ביעד השבוע 🎉'
+    ? 'כל הכבוד! עמדת ביעד 🎉 — רוצים יותר? בחרו יעד גבוה יותר ⬆️'
     : (isRead ? ('קראו ' + p.unit + ' השבוע כדי להתקדם') : 'סמנו ★ משניות בקורא כדי להתקדם');
   // כפתורי יעד דינמיים לפי מצב
   const wrap = document.getElementById('memGoalBtns');
@@ -723,6 +723,11 @@ function renderMemChallenge() {
       + 'border:1.5px solid var(--border);background:var(--surface);color:var(--text);">+</button>';
     wrap.innerHTML = html;
   }
+  // בונוס השלמה (יעד×5) + טוסט — פעם בשבוע לכל מצב
+  try {
+    const rw = Gamification.checkWeeklyChallengeReward && Gamification.checkWeeklyChallengeReward();
+    if (rw && typeof showToast === 'function') showToast('🎉 השלמת את האתגר השבועי! +' + rw.reward + ' מעלות');
+  } catch(e) {}
 }
 function setChMode(mode) {
   if (typeof Gamification === 'undefined' || !Gamification.setChallengeMode) return;
@@ -821,7 +826,10 @@ window.claimChallengeOnPage = function(key, reward) {
   if (typeof Gamification === 'undefined') return;
   if (typeof Gamification.claimChallenge !== 'function') return;
   const meta = Gamification.claimChallenge(key, reward);
-  if (meta) renderChallengesPage();
+  if (meta) {
+    if (typeof showToast === 'function') showToast('🎉 קיבלת +' + reward + ' מעלות!');
+    renderChallengesPage();
+  }
 }
 
 /* === Render BADGES grid (2.0.4) === */

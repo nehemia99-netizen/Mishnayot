@@ -734,6 +734,21 @@ function getWeeklyMemProgress() {
     weekKey: weekKey()
   };
 }
+// בונוס השלמת אתגר שבועי: יעד×5, פעם בשבוע לכל מצב, מצטבר בהעלאת יעד.
+// מחזיר {reward, mode} אם הוענק עכשיו, אחרת null.
+function checkWeeklyChallengeReward() {
+  const p = getWeeklyMemProgress();
+  if (!p.met) return null;
+  const k = 'mishnah_weekly_award_' + p.mode;
+  let rewardedGoal = 0;
+  const raw = localStorage.getItem(k);
+  if (raw) { const parts = raw.split(':'); if (parts[0] === p.weekKey) rewardedGoal = parseInt(parts[1], 10) || 0; }
+  if (p.goal <= rewardedGoal) return null;
+  const reward = (p.goal - rewardedGoal) * 5;
+  localStorage.setItem(k, p.weekKey + ':' + p.goal);
+  addMaalot(reward, 'weekly-challenge:' + p.mode);
+  return { reward: reward, mode: p.mode };
+}
 
 /* ─── חשיפה גלובלית ─── */
 global.Gamification = {
@@ -756,6 +771,6 @@ global.Gamification = {
   srsSchedule, srsRemove, srsDueList, srsCount, srsTotal,
   // אתגר שבועי (Stage D) — לימוד/שינון
   logMemEvent, getWeeklyMemGoal, setWeeklyMemGoal, getWeeklyMemProgress,
-  getChallengeMode, setChallengeMode
+  getChallengeMode, setChallengeMode, checkWeeklyChallengeReward
 };
 })(window);
