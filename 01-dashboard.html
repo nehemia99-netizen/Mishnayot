@@ -565,7 +565,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.31 BETA</div>
+          <div class="app-version">גרסה 1.5.32 BETA</div>
         </div>
       </div>
     </div>
@@ -1285,25 +1285,22 @@ window.openBlessingDirect = function(which) {
     // הצג כפתור קרא פרק רק אחרי ברכה לפני
     const readBtn = document.getElementById('blessingReadBtn');
     if (readBtn) readBtn.style.display = (which === 'b1') ? 'block' : 'none';
-    // סגור את כולם קודם
-    ['b1','b2','b3','b4','b5','b7','b8','b10'].forEach(function(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        const body = el.querySelector('.blessing-body');
-        const icon = el.querySelector('.blessing-toggle');
-        if (body) body.style.display = 'none';
-        if (icon) icon.textContent = '+';
-      }
+    // נקה כל מצב קודם — הסר open וגם סגנונות inline שאולי נשארו
+    // (openBlessingDirect הישן קבע display:none inline שדורס את מנגנון ה-class — גרם לברכות להיראות נעולות)
+    document.querySelectorAll('#blessingsModal .blessing-item').forEach(function(el) {
+      el.classList.remove('open');
+      const body = el.querySelector('.blessing-body');
+      if (body) body.style.removeProperty('display');
     });
-    // פתח את הנכון
-    const target = document.getElementById(which);
-    if (target) {
-      const body = target.querySelector('.blessing-body');
-      const icon = target.querySelector('.blessing-toggle');
-      if (body) body.style.display = 'block';
-      if (icon) icon.textContent = '−';
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // פתח את הנכון דרך אותו מנגנון כמו לחיצה רגילה (מוסיף .open + תופעות לוואי)
+    if (typeof toggleBlessing === 'function') {
+      toggleBlessing(which);
+    } else {
+      const t = document.getElementById(which);
+      if (t) t.classList.add('open');
     }
+    const target = document.getElementById(which);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 150);
 };
 

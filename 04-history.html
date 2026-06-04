@@ -1007,24 +1007,29 @@ function renderYesterday() {
 
   // רשימת פרקים
   if (doneCh.size > 0) {
-    html += '<div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">פרקים שנקראו</div>';
-    const bookColor = n => n<=41?'#3A7D44': n<=72?'#3B8C14': n<=89?'#7B2FF7': n<=106?'#C07A00': '#C0392B';
+    html += '<div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">פרקים שנלמדו</div>';
+    const _orderCol = {Zeraim:'#3A7D44',Moed:'#3B8C14',Nashim:'#7B2FF7',Nezikin:'#C07A00',Kodashim:'#C0392B',Tahorot:'#0E7C86'};
+    const _yLabel = id => { if (typeof Corpus==='undefined') return String(id); const p=Corpus.parseChapId(String(id)); if(!p) return String(id); const t=Corpus.getTractate(p.tractate); return (t?t.he:p.tractate)+' · פרק '+toGem(p.perek); };
+    const _yOrderHe = id => { if (typeof Corpus==='undefined') return ''; const p=Corpus.parseChapId(String(id)); if(!p) return ''; const t=Corpus.getTractate(p.tractate); const o=t&&Corpus.getOrder(t.order); return o?('סדר '+o.he):''; };
+    const bookColor = id => { if (typeof Corpus==='undefined') return '#3A7D44'; const p=Corpus.parseChapId(String(id)); if(!p) return '#3A7D44'; const t=Corpus.getTractate(p.tractate); return (t&&_orderCol[t.order])||'#3A7D44'; };
     const chapMap = {};
     dayRecs.forEach(r => {
-      if (!chapMap[r.chap]) chapMap[r.chap] = { secs:0, done:false };
-      chapMap[r.chap].secs += (r.secs||0);
-      if (!r.partial) chapMap[r.chap].done = true;
+      const k = String(r.chap);
+      if (!chapMap[k]) chapMap[k] = { secs:0, done:false };
+      chapMap[k].secs += (r.secs||0);
+      if (!r.partial) chapMap[k].done = true;
     });
-    Object.entries(chapMap).sort((a,b)=>+a[0]-+b[0]).forEach(([chap, info]) => {
-      const col = info.done ? bookColor(+chap) : 'var(--text-muted)';
-      html += '<a class="read-item" href="03-reader.html?chap=' + chap + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
+    Object.keys(chapMap).sort().forEach(chap => {
+      const info = chapMap[chap];
+      const col = info.done ? bookColor(chap) : 'var(--text-muted)';
+      html += '<a class="read-item" href="03-reader.html?chap=' + encodeURIComponent(chap) + '" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
         '<div class="read-left">' +
           '<div class="read-dot" style="background:' + col + '"></div>' +
           '<div>' +
-            '<div class="read-chap" style="color:' + col + '">פרק ' + toGem(+chap) +
+            '<div class="read-chap" style="color:' + col + '">' + _yLabel(chap) +
               (info.done ? ' <span style="color:var(--green);font-size:12px;">✓</span>' : ' <span style="font-size:11px;color:var(--text-muted);">חלקי</span>') +
             '</div>' +
-            '<div class="read-sub">פרק ' + chap + '</div>' +
+            '<div class="read-sub">' + _yOrderHe(chap) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="read-right"><div class="read-dur">' + fmtSecs(info.secs) + '</div></div>' +
