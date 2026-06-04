@@ -644,15 +644,22 @@ function srsCount() { return srsDueList().length; }
 function srsTotal() { return Object.keys(_srsLoad()).length; }
 
 /* ════════════════════════════════════════════════════════════
-   אתגר שינון שבועי (Stage D)
-   • mishnah_mem_log  = [{id, ts}]  אירועי סימון משנה בע״פ (עם חותמת-זמן)
-   • mishnah_weekly_goal = יעד שבועי שנבחר ע״י המשתמש
-   הספירה: כמה משניות ייחודיות סומנו בשבוע הנוכחי (ראשון–שבת).
-   גנרי — מתאים גם לתהילהון (id = מזהה פסוק/משנה כלשהו).
+   אתגר שבועי (Stage D) — שני מצבים: לימוד (קריאה) / שינון
+   • mishnah_mem_log = [{id, ts}]  אירועי סימון משנה בע״פ (שינון)
+   • mishnah_weekly_mode = 'memorize' | 'read'  (ברירת מחדל: שינון)
+   • mishnah_weekly_goal_<mode> = יעד שבועי לכל מצב
+   שינון: סופר משניות ייחודיות שסומנו ★ השבוע (מתוך הלוג).
+   לימוד:  סופר פרקים ייחודיים שנקראו השבוע (מתוך tehillim_readings).
+   גנרי — מתאים גם לתהילהון (שם משנים רק את יחידות-התווית).
    ════════════════════════════════════════════════════════════ */
-const MEM_LOG_KEY  = 'mishnah_mem_log';
-const MEM_GOAL_KEY = 'mishnah_weekly_goal';
-const MEM_GOAL_DEFAULT = 1;
+const MEM_LOG_KEY    = 'mishnah_mem_log';
+const WEEKLY_MODE_KEY= 'mishnah_weekly_mode';
+const READINGS_KEY   = 'tehillim_readings';
+// הגדרות פר-אפליקציה (בתהילהון: שתי היחידות = 'פרקים')
+const CHALLENGE_PRESETS = { memorize: [1, 2, 3, 4], read: [3, 7, 9, 14] };
+const CHALLENGE_GOAL_DEFAULT = { memorize: 1, read: 7 };
+const CHALLENGE_UNITS = { memorize: 'משניות', read: 'פרקים' };
+const CHALLENGE_TITLES = { memorize: 'אתגר שינון שבועי', read: 'אתגר לימוד שבועי' };
 function _weekKeyOf(ts) {
   const d = new Date(ts);
   d.setDate(d.getDate() - d.getDay());
@@ -668,16 +675,38 @@ function logMemEvent(id) {
   if (log.length > 800) log.splice(0, log.length - 800);
   _memLogSave(log);
 }
+// מצב האתגר
+function getChallengeMode() {
+  const m = localStorage.getItem(WEEKLY_MODE_KEY);
+  return (m === 'read' || m === 'memorize') ? m : 'memorize';
+}
+function setChallengeMode(m) {
+  if (m === 'read' || m === 'memorize') localStorage.setItem(WEEKLY_MODE_KEY, m);
+}
+function _goalKey(mode) { return 'mishnah_weekly_goal_' + mode; }
 function getWeeklyMemGoal() {
-  const v = parseInt(localStorage.getItem(MEM_GOAL_KEY), 10);
-  return (v && v > 0) ? v : MEM_GOAL_DEFAULT;
+  const mode = getChallengeMode();
+  const v = parseInt(localStorage.getItem(_goalKey(mode)), 10);
+  return (v && v > 0) ? v : CHALLENGE_GOAL_DEFAULT[mode];
 }
 function setWeeklyMemGoal(n) {
   n = parseInt(n, 10);
-  if (n && n > 0) localStorage.setItem(MEM_GOAL_KEY, String(n));
+  if (n && n > 0) localStorage.setItem(_goalKey(getChallengeMode()), String(n));
 }
-// התקדמות השבוע: כמה משניות ייחודיות סומנו בשבוע הנוכחי
-function getWeeklyMemProgress() {
+// פרקים ייחודיים שנקראו השבוע (מצב לימוד)
+function _readWeekUnique() {
+  const wkStart = weekKey();
+  let reads = [];
+  try { reads = JSON.parse(localStorage.getItem(READINGS_KEY)) || []; } catch(e) {}
+  const seen = {};
+  for (let i = 0; i < reads.length; i++) {
+    const r = reads[i];
+    if (r && r.date && r.date >= wkStart) seen[String(r.chap)] = 1;
+  }
+  return Object.keys(seen).length;
+}
+// משניות ייחודיות שסומנו ★ השבוע (מצב שינון)
+function _memWeekUnique() {
   const wk = weekKey();
   const log = _memLogLoad();
   const seen = {};
@@ -685,9 +714,24 @@ function getWeeklyMemProgress() {
     const e = log[i];
     if (e && e.ts && _weekKeyOf(e.ts) === wk) seen[e.id] = 1;
   }
-  const done = Object.keys(seen).length;
+  return Object.keys(seen).length;
+}
+// התקדמות השבוע (מודע-מצב)
+function getWeeklyMemProgress() {
+  const mode = getChallengeMode();
+  const done = (mode === 'read') ? _readWeekUnique() : _memWeekUnique();
   const goal = getWeeklyMemGoal();
-  return { goal: goal, done: done, pct: goal ? Math.min(100, Math.round(done / goal * 100)) : 0, met: done >= goal, weekKey: wk };
+  return {
+    mode: mode,
+    unit: CHALLENGE_UNITS[mode],
+    title: CHALLENGE_TITLES[mode],
+    presets: CHALLENGE_PRESETS[mode],
+    goal: goal,
+    done: done,
+    pct: goal ? Math.min(100, Math.round(done / goal * 100)) : 0,
+    met: done >= goal,
+    weekKey: weekKey()
+  };
 }
 
 /* ─── חשיפה גלובלית ─── */
@@ -709,7 +753,8 @@ global.Gamification = {
   getDailyChapters, DAILY_CHAPS_BY_DAY,
   // SRS — חזרה מרווחת
   srsSchedule, srsRemove, srsDueList, srsCount, srsTotal,
-  // אתגר שינון שבועי (Stage D)
-  logMemEvent, getWeeklyMemGoal, setWeeklyMemGoal, getWeeklyMemProgress
+  // אתגר שבועי (Stage D) — לימוד/שינון
+  logMemEvent, getWeeklyMemGoal, setWeeklyMemGoal, getWeeklyMemProgress,
+  getChallengeMode, setChallengeMode
 };
 })(window);

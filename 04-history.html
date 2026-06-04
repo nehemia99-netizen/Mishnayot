@@ -383,9 +383,14 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div class="challenges-page-title" data-i18n="hist.challenges_title">🎯 האתגרים שלך</div>
         <div class="challenges-page-sub" data-i18n="hist.challenges_intro">איסוף זכויות באמצעות אתגרים יומיים, שבועיים וחודשיים</div>
       </div>
-      <!-- אתגר שינון שבועי אישי (Stage D) -->
-      <div class="ch-section-label">🎯 אתגר השינון השבועי שלי</div>
+      <!-- אתגר שבועי אישי (Stage D) — לימוד/שינון -->
+      <div class="ch-section-label" id="memChLabel">🎯 אתגר שבועי שלי</div>
       <div class="ch-card" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <!-- מתג מצב: לימוד / שינון -->
+        <div style="display:flex;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3px;gap:3px;">
+          <button type="button" id="modeBtnRead" onclick="setChMode('read')" style="flex:1;padding:8px 0;border:none;border-radius:9px;background:transparent;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📖 לימוד</button>
+          <button type="button" id="modeBtnMem" onclick="setChMode('memorize')" style="flex:1;padding:8px 0;border:none;border-radius:9px;background:transparent;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🧠 שינון</button>
+        </div>
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="ch-icon" id="memChIcon">🎯</div>
           <div class="ch-info" style="flex:1;">
@@ -399,13 +404,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
         </div>
         <div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">בחרו יעד שבועי:</div>
-          <div style="display:flex;gap:8px;" id="memGoalBtns">
-            <button type="button" data-goal="1" onclick="setMemGoal(1)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">1</button>
-            <button type="button" data-goal="2" onclick="setMemGoal(2)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">2</button>
-            <button type="button" data-goal="3" onclick="setMemGoal(3)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">3</button>
-            <button type="button" data-goal="4" onclick="setMemGoal(4)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">4</button>
-            <button type="button" onclick="setMemGoalCustom()" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">+</button>
-          </div>
+          <div style="display:flex;gap:8px;" id="memGoalBtns"></div>
         </div>
       </div>
 
@@ -462,7 +461,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gamification.js?v=1.5.38"></script>
+<script src="gamification.js?v=1.5.39"></script>
 <script>
 /* ── Storage ── */
 const S = {
@@ -685,30 +684,60 @@ function renderAchievementsTab() {
 function renderMemChallenge() {
   if (typeof Gamification === 'undefined' || !Gamification.getWeeklyMemProgress) return;
   const p = Gamification.getWeeklyMemProgress();
-  const set = function(id, prop, val){ const el=document.getElementById(id); if(el) el[prop]=val; };
+  const isRead = p.mode === 'read';
+  // תווית סקשן + מתג
+  const label = document.getElementById('memChLabel');
+  if (label) label.textContent = (isRead ? '📖 ' : '🧠 ') + p.title + ' שלי';
+  const bRead = document.getElementById('modeBtnRead');
+  const bMem  = document.getElementById('modeBtnMem');
+  if (bRead && bMem) {
+    bRead.style.background = isRead ? 'var(--primary)' : 'transparent';
+    bRead.style.color = isRead ? '#fff' : 'var(--text)';
+    bMem.style.background = !isRead ? 'var(--primary)' : 'transparent';
+    bMem.style.color = !isRead ? '#fff' : 'var(--text)';
+  }
   const sub = document.getElementById('memChSub');
-  if (sub) sub.textContent = p.done + ' / ' + p.goal + ' משניות השבוע' + (p.met ? ' — הושלם! 🎉' : '');
+  if (sub) sub.textContent = p.done + ' / ' + p.goal + ' ' + p.unit + ' השבוע' + (p.met ? ' — הושלם! 🎉' : '');
   const pct = document.getElementById('memChPct'); if (pct) pct.textContent = p.pct + '%';
   const bar = document.getElementById('memChBar'); if (bar) bar.style.width = p.pct + '%';
   const icon = document.getElementById('memChIcon'); if (icon) icon.textContent = p.met ? '🏆' : '🎯';
   const meta = document.getElementById('memChMeta');
-  if (meta) meta.textContent = p.met ? 'כל הכבוד! עמדת ביעד השבוע 🎉' : 'סמנו ★ משניות בקורא כדי להתקדם';
-  document.querySelectorAll('#memGoalBtns button[data-goal]').forEach(function(b){
-    const on = parseInt(b.dataset.goal,10) === p.goal;
-    b.style.background = on ? 'var(--primary)' : 'var(--surface)';
-    b.style.color = on ? '#fff' : 'var(--text)';
-    b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
-  });
+  if (meta) meta.textContent = p.met
+    ? 'כל הכבוד! עמדת ביעד השבוע 🎉'
+    : (isRead ? ('קראו ' + p.unit + ' השבוע כדי להתקדם') : 'סמנו ★ משניות בקורא כדי להתקדם');
+  // כפתורי יעד דינמיים לפי מצב
+  const wrap = document.getElementById('memGoalBtns');
+  if (wrap) {
+    const bs = 'flex:1;padding:10px 0;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;';
+    let html = '';
+    (p.presets || []).forEach(function(n){
+      const on = n === p.goal;
+      html += '<button type="button" data-goal="' + n + '" onclick="setMemGoal(' + n + ')" style="' + bs
+        + 'border:1.5px solid ' + (on ? 'var(--primary)' : 'var(--border)') + ';'
+        + 'background:' + (on ? 'var(--primary)' : 'var(--surface)') + ';'
+        + 'color:' + (on ? '#fff' : 'var(--text)') + ';">' + n + '</button>';
+    });
+    html += '<button type="button" onclick="setMemGoalCustom()" style="' + bs
+      + 'border:1.5px solid var(--border);background:var(--surface);color:var(--text);">+</button>';
+    wrap.innerHTML = html;
+  }
+}
+function setChMode(mode) {
+  if (typeof Gamification === 'undefined' || !Gamification.setChallengeMode) return;
+  Gamification.setChallengeMode(mode);
+  renderMemChallenge();
+  if (typeof showToast === 'function') showToast(mode === 'read' ? '📖 מצב לימוד' : '🧠 מצב שינון');
 }
 function setMemGoal(n) {
   if (typeof Gamification === 'undefined' || !Gamification.setWeeklyMemGoal) return;
   Gamification.setWeeklyMemGoal(n);
+  const p = Gamification.getWeeklyMemProgress();
   renderMemChallenge();
-  if (typeof showToast === 'function') showToast('🎯 היעד עודכן ל-' + parseInt(n,10) + ' משניות בשבוע');
+  if (typeof showToast === 'function') showToast('🎯 היעד עודכן ל-' + parseInt(n,10) + ' ' + p.unit + ' בשבוע');
 }
 function setMemGoalCustom() {
-  const cur = (typeof Gamification!=='undefined' && Gamification.getWeeklyMemGoal) ? Gamification.getWeeklyMemGoal() : 7;
-  const v = prompt('כמה משניות לשנן בשבוע?', String(cur));
+  const p = (typeof Gamification!=='undefined' && Gamification.getWeeklyMemProgress) ? Gamification.getWeeklyMemProgress() : {goal:1, unit:'יחידות'};
+  const v = prompt('כמה ' + p.unit + ' בשבוע?', String(p.goal));
   const n = parseInt(v, 10);
   if (n && n > 0) setMemGoal(n);
 }
