@@ -105,7 +105,7 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .cert-btn-share:disabled{opacity:.6;cursor:default;}
 
 /* ── Toast ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:200;white-space:nowrap;pointer-events:none;}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:9999;white-space:nowrap;pointer-events:none;max-width:90vw;}
 html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 .toast.show{opacity:1;}
 
@@ -389,7 +389,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="ch-icon" id="memChIcon">🎯</div>
           <div class="ch-info" style="flex:1;">
-            <div class="ch-title" id="memChSub">0 / 7 משניות השבוע</div>
+            <div class="ch-title" id="memChSub">0 / 1 משניות השבוע</div>
             <div class="ch-meta" id="memChMeta">סמנו ★ משניות בקורא כדי להתקדם</div>
           </div>
           <span style="font-size:14px;font-weight:800;color:var(--primary);" id="memChPct">0%</span>
@@ -400,10 +400,11 @@ html.dark .cm-cell.fav{background:#2A1010;}
         <div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">בחרו יעד שבועי:</div>
           <div style="display:flex;gap:8px;" id="memGoalBtns">
+            <button type="button" data-goal="1" onclick="setMemGoal(1)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">1</button>
+            <button type="button" data-goal="2" onclick="setMemGoal(2)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">2</button>
             <button type="button" data-goal="3" onclick="setMemGoal(3)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">3</button>
-            <button type="button" data-goal="7" onclick="setMemGoal(7)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">7</button>
-            <button type="button" data-goal="14" onclick="setMemGoal(14)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">14</button>
-            <button type="button" onclick="setMemGoalCustom()" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">מותאם</button>
+            <button type="button" data-goal="4" onclick="setMemGoal(4)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">4</button>
+            <button type="button" onclick="setMemGoalCustom()" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">+</button>
           </div>
         </div>
       </div>
@@ -461,7 +462,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gamification.js?v=1.5.34"></script>
+<script src="gamification.js?v=1.5.38"></script>
 <script>
 /* ── Storage ── */
 const S = {

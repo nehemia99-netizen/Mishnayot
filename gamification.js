@@ -652,7 +652,7 @@ function srsTotal() { return Object.keys(_srsLoad()).length; }
    ════════════════════════════════════════════════════════════ */
 const MEM_LOG_KEY  = 'mishnah_mem_log';
 const MEM_GOAL_KEY = 'mishnah_weekly_goal';
-const MEM_GOAL_DEFAULT = 7;
+const MEM_GOAL_DEFAULT = 1;
 function _weekKeyOf(ts) {
   const d = new Date(ts);
   d.setDate(d.getDate() - d.getDay());
