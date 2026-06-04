@@ -396,6 +396,20 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
+  <div class="group-label">אתגר שינון שבועי 🎯</div>
+  <div class="group">
+    <div class="row" style="display:block;cursor:default;">
+      <div class="row-label" style="margin-bottom:10px;">כמה משניות לשנן השבוע?</div>
+      <div style="display:flex;gap:8px;" id="memGoalBtns">
+        <button type="button" data-goal="3" onclick="setMemGoal(3)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">3</button>
+        <button type="button" data-goal="7" onclick="setMemGoal(7)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">7</button>
+        <button type="button" data-goal="14" onclick="setMemGoal(14)" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">14</button>
+        <button type="button" onclick="setMemGoalCustom()" style="flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">מותאם</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:10px;" id="memGoalNote"></div>
+    </div>
+  </div>
+
   <div class="group-label" data-i18n="set.share_recommend">שיתוף והמלצה</div>
   <div class="group">
     <div class="row" onclick="inviteFriend()" style="cursor:pointer;">
@@ -415,7 +429,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.5.33 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.34 BETA · © 2026</div>
 </div>
 
 <script>
@@ -822,6 +836,35 @@ function resetData() {
 }
 
 /* ── Rate us / Terms of use (2.0.5) ── */
+/* ── אתגר שינון שבועי (Stage D) — פקד יעד. מקור אמת: localStorage key, נקרא ע״י gamification.js ── */
+const MEM_GOAL_KEY = 'mishnah_weekly_goal';
+function _getMemGoal() { const v = parseInt(localStorage.getItem(MEM_GOAL_KEY), 10); return (v && v > 0) ? v : 7; }
+function setMemGoal(n) {
+  n = parseInt(n, 10);
+  if (n && n > 0) {
+    localStorage.setItem(MEM_GOAL_KEY, String(n));
+    _renderMemGoalBtns();
+    if (typeof showSettingsToast === 'function') showSettingsToast('🎯 היעד עודכן ל-' + n + ' משניות בשבוע');
+  }
+}
+function setMemGoalCustom() {
+  const v = prompt('כמה משניות לשנן בשבוע?', String(_getMemGoal()));
+  const n = parseInt(v, 10);
+  if (n && n > 0) setMemGoal(n);
+}
+function _renderMemGoalBtns() {
+  const g = _getMemGoal();
+  const btns = document.querySelectorAll('#memGoalBtns button[data-goal]');
+  btns.forEach(function(b) {
+    const on = parseInt(b.dataset.goal, 10) === g;
+    b.style.background = on ? 'var(--primary)' : 'var(--surface)';
+    b.style.color = on ? '#fff' : 'var(--text)';
+    b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+  });
+  const note = document.getElementById('memGoalNote');
+  if (note) note.textContent = 'היעד הנוכחי: ' + g + ' משניות בשבוע.';
+}
+document.addEventListener('DOMContentLoaded', _renderMemGoalBtns);
 // כתובת אפליקציית האחות (תהילהון) — TODO: לאמת כתובת סופית
 const SISTER_APP_URL = 'https://tehillon.vercel.app';
 function openSisterApp() {

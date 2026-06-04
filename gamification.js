@@ -643,6 +643,53 @@ function srsDueList() {
 function srsCount() { return srsDueList().length; }
 function srsTotal() { return Object.keys(_srsLoad()).length; }
 
+/* ════════════════════════════════════════════════════════════
+   אתגר שינון שבועי (Stage D)
+   • mishnah_mem_log  = [{id, ts}]  אירועי סימון משנה בע״פ (עם חותמת-זמן)
+   • mishnah_weekly_goal = יעד שבועי שנבחר ע״י המשתמש
+   הספירה: כמה משניות ייחודיות סומנו בשבוע הנוכחי (ראשון–שבת).
+   גנרי — מתאים גם לתהילהון (id = מזהה פסוק/משנה כלשהו).
+   ════════════════════════════════════════════════════════════ */
+const MEM_LOG_KEY  = 'mishnah_mem_log';
+const MEM_GOAL_KEY = 'mishnah_weekly_goal';
+const MEM_GOAL_DEFAULT = 7;
+function _weekKeyOf(ts) {
+  const d = new Date(ts);
+  d.setDate(d.getDate() - d.getDay());
+  return localDateStr(d);
+}
+function _memLogLoad() { try { return JSON.parse(localStorage.getItem(MEM_LOG_KEY)) || []; } catch(e) { return []; } }
+function _memLogSave(a) { try { localStorage.setItem(MEM_LOG_KEY, JSON.stringify(a)); } catch(e){} }
+// רישום אירוע סימון משנה בע״פ (נקרא מהקורא בעת ★)
+function logMemEvent(id) {
+  if (!id) return;
+  const log = _memLogLoad();
+  log.push({ id: String(id), ts: Date.now() });
+  if (log.length > 800) log.splice(0, log.length - 800);
+  _memLogSave(log);
+}
+function getWeeklyMemGoal() {
+  const v = parseInt(localStorage.getItem(MEM_GOAL_KEY), 10);
+  return (v && v > 0) ? v : MEM_GOAL_DEFAULT;
+}
+function setWeeklyMemGoal(n) {
+  n = parseInt(n, 10);
+  if (n && n > 0) localStorage.setItem(MEM_GOAL_KEY, String(n));
+}
+// התקדמות השבוע: כמה משניות ייחודיות סומנו בשבוע הנוכחי
+function getWeeklyMemProgress() {
+  const wk = weekKey();
+  const log = _memLogLoad();
+  const seen = {};
+  for (let i = 0; i < log.length; i++) {
+    const e = log[i];
+    if (e && e.ts && _weekKeyOf(e.ts) === wk) seen[e.id] = 1;
+  }
+  const done = Object.keys(seen).length;
+  const goal = getWeeklyMemGoal();
+  return { goal: goal, done: done, pct: goal ? Math.min(100, Math.round(done / goal * 100)) : 0, met: done >= goal, weekKey: wk };
+}
+
 /* ─── חשיפה גלובלית ─── */
 global.Gamification = {
   LEVELS, levelOf,
@@ -661,6 +708,8 @@ global.Gamification = {
   BADGES, checkAndAwardBadges, getBadgesStatus, getBadgeContext,
   getDailyChapters, DAILY_CHAPS_BY_DAY,
   // SRS — חזרה מרווחת
-  srsSchedule, srsRemove, srsDueList, srsCount, srsTotal
+  srsSchedule, srsRemove, srsDueList, srsCount, srsTotal,
+  // אתגר שינון שבועי (Stage D)
+  logMemEvent, getWeeklyMemGoal, setWeeklyMemGoal, getWeeklyMemProgress
 };
 })(window);

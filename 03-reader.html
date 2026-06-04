@@ -319,7 +319,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=2.2.84"></script>
+<script src="gamification.js?v=1.5.34"></script>
 <script>
 /* ── Storage ── */
 const S = {
@@ -1128,6 +1128,7 @@ function toggleMemVerse(verseNum, btn) {
   if (adding) {
     addScore(2);
     if (typeof Gamification !== 'undefined' && Gamification.addMaalot) Gamification.addMaalot(2, 'memorization');
+    if (typeof Gamification !== 'undefined' && Gamification.logMemEvent) Gamification.logMemEvent(id);
     showToast(_rLang()==='en' ? '★ Mishnah marked — +2 points!' : '★ סומנה משנה בע״פ — +2 זכויות!');
   } else {
     showToast(_rLang()==='en' ? '☆ Mishnah unmarked' : '☆ סימון המשנה הוסר');
@@ -1149,7 +1150,7 @@ function toggleMem() {
     showToast(_rLang()==='en' ? '☆ Whole chapter unmarked' : '☆ כל הפרק הוסר מהשינון');
   } else {
     let added = 0;
-    for (let k=1;k<=total;k++) { const id=cid+':'+k; if (!memM.includes(id)) { memM.push(id); added++; } }
+    for (let k=1;k<=total;k++) { const id=cid+':'+k; if (!memM.includes(id)) { memM.push(id); added++; if (typeof Gamification !== 'undefined' && Gamification.logMemEvent) Gamification.logMemEvent(id); } }
     S.set(MEM_M_KEY, memM);
     if (added) {
       addScore(2 * added);
