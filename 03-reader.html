@@ -1772,14 +1772,25 @@ function _ttsSpeakNext(){
   const u = new SpeechSynthesisUtterance(_stripForTts(unit.text));
   u.lang = 'he-IL'; u.rate = 0.9;
   _applyTtsVoice(u);
-  let _started = false;
+  let _started = false, _uT0 = 0;
   u.onstart = function(){
     _started = true; _ttsAnySpoke = true;
+    _uT0 = (window.performance && performance.now) ? performance.now() : Date.now();
     const el = verseEls[unit.vIdx];
-    if (el){ el.classList.add('tts-speaking'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    if (el){
+      el.classList.add('tts-speaking');
+      // גלול רק אם המשנה מחוץ לתצוגה, וב-'nearest' כדי לא לקפוץ עד התחתית
+      const ta = document.getElementById('textArea');
+      const er = el.getBoundingClientRect();
+      const cr = ta ? ta.getBoundingClientRect() : { top: 0, bottom: (window.innerHeight || 0) };
+      if (er.top < cr.top || er.bottom > cr.bottom) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
   };
   u.onend = function(){
     if (!_started && !_ttsAnySpoke && _ttsIdx === 0){ _ttsStop(); _ttsNoVoice(); return; }
+    // הקראה שהסתיימה מיידית = אין קול עברי בפועל; עצור והזהר במקום לגלול את כל הפרק בשקט
+    const _dur = _uT0 ? (((window.performance && performance.now) ? performance.now() : Date.now()) - _uT0) : 999;
+    if (_ttsIdx === 0 && _started && _dur < 140 && _stripForTts(unit.text).length > 8){ _ttsStop(); _ttsNoVoice(); return; }
     _ttsIdx++;
     if (_ttsMode === 'repeat') {
       const pause = Math.max(1400, _stripForTts(unit.text).length * 45); // המתנה לחזרת המשתמש

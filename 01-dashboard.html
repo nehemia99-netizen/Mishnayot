@@ -18,7 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.42"></script>
+<script src="gamification.js?v=1.5.43"></script>
 <script src="notifications.js?v=2.2.31"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.31"></script>
@@ -565,7 +565,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.42 BETA</div>
+          <div class="app-version">גרסה 1.5.43 BETA</div>
         </div>
       </div>
     </div>
@@ -715,13 +715,18 @@ html.dark .lottery-trigger{opacity:.85;}
 
     <!-- כפתורי ברכה -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <button onclick="window.openBlessingDirect('b1')" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
+      <button onclick="location.href='blessings.html?open=b1'" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
         <span style="font-size:16px;">🙏</span><span data-i18n="home.blessing_before">ברכה לפני<br>לימוד</span>
       </button>
-      <button onclick="window.openBlessingDirect('b2')" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
+      <button onclick="location.href='blessings.html?open=b2'" style="padding:10px 8px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;">
         <span style="font-size:16px;">✨</span><span data-i18n="home.blessing_after">ברכה אחרי<br>לימוד</span>
       </button>
     </div>
+
+    <!-- ברכות ועוד — עמוד הברכות המלא -->
+    <a href="blessings.html" style="display:flex;width:100%;padding:13px 10px;border-radius:16px;background:var(--card);border:1.5px solid var(--primary);color:var(--primary);font-size:15px;font-weight:700;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;margin-bottom:12px;">
+      <span style="font-size:20px;">🙏</span><span>ברכות ועוד</span>
+    </a>
 
     <!-- כפתור מסלול אתגרי — מרוכז -->
     <div style="text-align:center;margin-bottom:10px;">
