@@ -44,9 +44,21 @@
     const app = await _app();
     const { getMessaging, getToken, onMessage } = await import(murl('messaging'));
     const messaging = getMessaging(app);
+    // רשום את ה-SW של ההודעות מראש כדי שהלחיצה הראשונה לא תיכשל (תקלת תזמון)
+    let swReg = null;
+    try {
+      if ('serviceWorker' in navigator) {
+        swReg = await navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: '/firebase-cloud-messaging-push-scope' });
+      }
+    } catch (e) { /* getToken ינסה לרשום לבד */ }
+    const _opts = swReg ? { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg } : { vapidKey: VAPID_KEY };
     let token;
-    try { token = await getToken(messaging, { vapidKey: VAPID_KEY }); }
-    catch (e) { return { ok: false, reason: 'token-error', err: String(e) }; }
+    try { token = await getToken(messaging, _opts); }
+    catch (e) {
+      await new Promise(r => setTimeout(r, 800));
+      try { token = await getToken(messaging, _opts); }
+      catch (e2) { return { ok: false, reason: 'token-error', err: String(e2) }; }
+    }
     if (!token) return { ok: false, reason: 'no-token' };
     const uid = await _uid();
     if (uid) {
