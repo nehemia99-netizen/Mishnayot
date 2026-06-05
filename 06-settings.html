@@ -415,7 +415,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משניון · גרסה 1.5.46 BETA · © 2026</div>
+  <div class="version-note">משניון · גרסה 1.5.47 BETA · © 2026</div>
 </div>
 
 <script>
@@ -829,7 +829,7 @@ function openSisterApp() {
 }
 function inviteFriend() {
   const url = 'https://mishnayot-alpha.vercel.app';
-  const msg = 'גיליתי אפליקציה מקסימה ללימוד ושינון משנה יומית — משניון 📖\nמצטרפים כאן: ' + url;
+  const text = 'גיליתי אפליקציה מקסימה ללימוד ושינון משנה יומית — משניון 📖';
   const grantBonus = function() {
     try {
       if (!localStorage.getItem('mishnayon_invite_bonus') && typeof Gamification !== 'undefined' && Gamification.addMaalot) {
@@ -842,9 +842,9 @@ function inviteFriend() {
     } catch (e) {}
   };
   if (navigator.share) {
-    navigator.share({ title: 'משניון', text: msg, url: url }).then(grantBonus).catch(function(){});
+    navigator.share({ title: 'משניון', text: text, url: url }).then(grantBonus).catch(function(){});
   } else {
-    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    window.open('https://wa.me/?text=' + encodeURIComponent(text + ' מצטרפים כאן: ' + url), '_blank');
     grantBonus();
   }
 }
