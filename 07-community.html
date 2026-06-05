@@ -308,9 +308,20 @@ document.getElementById('hotList').innerHTML = '<div style="text-align:center;pa
 document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען נתונים...</div>';
 
 async function loadCommunityData() {
+  // קאש מקומי — הצג מיידית ודלג על קריאות Firestore אם טרי (≤10 דק')
+  try {
+    const _c = JSON.parse(localStorage.getItem('community_cache_v1'));
+    if (_c && (Date.now() - _c.ts) < 10*60*1000) {
+      const _h=(id,v)=>{ const el=document.getElementById(id); if(el&&v!=null) el.innerHTML=v; };
+      const _t=(id,v)=>{ const el=document.getElementById(id); if(el&&v!=null) el.textContent=v; };
+      _h('leaderboard',_c.lb); _h('hotList',_c.hot);
+      _t('statTotalUsers',_c.su); _t('statTotalChaps',_c.sc); _t('statTodayChaps',_c.sd);
+      return;
+    }
+  } catch(_e){}
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, collection, getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getFirestore, collection, getDocs, query, orderBy, limit, where, getAggregateFromServer, sum, count } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
     const FB_CFG = {
@@ -333,24 +344,22 @@ async function loadCommunityData() {
       });
     });
 
-    // ── סטטיסטיקות כלליות ──
+    // ── סטטיסטיקות כלליות (אגרגציה בצד-שרת — לא קוראים את כל המסמכים) ──
     try {
       const today = localDateStr();
-      const allLb = await getDocs(collection(db,'leaderboard'));
-      let totalChaps = 0, todayChaps = 0, userCount = 0;
-      allLb.forEach(d => {
-        const dd = d.data();
-        userCount++;
-        totalChaps += dd.chaps || 0;
-        if (dd.lastDate === today) todayChaps += dd.todayChaps || 0;
-      });
+      const lbCol = collection(db,'leaderboard');
+      let userCount = 0, totalChaps = 0, todayChaps = 0;
+      // count בקריאה נפרדת מ-sum: שילוב sum על שדה שלא קיים מחזיר count=0 שגוי
+      try { const _a = await getAggregateFromServer(lbCol, { c: count() }); userCount = _a.data().c || 0; } catch(_ec){}
+      try { const _a = await getAggregateFromServer(lbCol, { s: sum('chaps') }); totalChaps = _a.data().s || 0; } catch(_es){}
+      try { const _a = await getAggregateFromServer(query(lbCol, where('lastDate','==',today)), { s: sum('todayChaps') }); todayChaps = _a.data().s || 0; } catch(_ed){}
       const su = document.getElementById('statTotalUsers');
       const sc = document.getElementById('statTotalChaps');
       const sd = document.getElementById('statTodayChaps');
       if (su) su.textContent = userCount.toLocaleString();
       if (sc) sc.textContent = totalChaps.toLocaleString();
       if (sd) sd.textContent = todayChaps.toLocaleString();
-    } catch(e2) { /* ignore stat errors */ }
+    } catch(e2) { /* אגרגציה לא זמינה — לא סורקים את כל הקולקציה */ }
 
     // ── לוח מובילים ──
     const lbSnap = await getDocs(query(collection(db,'leaderboard'), orderBy('score','desc'), limit(10)));
@@ -393,6 +402,12 @@ async function loadCommunityData() {
           <span class="chap-count">${c.reads.toLocaleString()} קריאות</span>
         </a>`).join('');
     }
+    // שמור קאש ל-10 דק' (חוסך קריאות בכניסות חוזרות)
+    try {
+      const _g=id=>{ const el=document.getElementById(id); return el?el.innerHTML:null; };
+      const _gt=id=>{ const el=document.getElementById(id); return el?el.textContent:null; };
+      localStorage.setItem('community_cache_v1', JSON.stringify({ ts:Date.now(), lb:_g('leaderboard'), hot:_g('hotList'), su:_gt('statTotalUsers'), sc:_gt('statTotalChaps'), sd:_gt('statTodayChaps') }));
+    } catch(_e){}
   } catch(e) {
     console.error('loadCommunityData error:', e);
     document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⚠️ שגיאה בטעינת הנתונים</div>';

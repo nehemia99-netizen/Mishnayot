@@ -1,56 +1,42 @@
 rules_version = '2';
 // ═══════════════════════════════════════════════════════════
 //  משניון — Firestore Security Rules
-//  עודכן: יוני 2026
-//
-//  Collections בשימוש:
-//    users/{uid}                   — נתוני משתמש (ניקוד, היסטוריה, הגדרות)
-//    leaderboard/{uid}             — לוח מובילים
-//    chapReads/{chapId}            — מונה לימודים לפרק (מזהה כמו "Berakhot.2")
-//    groups/{code}                 — קבוצות
-//    groups/{code}/members/{uid}   — חברי קבוצה
+//  עודכן: יוני 2026 (חיזוק: groups לבעלים בלבד, whitelist שדות)
 // ═══════════════════════════════════════════════════════════
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── פונקציות עזר ──────────────────────────────────────
-    // משתמש מחובר (כולל אנונימי)
-    function isSignedIn() {
-      return request.auth != null;
-    }
-    // המשתמש הוא הבעלים של המסמך
-    function isOwner(uid) {
-      return request.auth != null && request.auth.uid == uid;
-    }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
 
-    // ── users/{uid} ────────────────────────────────────────
-    // רק הבעלים יכול לקרוא ולכתוב את הנתונים שלו
+    // ── users/{uid} — רק הבעלים ──
     match /users/{uid} {
       allow read, write: if isOwner(uid);
+      // תת-אוספים פרטיים של המשתמש (למשל groups שמורים)
+      match /{document=**} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
-    // ── leaderboard/{uid} ──────────────────────────────────
-    // כל משתמש מחובר יכול לקרוא (לצפות בלוח)
-    // רק הבעלים יכול לכתוב את הרשומה שלו
+    // ── leaderboard/{uid} — קריאה לכל מחובר, כתיבה לבעלים בלבד + רק שדות מותרים ──
     match /leaderboard/{uid} {
       allow read:  if isSignedIn();
-      allow write: if isOwner(uid);
+      allow write: if isOwner(uid)
+                   && request.resource.data.keys().hasOnly(['displayName','score','updatedAt']);
     }
 
-    // ── chapReads/{chapNum} ────────────────────────────────
-    // מונה כמה פעמים כל פרק נקרא (גלובלי)
-    // כל משתמש מחובר יכול לקרוא ולעדכן
-    match /chapReads/{chapNum} {
+    // ── chapReads/{chapId} — מונה קריאות גלובלי; רק שדה count ──
+    match /chapReads/{chapId} {
       allow read:  if isSignedIn();
-      allow write: if isSignedIn();
+      allow write: if isSignedIn()
+                   && request.resource.data.keys().hasOnly(['count']);
     }
 
-    // ── groups/{code} ──────────────────────────────────────
-    // כל משתמש מחובר יכול לקרוא קבוצה (להצטרף לפי קוד)
-    // כל משתמש מחובר יכול ליצור קבוצה
+    // ── groups/{code} — יצירה לכל מחובר; עדכון/מחיקה ליוצר בלבד ──
     match /groups/{code} {
-      allow read:  if isSignedIn();
-      allow write: if isSignedIn();
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
 
       // חבר קבוצה — כותב רק את הרשומה שלו
       match /members/{uid} {
@@ -59,8 +45,7 @@ service cloud.firestore {
       }
     }
 
-    // ── ברירת מחדל: חסום הכל ────────────────────────────
-    // כל מסמך שלא הוגדר לעיל — נדחה
+    // ── ברירת מחדל: חסום הכל ──
     match /{document=**} {
       allow read, write: if false;
     }
