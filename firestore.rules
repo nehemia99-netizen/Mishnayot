@@ -46,6 +46,11 @@ service cloud.firestore {
       }
     }
 
+    // ── pushTokens/{uid} — token ל-Push; הבעלים כותב, Functions קוראות (Admin) ──
+    match /pushTokens/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
     // ── ברירת מחדל: חסום הכל ──
     match /{document=**} {
       allow read, write: if false;
