@@ -461,7 +461,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gamification.js?v=1.5.42"></script>
+<script src="gamification.js?v=1.5.45"></script>
 <script>
 /* ── Storage ── */
 const S = {
@@ -685,12 +685,15 @@ function renderMemChallenge() {
   if (typeof Gamification === 'undefined' || !Gamification.getWeeklyMemProgress) return;
   const p = Gamification.getWeeklyMemProgress();
   const isRead = p.mode === 'read';
+  const L = (typeof i18n!=='undefined' && i18n.getCurrentLang) ? i18n.getCurrentLang() : 'he';
   // תווית סקשן + מתג
   const label = document.getElementById('memChLabel');
-  if (label) label.textContent = (isRead ? '📖 ' : '🧠 ') + p.title + ' שלי';
+  if (label) label.textContent = (isRead ? '📖 ' : '🧠 ') + (L === 'en' ? ('My ' + p.title) : (p.title + ' שלי'));
   const bRead = document.getElementById('modeBtnRead');
   const bMem  = document.getElementById('modeBtnMem');
   if (bRead && bMem) {
+    bRead.textContent = L === 'en' ? '📖 Study' : '📖 לימוד';
+    bMem.textContent = L === 'en' ? '🧠 Memorize' : '🧠 שינון';
     bRead.style.background = isRead ? 'var(--primary)' : 'transparent';
     bRead.style.color = isRead ? '#fff' : 'var(--text)';
     bMem.style.background = !isRead ? 'var(--primary)' : 'transparent';
@@ -698,15 +701,15 @@ function renderMemChallenge() {
   }
   const sub = document.getElementById('memChSub');
   if (sub) sub.textContent = p.met
-    ? ('✓ הושלם! ' + p.done + ' ' + p.unit + ' השבוע 🎉')
-    : (p.done + ' מתוך ' + p.goal + ' ' + p.unit + ' השבוע');
+    ? (L === 'en' ? ('✓ Done! ' + p.done + ' ' + p.unit + ' this week 🎉') : ('✓ הושלם! ' + p.done + ' ' + p.unit + ' השבוע 🎉'))
+    : (L === 'en' ? (p.done + ' of ' + p.goal + ' ' + p.unit + ' this week') : (p.done + ' מתוך ' + p.goal + ' ' + p.unit + ' השבוע'));
   const pct = document.getElementById('memChPct'); if (pct) pct.textContent = p.pct + '%';
   const bar = document.getElementById('memChBar'); if (bar) bar.style.width = p.pct + '%';
   const icon = document.getElementById('memChIcon'); if (icon) icon.textContent = p.met ? '🏆' : '🎯';
   const meta = document.getElementById('memChMeta');
   if (meta) meta.textContent = p.met
-    ? 'כל הכבוד! עמדת ביעד 🎉 — רוצים יותר? בחרו יעד גבוה יותר ⬆️'
-    : (isRead ? ('קראו ' + p.unit + ' השבוע כדי להתקדם') : 'סמנו ★ משניות בקורא כדי להתקדם');
+    ? (L === 'en' ? 'Great! Goal reached 🎉 — want more? pick a higher goal ⬆️' : 'כל הכבוד! עמדת ביעד 🎉 — רוצים יותר? בחרו יעד גבוה יותר ⬆️')
+    : (isRead ? (L === 'en' ? ('Study ' + p.unit + ' this week to progress') : ('קראו ' + p.unit + ' השבוע כדי להתקדם')) : (L === 'en' ? 'Mark ★ mishnayot in the reader to progress' : 'סמנו ★ משניות בקורא כדי להתקדם'));
   // כפתורי יעד דינמיים לפי מצב
   const wrap = document.getElementById('memGoalBtns');
   if (wrap) {
@@ -726,25 +729,28 @@ function renderMemChallenge() {
   // בונוס השלמה (יעד×5) + טוסט — פעם בשבוע לכל מצב
   try {
     const rw = Gamification.checkWeeklyChallengeReward && Gamification.checkWeeklyChallengeReward();
-    if (rw && typeof showToast === 'function') showToast('🎉 השלמת את האתגר השבועי! +' + rw.reward + ' מעלות');
+    if (rw && typeof showToast === 'function') showToast(L === 'en' ? ('🎉 Weekly challenge complete! +' + rw.reward + ' points') : ('🎉 השלמת את האתגר השבועי! +' + rw.reward + ' מעלות'));
   } catch(e) {}
 }
 function setChMode(mode) {
   if (typeof Gamification === 'undefined' || !Gamification.setChallengeMode) return;
   Gamification.setChallengeMode(mode);
   renderMemChallenge();
-  if (typeof showToast === 'function') showToast(mode === 'read' ? '📖 מצב לימוד' : '🧠 מצב שינון');
+  const L = (typeof i18n!=='undefined' && i18n.getCurrentLang) ? i18n.getCurrentLang() : 'he';
+  if (typeof showToast === 'function') showToast(mode === 'read' ? (L==='en'?'📖 Study mode':'📖 מצב לימוד') : (L==='en'?'🧠 Memorize mode':'🧠 מצב שינון'));
 }
 function setMemGoal(n) {
   if (typeof Gamification === 'undefined' || !Gamification.setWeeklyMemGoal) return;
   Gamification.setWeeklyMemGoal(n);
   const p = Gamification.getWeeklyMemProgress();
   renderMemChallenge();
-  if (typeof showToast === 'function') showToast('🎯 היעד עודכן ל-' + parseInt(n,10) + ' ' + p.unit + ' בשבוע');
+  const L = (typeof i18n!=='undefined' && i18n.getCurrentLang) ? i18n.getCurrentLang() : 'he';
+  if (typeof showToast === 'function') showToast(L==='en' ? ('🎯 Goal set to ' + parseInt(n,10) + ' ' + p.unit + ' per week') : ('🎯 היעד עודכן ל-' + parseInt(n,10) + ' ' + p.unit + ' בשבוע'));
 }
 function setMemGoalCustom() {
   const p = (typeof Gamification!=='undefined' && Gamification.getWeeklyMemProgress) ? Gamification.getWeeklyMemProgress() : {goal:1, unit:'יחידות'};
-  const v = prompt('כמה ' + p.unit + ' בשבוע?', String(p.goal));
+  const L = (typeof i18n!=='undefined' && i18n.getCurrentLang) ? i18n.getCurrentLang() : 'he';
+  const v = prompt(L==='en' ? ('How many ' + p.unit + ' per week?') : ('כמה ' + p.unit + ' בשבוע?'), String(p.goal));
   const n = parseInt(v, 10);
   if (n && n > 0) setMemGoal(n);
 }

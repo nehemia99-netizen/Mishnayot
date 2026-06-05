@@ -658,8 +658,9 @@ const READINGS_KEY   = 'tehillim_readings';
 // הגדרות פר-אפליקציה (בתהילהון: שתי היחידות = 'פרקים')
 const CHALLENGE_PRESETS = { memorize: [1, 2, 3, 4], read: [3, 7, 9, 14] };
 const CHALLENGE_GOAL_DEFAULT = { memorize: 1, read: 7 };
-const CHALLENGE_UNITS = { memorize: 'משניות', read: 'פרקים' };
-const CHALLENGE_TITLES = { memorize: 'אתגר שינון שבועי', read: 'אתגר לימוד שבועי' };
+function _chLang(){ try { return (typeof i18n !== 'undefined' && i18n.getCurrentLang) ? i18n.getCurrentLang() : 'he'; } catch(e){ return 'he'; } }
+const CHALLENGE_UNITS = { memorize: { he:'משניות', en:'mishnayot' }, read: { he:'פרקים', en:'chapters' } };
+const CHALLENGE_TITLES = { memorize: { he:'אתגר שינון שבועי', en:'Weekly Memorization' }, read: { he:'אתגר לימוד שבועי', en:'Weekly Study' } };
 function _weekKeyOf(ts) {
   const d = new Date(ts);
   d.setDate(d.getDate() - d.getDay());
@@ -724,8 +725,8 @@ function getWeeklyMemProgress() {
   const goal = getWeeklyMemGoal();
   return {
     mode: mode,
-    unit: CHALLENGE_UNITS[mode],
-    title: CHALLENGE_TITLES[mode],
+    unit: (CHALLENGE_UNITS[mode][_chLang()] || CHALLENGE_UNITS[mode].he),
+    title: (CHALLENGE_TITLES[mode][_chLang()] || CHALLENGE_TITLES[mode].he),
     presets: CHALLENGE_PRESETS[mode],
     goal: goal,
     done: done,
