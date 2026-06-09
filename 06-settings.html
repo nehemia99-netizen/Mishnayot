@@ -233,6 +233,23 @@ html.dark .google-btn{background:var(--surface);}
         <option value="female" data-i18n="set.tts_female">קול נשי</option>
       </select>
     </div>
+    <div id="rowCloudTune" style="display:none;flex-direction:column;gap:10px;padding:12px 16px;border-top:.5px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <div class="row-label">🎧 כוונון קול הענן</div>
+        <select id="selCloudVoice" onchange="saveSettings()" class="sel" style="max-width:160px;">
+          <option value="he-IL-Wavenet-D">גברי D (עמוק)</option>
+          <option value="he-IL-Wavenet-B">גברי B</option>
+          <option value="he-IL-Standard-D">גברי D — רגיל</option>
+          <option value="he-IL-Standard-B">גברי B — רגיל</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:12px;color:var(--text-muted);white-space:nowrap;">עומק קול</span>
+        <input type="range" id="rngCloudPitch" min="-12" max="4" step="1" value="-5" onchange="saveSettings()" oninput="var e=document.getElementById('cloudPitchVal');if(e)e.textContent=this.value" style="flex:1;accent-color:var(--primary);">
+        <span id="cloudPitchVal" style="font-size:12px;color:var(--primary);width:26px;text-align:center;">-5</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.4;">ערך נמוך = קול עמוק יותר. נסה קולות שונים ועומקים עד שתמצא את הכי טוב. (כל שינוי טוען מחדש מהענן.)</div>
+    </div>
     <div class="row" id="rowScrollSpeed">
       <div class="row-left">
         <span class="row-icon">🐢</span>
@@ -437,7 +454,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.54 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.55 BETA · © 2026</div>
 </div>
 
 <script>
@@ -489,6 +506,11 @@ function loadSettings() {
   applyFontSize(fs);
   // קול ההקראה — מילוי הרשימה ובחירת הערך השמור
   populateTtsVoices();
+  // כוונון קול הענן
+  { const cv=document.getElementById('selCloudVoice'); if(cv && s.ttsCloudVoice) cv.value=s.ttsCloudVoice;
+    const cp=document.getElementById('rngCloudPitch'); const cpv=document.getElementById('cloudPitchVal');
+    if(cp && s.ttsCloudPitch!=null){ cp.value=s.ttsCloudPitch; if(cpv) cpv.textContent=s.ttsCloudPitch; }
+    const rt=document.getElementById('rowCloudTune'); if(rt) rt.style.display=(s.ttsVoice==='cloud')?'flex':'none'; }
   // Language buttons — הדגש את השפה הפעילה
   const activeLang = s.lang || 'he';
   const btnHe = document.getElementById('btnLangHe');
@@ -580,6 +602,10 @@ function saveSettings() {
   s.medalAlert    = document.getElementById('tMedal').classList.contains('on');
   s.verseNums     = document.getElementById('tVerseNums').classList.contains('on');
   { const _tv = document.getElementById('selTtsVoice'); if (_tv) s.ttsVoice = _tv.value; }
+  { const cv=document.getElementById('selCloudVoice'); if(cv) s.ttsCloudVoice=cv.value;
+    const cp=document.getElementById('rngCloudPitch'); if(cp) s.ttsCloudPitch=+cp.value;
+    const rt=document.getElementById('rowCloudTune'); const _tv2=document.getElementById('selTtsVoice');
+    if(rt&&_tv2) rt.style.display=(_tv2.value==='cloud')?'flex':'none'; }
   // שמור leaderboard — אם גלוי: קרא מהטוגל. אם מוסתר: ברירת מחדל true.
   // שמור leaderboard תמיד — לא תלוי בנראות הסקשן
   const _tLeader = document.getElementById('tLeader');

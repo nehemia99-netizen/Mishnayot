@@ -23,8 +23,8 @@ module.exports = async (req, res) => {
   body = body || {};
   const text = String(body.text || '').slice(0, 900);
   if (!text.trim()) { res.status(400).json({ error: 'no text' }); return; }
-  const voice = /^he-IL-[A-Za-z0-9-]+$/.test(body.voice || '') ? body.voice : 'he-IL-Wavenet-B'; // male
-  const pitch = Math.max(-20, Math.min(20, Number(body.pitch != null ? body.pitch : -3)));   // שלילי = עמוק יותר (טבעי)
+  const voice = /^he-IL-[A-Za-z0-9-]+$/.test(body.voice || '') ? body.voice : 'he-IL-Wavenet-D'; // male
+  const pitch = Math.max(-20, Math.min(20, Number(body.pitch != null ? body.pitch : -5)));   // שלילי = עמוק יותר (טבעי)
   const rate  = Math.max(0.5, Math.min(1.5, Number(body.rate != null ? body.rate : 0.92)));
 
   try {

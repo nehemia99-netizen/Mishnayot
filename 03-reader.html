@@ -1704,11 +1704,13 @@ function _ttsCloudOpenDB(){ return new Promise(function(res,rej){ if(_ttsCloudDB
 function _cloudCacheGet(key){ return _ttsCloudOpenDB().then(function(db){ return new Promise(function(res){ try{ const r=db.transaction('audio').objectStore('audio').get(key); r.onsuccess=function(){ res(r.result||null); }; r.onerror=function(){ res(null); }; }catch(e){ res(null); } }); }).catch(function(){ return null; }); }
 function _cloudCachePut(key,blob){ _ttsCloudOpenDB().then(function(db){ try{ db.transaction('audio','readwrite').objectStore('audio').put(blob,key); }catch(e){} }).catch(function(){}); }
 async function _cloudTtsAudio(text){
-  const voice='he-IL-Wavenet-B';
-  const k=voice+'|'+text;
+  const s=S.get('tehillim_settings')||{};
+  const voice=s.ttsCloudVoice || 'he-IL-Wavenet-D';
+  const pitch=(s.ttsCloudPitch!=null)?s.ttsCloudPitch:-5;
+  const k=voice+'|'+pitch+'|'+text;
   const cached=await _cloudCacheGet(k);
   if(cached && cached.size>200) return cached;
-  const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:-3, rate:0.9 }) });
+  const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:pitch, rate:0.88 }) });
   if(!resp.ok) throw new Error('tts http '+resp.status);
   const blob=await resp.blob();
   if(!blob || blob.size<200) throw new Error('tts empty');
