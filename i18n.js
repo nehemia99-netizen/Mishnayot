@@ -238,6 +238,8 @@ const DICT = {
   'set.tts_female':           { he: 'קול נשי',                  en: 'Female voice' },
   'set.my_chap_banner':       { he: 'באנר "המשנה שלי"',          en: '"My Mishnah" banner' },
   'set.my_chap_banner_sub':   { he: 'מתי להציג את הבאנר בדף הבית', en: 'When to show the banner on home' },
+  'set.remove_my_chap':       { he: 'הסר את "המשנה שלי"',         en: 'Remove "my Mishnah"' },
+  'set.remove_my_chap_sub':   { he: 'בטל את המשנה שסומנה',         en: 'Clear the marked Mishnah' },
   'set.banner_daily':         { he: 'פעם ביום',                  en: 'Once a day' },
   'set.banner_always':        { he: 'בכל כניסה',                 en: 'Every visit' },
   'set.groups_section':       { he: '👥 קבוצות',                 en: '👥 Groups' },

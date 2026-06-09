@@ -123,7 +123,7 @@ html.dark .google-btn{background:var(--surface);}
 <script src="utils.js?v=2.2.0"></script>
 <script src="notifications.js?v=2.2.33" defer></script>
 <script src="fcm.js?v=3"></script>
-<script src="i18n.js?v=2.2.89" defer></script>
+<script src="i18n.js?v=2.2.90" defer></script>
 <script src="onboarding.js?v=2.2.31"></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -255,6 +255,13 @@ html.dark .google-btn{background:var(--surface);}
         <option value="daily" data-i18n="set.banner_daily">פעם ביום</option>
         <option value="always" data-i18n="set.banner_always">בכל כניסה</option>
       </select>
+    </div>
+    <div class="row" id="rowRemoveMyChap" style="display:none;cursor:pointer;" onclick="removeMyChapterSetting()">
+      <div class="row-left">
+        <span class="row-icon">🗑️</span>
+        <div><div class="row-label" data-i18n="set.remove_my_chap">הסר את "המשנה שלי"</div><div class="row-sub" data-i18n="set.remove_my_chap_sub">בטל את הפרק שסומן</div></div>
+      </div>
+      <span class="chevron" style="color:#d33;">›</span>
     </div>
   </div>
 
@@ -430,7 +437,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.52 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.53 BETA · © 2026</div>
 </div>
 
 <script>
@@ -475,6 +482,7 @@ function loadSettings() {
   }
   if (s.groupName) { const gi = document.getElementById('groupNameInput'); if(gi) gi.value = s.groupName; }
   if (s.myChapterBannerFreq) { const el=document.getElementById('selBannerFreq'); if(el) el.value=s.myChapterBannerFreq; }
+  if (S.get('tehillim_my_chapter')) { const r=document.getElementById('rowRemoveMyChap'); if(r) r.style.display='flex'; } // הצג "הסר" רק אם נקבעה משנה
 
   // Font size
   const fs = typeof s.fontSize === 'number' ? s.fontSize : 22;
@@ -697,6 +705,20 @@ function _syncShabbatPref(on) {
     req.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv'); };
     req.onsuccess = e => { try { e.target.result.transaction('kv', 'readwrite').objectStore('kv').put(!!on, 'noShabbatNotif'); } catch(_){} };
   } catch(_){}
+}
+
+/* ── הסרת "המשנה שלי" ── */
+function removeMyChapterSetting() {
+  localStorage.removeItem('tehillim_my_chapter');
+  try { localStorage.removeItem('tehillim_my_chapter_shown'); } catch(e){}
+  const r = document.getElementById('rowRemoveMyChap'); if (r) r.style.display = 'none';
+  _miniToast('⭐ "המשנה שלי" הוסרה');
+}
+function _miniToast(msg) {
+  let t = document.getElementById('_setToast');
+  if (!t) { t = document.createElement('div'); t.id = '_setToast'; t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,30,.92);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(window._setToastTmr); window._setToastTmr = setTimeout(() => { t.style.opacity = '0'; }, 2200);
 }
 
 /* ── Hourly reminder ── */

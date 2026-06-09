@@ -165,7 +165,7 @@ html.dark .srch-hl{background:#4A3800;color:#FFD060;}
 .ws-empty-icon{font-size:36px;margin-bottom:8px;display:block;}
 </style>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.89" defer></script>
+<script src="i18n.js?v=2.2.90" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -252,6 +252,9 @@ html.dark .chap-cell.mem{background:#1C1230;}
       <button class="play-all-btn" onclick="playAllFavs()" style="width:100%;padding:10px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-family:inherit;font-size:13px;cursor:pointer;">▶ למד את כל המועדפים ברצף</button>
     </div>
     <div id="favHint" style="display:none;padding:0 16px 8px;font-size:11px;color:var(--text-muted);text-align:center;">⭐ לחץ על הכוכב כדי לקבוע ״המשנה שלי״ — היא תיפתח אוטומטית בכניסה לאפליקציה</div>
+    <div id="myChapRemoveWrap" style="display:none;padding:0 16px 8px;text-align:center;">
+      <button onclick="removeMyChapterFav()" style="border:.5px solid #d33;background:rgba(211,51,51,.08);color:#d33;border-radius:8px;padding:6px 14px;font-size:12px;font-family:inherit;cursor:pointer;">🗑️ הסר את ״המשנה שלי״</button>
+    </div>
     <div class="fav-grid" id="favGrid" style="padding:0 16px;"></div>
     <div style="height:16px;"></div>
     <div class="section-header" style="padding:14px 16px 6px;display:flex;justify-content:space-between;align-items:center;">
@@ -393,6 +396,12 @@ html.dark .chap-cell.mem{background:#1C1230;}
     else { S.set('tehillim_my_chapter', id); _selToast('⭐ ' + favLabel(id) + ' נקבעה כ׳המשנה שלי׳'); }
     buildFavs();
   };
+  window.removeMyChapterFav=function(){
+    S.remove('tehillim_my_chapter');
+    try{ localStorage.removeItem('tehillim_my_chapter_shown'); }catch(e){}
+    _selToast('☆ ׳המשנה שלי׳ בוטלה');
+    buildFavs();
+  };
 
   window.buildFavs=function(){
     var favArr=Array.from(favs), memArr=Array.from(mems);
@@ -404,6 +413,7 @@ html.dark .chap-cell.mem{background:#1C1230;}
       ? favArr.map(function(id){ var star=(myc===id); return '<div style="position:relative;cursor:pointer;padding:12px 6px 10px;border:1px solid #E53935;border-radius:10px;background:#FFF0F0;color:#B02020;font-size:12px;text-align:center;font-weight:600;overflow:visible;" onclick="openChap(\''+id+'\')"><span onclick="event.stopPropagation();toggleMyChapter(\''+id+'\')" title="קבע כ׳המשנה שלי׳" style="position:absolute;top:-8px;left:-6px;font-size:17px;line-height:1;cursor:pointer;filter:'+(star?'none':'grayscale(1) opacity(.4)')+';">⭐</span>'+favLabel(id)+'</div>'; }).join('')
       : '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:24px;font-size:13px;line-height:1.7;">🤍 לחץ ❤️ בזמן לימוד כדי להוסיף פרקים למועדפים</div>';
     var fh=document.getElementById('favHint'); if(fh) fh.style.display=favArr.length?'block':'none';
+    var mrw=document.getElementById('myChapRemoveWrap'); if(mrw) mrw.style.display=myc?'block':'none';
     document.getElementById('memGrid').innerHTML=memArr.length
       ? memArr.map(function(id){ return '<div style="cursor:pointer;padding:10px 6px;border:1px solid #7B2FF7;border-radius:10px;background:#F4EEFF;color:#5B1FB0;font-size:12px;text-align:center;font-weight:600;" onclick="openChap(\''+id+'\')">'+favLabel(id)+'</div>'; }).join('')
       : '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:24px;font-size:13px;line-height:1.7;">★ לחץ ★ בזמן לימוד כדי לסמן פרקים ששיננת (+5 זכויות)</div>';
