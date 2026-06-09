@@ -68,6 +68,7 @@
         await setDoc(doc(getFirestore(app), 'pushTokens', uid), {
           token, lang: s.lang || 'he',
           remTime: s.remTime || s.reminderTime || '20:00',
+          noShabbatNotif: s.noShabbatNotif !== false, // ברירת מחדל: השתקה בשבת
           platform: (navigator.userAgent || '').slice(0, 120),
           updatedAt: Date.now()
         }, { merge: true });

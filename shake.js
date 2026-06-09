@@ -114,20 +114,28 @@ function requestPermissionIOS() {
     .catch(() => 'denied');
 }
 
-/* התחל מאזין רק אחרי user gesture ראשון (חשוב ל-iOS) */
+function _needsIOSPermission() {
+  return typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
+}
+/* אתחול מאזין השייק */
 function initOnFirstGesture() {
-  if (!isMobile()) return;
-  if (!isEnabled()) return;
+  if (!isMobile() || !isEnabled()) return;
+  if (!_needsIOSPermission()) {
+    // אנדרואיד / iOS ישן — אין צורך בהרשאה מפורשת, התחל להאזין מיד (זה התקלקל כשחיכינו ל-gesture)
+    startListening();
+    return;
+  }
+  // iOS 13+ — חובה user gesture (לחיצה/נגיעה) כדי לבקש הרשאת חיישן תנועה
   const handler = function() {
-    requestPermissionIOS().then(res => {
-      if (res === 'granted') startListening();
-    });
-    document.removeEventListener('touchstart', handler, true);
+    requestPermissionIOS().then(res => { if (res === 'granted') startListening(); });
+    document.removeEventListener('touchend', handler, true);
     document.removeEventListener('click', handler, true);
   };
-  document.addEventListener('touchstart', handler, true);
+  document.addEventListener('touchend', handler, true);
   document.addEventListener('click', handler, true);
 }
+// אם המשתמש חזר לעמוד (bfcache) — ודא שהמאזין פעיל מחדש
+window.addEventListener('pageshow', function(){ if (isMobile() && isEnabled() && !_needsIOSPermission()) startListening(); });
 
 /* API חיצוני */
 global.TehillonShake = {

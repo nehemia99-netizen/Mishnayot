@@ -121,9 +121,9 @@ html.dark .account-card{box-shadow:none;}
 html.dark .google-btn{background:var(--surface);}
 </style>
 <script src="utils.js?v=2.2.0"></script>
-<script src="notifications.js?v=2.2.32" defer></script>
-<script src="fcm.js?v=2"></script>
-<script src="i18n.js?v=2.2.88" defer></script>
+<script src="notifications.js?v=2.2.33" defer></script>
+<script src="fcm.js?v=3"></script>
+<script src="i18n.js?v=2.2.89" defer></script>
 <script src="onboarding.js?v=2.2.31"></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -263,17 +263,17 @@ html.dark .google-btn{background:var(--surface);}
   <div class="group">
     <div class="row">
       <div class="row-left">
-        <span class="row-icon">🔔</span>
-        <div><div class="row-label" data-i18n="set.daily_reminder">תזכורת יומית</div><div class="row-sub" id="remDailySub">כבויה</div><div class="row-sub" data-i18n="set.reminder_note" style="opacity:.7;margin-top:1px;">פועל כשהאפליקציה פתוחה</div></div>
-      </div>
-      <div class="toggle" id="tRemDaily" onclick="toggleDailyRem()"><div class="toggle-knob"></div></div>
-    </div>
-    <div class="row">
-      <div class="row-left">
         <span class="row-icon">📲</span>
         <div><div class="row-label">התראות Push</div><div class="row-sub" id="remPushSub">כבוי — גם כשהאפליקציה סגורה</div></div>
       </div>
       <div class="toggle" id="tRemPush" onclick="togglePush()"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="row">
+      <div class="row-left">
+        <span class="row-icon">🔔</span>
+        <div><div class="row-label" data-i18n="set.daily_reminder">תזכורת יומית</div><div class="row-sub" id="remDailySub">כבויה</div><div class="row-sub" data-i18n="set.reminder_note" style="opacity:.7;margin-top:1px;">פועל כשהאפליקציה פתוחה</div></div>
+      </div>
+      <div class="toggle" id="tRemDaily" onclick="toggleDailyRem()"><div class="toggle-knob"></div></div>
     </div>
     <div class="row" id="remTimeRow" style="display:none;">
       <div class="row-left">
@@ -430,7 +430,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.51 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.52 BETA · © 2026</div>
 </div>
 
 <script>
@@ -461,8 +461,8 @@ function loadSettings() {
   if (s.remTime)       document.getElementById('remTime').value = s.remTime;
   if (s.hourlyRem)     { document.getElementById('tRemHourly').classList.add('on'); document.getElementById('remHourlyExpand').classList.add('open'); updateHourlySub(s.hourlyInterval||1); }
   if (s.hourlyInterval) setInterval_(s.hourlyInterval, true);
-  if (s.noShabbatNotif) document.getElementById('tShabbatSilent').classList.add('on');
-  _syncShabbatPref(!!s.noShabbatNotif); // ודא שה-SW (Push ברקע) מסונכרן עם ההגדרה
+  if (s.noShabbatNotif !== false) document.getElementById('tShabbatSilent').classList.add('on'); // ברירת מחדל: מופעל
+  _syncShabbatPref(s.noShabbatNotif !== false); // ודא שה-SW (Push ברקע) מסונכרן עם ההגדרה
   if (s.medalAlert===false) document.getElementById('tMedal').classList.remove('on');
   // leaderboard — ברירת מחדל ON (undefined = true)
   if (s.leaderboard === undefined) s.leaderboard = true;

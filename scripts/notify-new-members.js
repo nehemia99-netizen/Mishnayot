@@ -8,6 +8,13 @@ const messaging = admin.messaging();
 const STATE = db.doc('meta/pushState');
 
 (async () => {
+  // שעות שקטות (לילה) + שבת בישראל — לא מעירים. יוצאים בלי לקדם את הסריקה, כך שיודיע בבוקר.
+  const il = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+  const ilH = il.getHours(), ilD = il.getDay();
+  const quiet = ilH >= 22 || ilH < 8;
+  const shabbat = (ilD === 5 && ilH >= 16) || (ilD === 6 && ilH < 21);
+  if (quiet || shabbat) { console.log('quiet/shabbat in Israel — skipping member push'); return; }
+
   const st = await STATE.get();
   const lastScan = (st.exists && st.data().lastMemberScan) || (Date.now() - 20 * 60 * 1000);
   const nowScan = Date.now();

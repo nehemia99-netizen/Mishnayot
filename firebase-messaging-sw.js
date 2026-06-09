@@ -29,8 +29,8 @@ function _noShabbatPref() {
     try {
       const req = indexedDB.open('mishnayon_prefs', 1);
       req.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv'); };
-      req.onsuccess = e => { try { const r = e.target.result.transaction('kv').objectStore('kv').get('noShabbatNotif'); r.onsuccess = () => res(!!r.result); r.onerror = () => res(false); } catch(_) { res(false); } };
-      req.onerror = () => res(false);
+      req.onsuccess = e => { try { const r = e.target.result.transaction('kv').objectStore('kv').get('noShabbatNotif'); r.onsuccess = () => res(r.result === undefined ? true : !!r.result); r.onerror = () => res(true); } catch(_) { res(true); } };
+      req.onerror = () => res(true);
     } catch(_) { res(false); }
   });
 }

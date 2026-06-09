@@ -44,7 +44,8 @@ function inShabbatWindow(now) {
   return false;
 }
 function shabbatSilenced() {
-  try { return !!settings().noShabbatNotif && inShabbatWindow(); } catch(e){ return false; }
+  // ברירת מחדל: השתקה בשבת (true), אלא אם המשתמש ביטל מפורשות (=== false)
+  try { return settings().noShabbatNotif !== false && inShabbatWindow(); } catch(e){ return false; }
 }
 
 /* ─── הצגת notification — דרך SW (תומך נייד) ─── */
