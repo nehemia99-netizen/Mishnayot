@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   משניון — Push לקוח (FCM)
+   משנתי — Push לקוח (FCM)
    דורש: firebase-messaging-sw.js בשורש + VAPID key (להלן)
    API: window.AppPush.enable() / .disable() / .isSupported() / .isOn()
    ═══════════════════════════════════════════════════════ */

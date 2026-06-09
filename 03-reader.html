@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>משניון — קורא</title>
+<title>משנתי — קורא</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--verse-bg:#FAFAF8;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--verse-bg:#1A1A1A;}
@@ -200,7 +200,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 .chap-cell.mem-chap{border-color:var(--green);color:var(--green);}
 .picker-close{margin-top:12px;padding:11px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);width:100%;cursor:pointer;font-size:14px;color:var(--text-sec);}
 </style>
-<script src="i18n.js?v=2.2.86" defer></script>
+<script src="i18n.js?v=2.2.88" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -448,9 +448,9 @@ let autoScrollAccum = 0; // מצבר לגלילה חלקה
 let timerSec   = 0;
 let sessionPts = 0;
 let lastActivity = Date.now();
-let IDLE_MS = 3 * 60 * 1000;  // ברירת מחדל: 3 דק חוסר פעילות
+let IDLE_MS = 7 * 60 * 1000;  // ברירת מחדל: 7 דק חוסר פעילות (פרקי משנה ארוכים)
 function updateIdleMs() {
-  IDLE_MS = 3 * 60 * 1000;
+  IDLE_MS = 7 * 60 * 1000;
 }
 let timerInterval = null;
 let idlePaused = false;
@@ -1283,8 +1283,8 @@ function startTimer() {
     }
     timerSec++;
     document.getElementById('timerNum').textContent = fmt(timerSec);
-    // מגבלת זמן מקסימלית: 3 דק' לפרק רגיל, 11 דק' לקי"ט
-    const MAX_SECS = 180;
+    // מגבלת זמן מקסימלית: 7 דק' לפרק משנה (פרקי משנה ארוכים מפרקי תהילים)
+    const MAX_SECS = 420;
     if (timerSec >= MAX_SECS) {
       idlePaused = true;
       document.getElementById('idleWarning').style.display = 'block';
@@ -1675,6 +1675,25 @@ function recordMasteryScore(id, pct, perfectFirstPass){
 
 /* ── הקראה קולית (Text-to-Speech) ── */
 let _ttsOn = false, _ttsIdx = 0, _ttsMode = 'read', _ttsUnits = [], _ttsTimer = null, _ttsAnySpoke = false;
+let _ttsCurVIdx = null;            // המשנה (vIdx) שמתנגנת כרגע — לצורך "המשך מהנקודה"
+let _ttsResume = null;             // {chapId, vIdx} — נקודת המשך אחרי עצירה
+let _wakeLock = null;              // Screen Wake Lock — מונע כיבוי מסך בזמן הקראה
+// מבקש נעילת-מסך כדי שההקראה לא תיקטע כשהמסך נכבה
+async function _acquireWakeLock(){
+  try {
+    if ('wakeLock' in navigator && navigator.wakeLock) {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', function(){ _wakeLock = null; });
+    }
+  } catch(e){ _wakeLock = null; }
+}
+function _releaseWakeLock(){
+  try { if (_wakeLock) { _wakeLock.release(); _wakeLock = null; } } catch(e){}
+}
+// נעילת-מסך משתחררת אוטומטית כשהטאב יורד לרקע — נבקש מחדש בחזרה לחזית אם עדיין מקריאים
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && _ttsOn && !_wakeLock) _acquireWakeLock();
+});
 function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
 function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
 // קולות עבריים זמינים במכשיר
@@ -1724,7 +1743,12 @@ function toggleNote(verseNum, btn) {
 
 function _ttsNoVoice(){ showToast(_rLang()==='en' ? '🔇 No Hebrew voice available on this device' : '🔇 אין קול עברי מותקן במכשיר זה'); }
 function _ttsStop(){
+  // שמור נקודת-המשך (המשנה שהתנגנה) אם נעצר באמצע
+  if (_ttsOn && _ttsCurVIdx != null) {
+    _ttsResume = { chapId: curId(), vIdx: _ttsCurVIdx };
+  }
   _ttsOn = false;
+  _releaseWakeLock();
   if (_ttsTimer) { clearTimeout(_ttsTimer); _ttsTimer = null; }
   try { speechSynthesis.cancel(); } catch(e){}
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
@@ -1753,20 +1777,30 @@ function ttsStart(mode){
   } else {
     verses.forEach((v, vi) => _ttsUnits.push({ text:v, vIdx:vi }));
   }
-  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false;
+  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null;
+  // המשך מהמשנה שבה נעצר (אם יש נקודת-המשך לפרק הזה)
+  let _resumed = false;
+  if (_ttsResume && _ttsResume.chapId === curId()) {
+    const ri = _ttsUnits.findIndex(u => u.vIdx >= _ttsResume.vIdx);
+    if (ri > 0) { _ttsIdx = ri; _resumed = true; }
+  }
   document.getElementById('ttsBtn').classList.add('tts-on');
   document.querySelectorAll('.audio-opt').forEach(el=>el.classList.remove('playing'));
   const optBtn = document.getElementById('aopt_' + mode); if (optBtn) optBtn.classList.add('playing');
   try { speechSynthesis.cancel(); } catch(e){}
-  showToast(mode==='repeat' ? '🗣️ אמור אחריי — חזור בקול אחרי כל משפט' : (mode==='loop' ? '🔁 הקראה בלולאה' : '▶ הקראה'), { dur: 3000 });
+  _acquireWakeLock();
+  const _resVn = _resumed ? (_ttsUnits[_ttsIdx].vIdx + 1) : 0;
+  showToast(_resumed ? ('▶ ממשיך ממשנה ' + _resVn) : (mode==='repeat' ? '🗣️ אמור אחריי — חזור בקול אחרי כל משפט' : (mode==='loop' ? '🔁 הקראה בלולאה' : '▶ הקראה')), { dur: 3000 });
   _ttsSpeakNext();
 }
 function _ttsSpeakNext(){
   if (!_ttsOn) return;
   if (_ttsIdx >= _ttsUnits.length) {
-    if (_ttsMode === 'loop') { _ttsIdx = 0; } else { _ttsStop(); return; }
+    // סיום טבעי של הפרק — אפס נקודת-המשך כדי שהפעם הבאה תתחיל מההתחלה
+    if (_ttsMode === 'loop') { _ttsIdx = 0; } else { _ttsResume = null; _ttsCurVIdx = null; _ttsStop(); return; }
   }
   const unit = _ttsUnits[_ttsIdx];
+  _ttsCurVIdx = unit.vIdx;
   const verseEls = document.querySelectorAll('#textArea .verse');
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
   const u = new SpeechSynthesisUtterance(_stripForTts(unit.text));

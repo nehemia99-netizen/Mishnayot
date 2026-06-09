@@ -8,9 +8,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="משניון">
+  <meta name="apple-mobile-web-app-title" content="משנתי">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>משניון — קבוצות</title>
+<title>משנתי — קבוצות</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;--purple:#7B2FF7;--purple-light:#F0EAFF;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;--purple:#A87BF7;--purple-light:#1E1030;}
@@ -144,7 +144,7 @@ html.dark .toast{background:#F0EFE9;color:#1A1A1A;}
 </style>
 <script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
-<script src="i18n.js?v=2.2.87" defer></script>
+<script src="i18n.js?v=2.2.88" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -864,8 +864,8 @@ window.shareInvite=function(){
   const g=S.get('tehillim_group');if(!g)return;
   const isDeployed=location.protocol==='https:';
   const joinUrl=isDeployed?(location.origin+location.pathname.replace('08-group.html','')+'08-group.html?join='+g.code):('https://mishnayot-alpha.vercel.app/08-group.html?join='+g.code);
-  const text=`📖 הצטרף לקבוצת המשנה שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח משניון ← קבוצות ← הצטרף ← הזן קוד`;
-  if(IS_MOBILE&&navigator.share)navigator.share({title:'משניון — '+g.name,text}).catch(()=>{});
+  const text=`📖 הצטרף לקבוצת המשנה שלנו!\n\nשם הקבוצה: ${g.name}\nקוד הצטרפות: ${g.code}\n\n👉 ${joinUrl}\n\nאו פתח משנתי ← קבוצות ← הצטרף ← הזן קוד`;
+  if(IS_MOBILE&&navigator.share)navigator.share({title:'משנתי — '+g.name,text}).catch(()=>{});
   else{navigator.clipboard.writeText(text).catch(()=>{});window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');toast('✅ נפתח WhatsApp');}
 };
 

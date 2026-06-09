@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   משניון — Onboarding Tour אינטראקטיבי
+   משנתי — Onboarding Tour אינטראקטיבי
    נוצר: 1.6.0 (10.5.2026)
    ──────────────────────────────────────────────────────────────
    הסיור הראשון מופיע בכניסה הראשונה לאפליקציה.
@@ -17,7 +17,7 @@ function _getLang() {
 }
 
 const STEPS_HE = [
-  { icon:'📖', title:'ברוך הבא למשניון!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#3A7D44' },
+  { icon:'📖', title:'ברוך הבא למשנתי!', body:'האפליקציה שתעזור לך להתמיד בלימוד משניות — בקלות, באהבה, ובהישגים שמלווים אותך כל הדרך.', bg:'#3A7D44' },
   { icon:'⭐', title:'מערכת זכויות', body:'כל פרק שתלמד ייתן לך נקודות "זכויות". תעבור 10 רמות, מ"מתחיל" 🌱 עד "גדול הדור" 🕯️. ככל שתלמד יותר — תעלה לרמה הבאה.', bg:'#1E5A2E' },
   { icon:'📚', title:'פירוש למשנה', body:'לחץ על כפתור הפירוש בקורא כדי לקרוא פירוש לכל משנה — ברטנורא ותוספות יום טוב. הפירוש מופיע מתחת לכל משנה ומעמיק את ההבנה.', bg:'#993556' },
   { icon:'🎯', title:'אתגרים יומיים', body:'יש לך 3 אתגרים פעילים בכל זמן: יומי, שבועי, וחודשי. השלם אותם ותקבל בונוס זכויות. אתגר חדש בכל יום חדש.', bg:'#3B6D11' },
@@ -29,7 +29,7 @@ const STEPS_HE = [
 ];
 
 const STEPS_EN = [
-  { icon:'📖', title:'Welcome to Mishnayon!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#3A7D44' },
+  { icon:'📖', title:'Welcome to Mishnati!', body:'The app that helps you study Mishnayot consistently — with ease, love, and achievements that guide you every step of the way.', bg:'#3A7D44' },
   { icon:'⭐', title:'Spiritual Points', body:'Every chapter you study earns you "Zechuyot" points. Progress through 10 levels from Beginner 🌱 to Sage of the Generation 🕯️. The more you study — the higher you climb.', bg:'#1E5A2E' },
   { icon:'📚', title:'Mishnah Commentary', body:'Tap the commentary button in the reader to see explanations for each Mishnah — Bartenura and Tosafot Yom Tov. Commentary appears below each Mishnah.', bg:'#993556' },
   { icon:'🎯', title:'Daily Challenges', body:'You have 3 active challenges at all times: daily, weekly, and monthly. Complete them for bonus points. A new challenge every new day.', bg:'#3B6D11' },
@@ -96,7 +96,7 @@ function render() {
   document.getElementById('_onb_header').style.background = s.bg;
   const iconEl = document.getElementById('_onb_icon');
   if (s.modeSelect) {
-    iconEl.innerHTML = '<img src="4.jpg" alt="משניון" style="width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.25);">';
+    iconEl.innerHTML = '<img src="4.jpg" alt="משנתי" style="width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.25);">';
   } else {
     iconEl.textContent = s.icon;
   }
@@ -184,8 +184,8 @@ function render() {
         + '<div style="font-size:20px;margin-bottom:3px;">📱</div>'
         + `<div style="font-size:14px;font-weight:700;color:#1A6B3A;margin-bottom:3px;">${isEn ? 'Add to Home Screen' : 'הוסף אייקון למסך הבית'}</div>`
         + `<div style="font-size:12px;color:#444;line-height:1.5;">${isEn
-            ? 'Mishnayon is a Web App. To open it easily:<br><b>iPhone:</b> Share → "Add to Home Screen"<br><b>Android:</b> Menu ⋮ → "Add to Home Screen"'
-            : 'משניון היא אפליקציית Web. כדי לפתוח בנוחות:<br><b>iPhone:</b> כפתור שיתוף ← "הוסף למסך הבית"<br><b>Android:</b> תפריט ⋮ ← "הוסף למסך הבית"'}</div>`
+            ? 'Mishnati is a Web App. To open it easily:<br><b>iPhone:</b> Share → "Add to Home Screen"<br><b>Android:</b> Menu ⋮ → "Add to Home Screen"'
+            : 'משנתי היא אפליקציית Web. כדי לפתוח בנוחות:<br><b>iPhone:</b> כפתור שיתוף ← "הוסף למסך הבית"<br><b>Android:</b> תפריט ⋮ ← "הוסף למסך הבית"'}</div>`
         + '</div>'
         + '<div style="background:#EAF2EA;border-radius:14px;padding:12px 14px;">'
         + '<div style="font-size:20px;margin-bottom:3px;">🔐</div>'

@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   משניון — מודול תזכורות (Notifications) v2.2.50
+   משנתי — מודול תזכורות (Notifications) v2.2.50
    ──────────────────────────────────────────────────────────────
    שולח דרך Service Worker (תומך בנייד/Android Chrome)
    ════════════════════════════════════════════════════════════ */
@@ -7,9 +7,9 @@
 'use strict';
 
 const LIBRARY = [
-  { title:'משניון — זמן ללמוד משנה', body:'"וְשִׁנַּנְתָּם לְבָנֶיךָ" — בוא נלמד משנה' },
-  { title:'משניון — דקה למשנה?', body:'אפילו משנה אחת ביום עושה את ההבדל. לחץ כדי להתחיל' },
-  { title:'🕯️ משניון', body:'"משנה" אותיות "נשמה" — דקה אחת של לימוד, בקלות' },
+  { title:'משנתי — זמן ללמוד משנה', body:'"וְשִׁנַּנְתָּם לְבָנֶיךָ" — בוא נלמד משנה' },
+  { title:'משנתי — דקה למשנה?', body:'אפילו משנה אחת ביום עושה את ההבדל. לחץ כדי להתחיל' },
+  { title:'🕯️ משנתי', body:'"משנה" אותיות "נשמה" — דקה אחת של לימוד, בקלות' },
   { title:'📖 הזמן הוא עכשיו', body:'"הָפֵךְ בָּהּ וַהֲפֵךְ בָּהּ דְּכֹלָּא בָהּ" (אבות ה׳)' },
   { title:'⭐ הרצף שלך מחכה', body:'אל תשבור את הרצף — למד משנה קצרה עכשיו' },
   { title:'🎯 אתגר היום מחכה', body:'יש לך אתגר פעיל — בוא נשלים אותו' },
@@ -35,11 +35,25 @@ function settings() {
 function today() { return localDateStr(); }
 function randomMsg() { return LIBRARY[Math.floor(Math.random()*LIBRARY.length)]; }
 
+/* ─── חלון שבת: ערב שבת (שישי מ-16:00) עד מוצ"ש (שבת עד 21:00) ─── */
+function inShabbatWindow(now) {
+  now = now || new Date();
+  const day = now.getDay(), h = now.getHours();
+  if (day === 5) return h >= 16;  // שישי אחה"צ — ערב שבת
+  if (day === 6) return h < 21;   // שבת — עד הלילה (מוצ"ש)
+  return false;
+}
+function shabbatSilenced() {
+  try { return !!settings().noShabbatNotif && inShabbatWindow(); } catch(e){ return false; }
+}
+
 /* ─── הצגת notification — דרך SW (תומך נייד) ─── */
 async function show(title, body, opts) {
   opts = opts || {};
   if (!('Notification' in window)) return false;
   if (Notification.permission !== 'granted') return false;
+  // השתקה בשבת (למי שסימן בהגדרות) — דלג על תזכורות בערב שבת ובשבת
+  if (shabbatSilenced()) return false;
 
   // נסה דרך Service Worker קודם (עובד בנייד)
   if ('serviceWorker' in navigator) {

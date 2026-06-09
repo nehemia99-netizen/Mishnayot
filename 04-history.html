@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>משניון — היסטוריה</title>
+<title>משנתי — היסטוריה</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--surface:#F5F5F3;--green:#3B8C14;--green-light:#EBF5E5;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--surface:#272727;--green:#5DBF35;--green-light:#1A2E14;}
@@ -186,12 +186,17 @@ html.dark .sc-cell.sc3{background:#2A7A30;border-color:#4CAF50;}
 html.dark .sc-cell.sc4{background:#3DAA45;border-color:#81C784;}
 .streak-cal-legend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:10px;color:var(--text-muted);justify-content:flex-end;}
 .sc-leg{width:11px;height:11px;border-radius:2px;border:.5px solid var(--border);}
-.sc-cell.shabbat{background:#E3F4E5;border-color:#54A463;}
-html.dark .sc-cell.shabbat{background:#0E2416;border-color:#54A463;}
-.sc-cell.shabbat.sc1{background:#BFDCC2;border-color:#2F7D45;}
-.sc-cell.shabbat.sc2{background:#88C492;border-color:#225E32;}
-.sc-cell.shabbat.sc3{background:#4C9E60;border-color:#0E4A24;}
-.sc-cell.shabbat.sc4{background:#2F7D45;border-color:#0C4622;}
+/* ימי שישי/שבת — תכלת להבדלה מימי חול (ירוק) */
+.sc-cell.shabbat{background:#D6EEFB;border-color:#4FA3D1;}
+html.dark .sc-cell.shabbat{background:#0E2233;border-color:#4FA3D1;}
+.sc-cell.shabbat.sc1{background:#BCE0F5;border-color:#2D8FCF;}
+.sc-cell.shabbat.sc2{background:#64B5E6;border-color:#1976B5;}
+.sc-cell.shabbat.sc3{background:#2E7DB5;border-color:#145A8A;}
+.sc-cell.shabbat.sc4{background:#1B5E8F;border-color:#0A3A5C;}
+html.dark .sc-cell.shabbat.sc1{background:#103A55;border-color:#2D8FCF;}
+html.dark .sc-cell.shabbat.sc2{background:#175C86;border-color:#3D9AD4;}
+html.dark .sc-cell.shabbat.sc3{background:#2A86BE;border-color:#5BB5E6;}
+html.dark .sc-cell.shabbat.sc4{background:#3DA0DC;border-color:#85CBF0;}
 .lstat{text-align:center;}
 .lstat-num{font-size:18px;font-weight:800;}
 .lstat-lbl{font-size:9.5px;opacity:.8;}
@@ -233,7 +238,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 <script src="utils.js?v=2.2.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-<script src="i18n.js?v=2.2.86" defer></script>
+<script src="i18n.js?v=2.2.88" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -1289,7 +1294,7 @@ function _renderStreakCalendar(readings) {
     const _cellClick = "_streakPopup('" + title + "')";
     const _dayNum = parseInt(c.key.slice(8));
     // צבע המספר — בהיר על רקע כהה, כהה על רקע בהיר
-    const _numColor = (lvl === 'sc3' || lvl === 'sc4') ? 'rgba(255,255,255,.8)' : (isShabbat && !lvl) ? '#54A463' : 'var(--text-muted)';
+    const _numColor = (lvl === 'sc3' || lvl === 'sc4') ? 'rgba(255,255,255,.8)' : (isShabbat && !lvl) ? '#2D8FCF' : 'var(--text-muted)';
     html += '<div class="sc-cell ' + lvl + shabbatCls + '" onclick="' + _cellClick + '" style="color:' + _numColor + ';' + border + '">' + _dayNum + '</div>';
     if (c.count > 0) activeDays++;
   });
@@ -1500,14 +1505,14 @@ function buildShareText(level) {
     return m.emoji + ' I earned the ' + (m.en || m.label) + ' Medal for studying Mishnah!\n' +
            'Bonus: +' + m.bonus + ' Zechuyot ⭐\n\n' +
            '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
-           '📲 Join Mishnayon: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
-           '— Mishnayon 📖';
+           '📲 Join Mishnati: ' + APP_URL + '/01-dashboard.html?lang=en' + '\n' +
+           '— Mishnati 📖';
   }
   return m.emoji + ' זכיתי במדליית ' + m.label + ' על לימוד משניות!\n' +
          'בונוס: +' + m.bonus + ' זכויות ⭐\n\n' +
          '"' + m.quote.replace('\n',' ') + '"\n(' + m.ref + ')\n\n' +
-         '📲 הצטרף למשניון: ' + APP_URL + '\n' +
-         '— משניון 📖';
+         '📲 הצטרף למשנתי: ' + APP_URL + '\n' +
+         '— משנתי 📖';
 }
 
 // Mobile = Android / iPhone / iPad (navigator.share on desktop opens OS share sheet, not WhatsApp Web)
@@ -1557,7 +1562,7 @@ window.shareCert = async function(level) {
     if (IS_MOBILE && navigator.share) {
       /* ── נייד: גיליון שיתוף נייטיב (וואטסאפ, טלגרם, מייל…) ── */
       const _stLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
-      const _stTitle = _stLang === 'en' ? (m.en||m.label) + ' Medal — Mishnayon' : 'מדליית ' + m.label + ' — משניון';
+      const _stTitle = _stLang === 'en' ? (m.en||m.label) + ' Medal — Mishnati' : 'מדליית ' + m.label + ' — משנתי';
       const shareData = { title: _stTitle, text: shareText };
       if (blob) {
         const file = new File([blob], 'מדלית-' + m.label + '.png', { type:'image/png' });

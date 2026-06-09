@@ -6,7 +6,7 @@
 
 const DICT = {
   // עמוד הבית (01-dashboard)
-  'app.title':               { he: 'משניון',                en: 'Mishnayon' },
+  'app.title':               { he: 'משנתי',                 en: 'Mishnati' },
   'home.greeting':           { he: 'ברכת השלום',              en: 'Welcome' },
   'home.streak':             { he: 'רצף ימים',                en: 'Day streak' },
   'home.memorized':          { he: 'למדתי בע״פ',              en: 'Memorized' },
@@ -205,6 +205,8 @@ const DICT = {
   // הגדרות נוספים
   'set.medal_alert':         { he: 'התראת מדליה',             en: 'Medal alert' },
   'set.medal_alert_sub':     { he: 'פופ-אפ בהגעה למדליה חדשה', en: 'Popup on new medal' },
+  'set.shabbat_silent':      { he: 'השתקה בשבת',              en: 'Silence on Shabbat' },
+  'set.shabbat_silent_sub':  { he: 'לא לקבל תזכורות מערב שבת ועד מוצ״ש', en: 'No reminders from Erev Shabbat until Motzaei Shabbat' },
   'set.daily_reminder_sub_off': { he: 'כבויה',                 en: 'Off' },
   'set.daily_reminder_sub_on':  { he: 'פעילה',                 en: 'On' },
   'set.hourly_reminder':     { he: 'תזכורת שעתית',            en: 'Hourly reminder' },

@@ -9,17 +9,17 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="משניון">
+  <meta name="apple-mobile-web-app-title" content="משנתי">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   
-<title>משניון</title>
+<title>משנתי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.50"></script>
-<script src="notifications.js?v=2.2.31"></script>
+<script src="gamification.js?v=1.5.51"></script>
+<script src="notifications.js?v=2.2.32"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.31"></script>
 <script>
@@ -235,11 +235,11 @@ async function shareGraph(ev){
   const _sgLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   const _sgUrl = _sgLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _sgLang === 'en'
-    ? '📊 My Mishnayon Progress\n' +
+    ? '📊 My Mishnati Progress\n' +
       '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Zechuyot\n' +
       '⭐ Total: ' + totalPts.toLocaleString() + ' Zechuyot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
       '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' + _sgUrl
-    : '📊 ההתקדמות שלי במשניון\n' +
+    : '📊 ההתקדמות שלי במשנתי\n' +
               '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' זכויות\n' +
               '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' זכויות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
               '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
@@ -247,14 +247,14 @@ async function shareGraph(ev){
   const file=new File([blob],'tehilahon-graph.png',{type:'image/png'});
   // ניסיון שיתוף ישיר (Web Share API Level 2) - תומך בוואטסאפ, טלגרם וכו'
   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({title:'משניון',text:msg,files:[file]});return;}
+    try{await navigator.share({title:'משנתי',text:msg,files:[file]});return;}
     catch(e){if(e.name==='AbortError')return;}
   }
   // fallback - שיתוף טקסט בלבד דרך WhatsApp Web
   if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
     // במובייל - נסה Web Share API לטקסט בלבד
     if(navigator.share){
-      try{await navigator.share({title:'משניון',text:msg});return;}catch(e){}
+      try{await navigator.share({title:'משנתי',text:msg});return;}catch(e){}
     }
   }
   // אחרון - הצע לפתוח WhatsApp עם הטקסט + הורד את התמונה
@@ -508,7 +508,7 @@ html.dark .lottery-trigger{opacity:.85;}
 .lres-go{background:var(--primary);color:#fff;margin-left:8px;}
 .lres-close{background:var(--surface);color:var(--text);border:.5px solid var(--border);}
 </style>
-<script src="i18n.js?v=2.2.86" defer></script>
+<script src="i18n.js?v=2.2.88" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -562,10 +562,10 @@ html.dark .lottery-trigger{opacity:.85;}
   <div class="header">
     <div>
       <div class="app-logo">
-        <img src="4.jpg" alt="משניון" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
+        <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
-          <div class="app-title" style="font-size:22px;font-weight:700;">משניון</div>
-          <div class="app-version">גרסה 1.5.50 BETA</div>
+          <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
+          <div class="app-version">גרסה 1.5.51 BETA</div>
         </div>
       </div>
     </div>
@@ -836,7 +836,7 @@ html.dark .lottery-trigger{opacity:.85;}
 
   <div class="footer" id="mainFooter">
     <button class="footer-btn" onclick="shareApp()" data-i18n="home.share">📤 שתף</button>
-    <span class="footer-copy">© 2026 משניון</span>
+    <span class="footer-copy">© 2026 משנתי</span>
   </div>
 </div>
 
@@ -1506,20 +1506,20 @@ async function _shareSolidMsg() {
   const _baseUrl = (typeof APP_URL_DASH !== 'undefined' ? APP_URL_DASH : 'https://mishnayot-alpha.vercel.app');
   const link = _lang === 'en' ? _baseUrl + '/01-dashboard.html?lang=en' : _baseUrl;
   const msg = _lang === 'en'
-    ? '📖 *Mishnayon*\n'
+    ? '📖 *Mishnati*\n'
       + 'A beautiful & challenging app for studying Mishnah — free.\n'
       + 'Earn spiritual merit in this world and the next.\n\n'
       + 'Share to spread the mitzvah 🙏\n'
       + 'Am Yisrael Chai! ✡️\n\n'
       + link
-    : '📖 *משניון*\n'
+    : '📖 *משנתי*\n'
       + 'אפליקציה משוכללת ומאתגרת ללימוד משניות בקלות, ובחינם.\n'
       + 'לצבירת הון רוחני בעולם הזה ובעולם הבא..\n\n'
       + 'שתפו לזיכוי הרבים 🙏\n'
       + 'עם ישראל חי! ✡️\n\n'
       + link;
   if (navigator.share) {
-    const shareData = { title: 'משניון', text: msg };
+    const shareData = { title: 'משנתי', text: msg };
     // נסה לצרף לוגו — מוקטן ל-75%
     try {
       const res = await fetch('4.jpg');
@@ -2375,16 +2375,16 @@ async function shareApp(){
   const _saLang = (typeof i18n !== 'undefined') ? i18n.getCurrentLang() : 'he';
   const _saUrl = _saLang === 'en' ? APP_URL_DASH + '/01-dashboard.html?lang=en' : APP_URL_DASH;
   const msg = _saLang === 'en'
-    ? '📖 My Mishnayon Progress\n' +
+    ? '📖 My Mishnati Progress\n' +
       '🕯️ Today: ' + mins + ' min · +' + todayPts + ' Zechuyot\n' +
       '⭐ Total: ' + totalPts.toLocaleString() + ' Zechuyot' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
       '📖 ' + chapsCount + ' unique mishnah chapters studied\n\n' +
-      'Join me on *Mishnayon*:\n' + _saUrl
-    : '📖 ההתקדמות שלי במשניון\n' +
+      'Join me on *Mishnati*:\n' + _saUrl
+    : '📖 ההתקדמות שלי במשנתי\n' +
               '🕯️ היום: ' + mins + ' דק\u05f3 · +' + todayPts + ' זכויות\n' +
               '⭐ סה\u05f4כ: ' + totalPts.toLocaleString() + ' זכויות' + (levelKey ? ' (' + levelKey + ')' : '') + '\n' +
               '📖 ' + chapsCount + ' פרקים שונים נלמדו\n\n' +
-              'הצטרף אלי לאפליקציית *משניון*:\n' +
+              'הצטרף אלי לאפליקציית *משנתי*:\n' +
               _saUrl;
 
   addDashScore(3);
@@ -2392,7 +2392,7 @@ async function shareApp(){
   const blob = await captureGraph();
 
   if (IS_MOBILE_DASH && navigator.share) {
-    const shareData = { title:'משניון', text: msg };
+    const shareData = { title:'משנתי', text: msg };
     if (blob) {
       const file = new File([blob], 'tehilahon-progress.png', { type:'image/png' });
       if (navigator.canShare && navigator.canShare({ files:[file] })) {
@@ -2954,7 +2954,7 @@ function openAbout() {
     const _aSettings = _aLang === 'en' ? '⚙️ Settings' : '⚙️ הגדרות';
     m.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-width:390px;width:100%;text-align:center;">
       <div style="font-size:52px;margin-bottom:8px;">📖</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;">משניון · Mishnayon</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;">משנתי · Mishnati</div>
       <div style="font-size:15px;color:var(--text-sec);margin-bottom:18px;line-height:1.6;">${_aDesc}</div>
       ${q ? `<div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:18px;font-family:'David Libre',serif;font-size:16px;color:var(--text);line-height:1.6;">"${q.t}"<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">תהלים ${q.ref}</div></div>` : ''}
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
