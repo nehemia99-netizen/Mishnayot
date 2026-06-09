@@ -437,7 +437,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.53 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.54 BETA · © 2026</div>
 </div>
 
 <script>
@@ -520,7 +520,8 @@ function populateTtsVoices() {
   const males   = voices.filter(v => !isFem(v.name));
   const females = voices.filter(v => isFem(v.name));
   const shortName = n => (n||'').replace(/^(Microsoft|Google|Apple)\s+/i,'').replace(/\s*[-(].*$/,'').trim() || n;
-  let opts = '<option value="male">גברי ✓</option>';
+  let opts = '<option value="cloud">🎧 גברי איכותי (ענן)</option>';
+  opts += '<option value="male">גברי — קול המכשיר</option>';
   males.forEach(v   => opts += '<option value="' + v.name + '">' + shortName(v.name) + '</option>');
   females.forEach(v => opts += '<option value="' + v.name + '">' + shortName(v.name) + '</option>');
   opts += '<option value="female">נשי</option>';

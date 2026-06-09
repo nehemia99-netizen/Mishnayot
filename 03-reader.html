@@ -1694,6 +1694,61 @@ function _releaseWakeLock(){
 document.addEventListener('visibilitychange', function(){
   if (document.visibilityState === 'visible' && _ttsOn && !_wakeLock) _acquireWakeLock();
 });
+/* ── קול גברי איכותי מהענן (Google TTS דרך /api/tts) ── */
+let _ttsAudioEl = null, _ttsCloudFailed = false, _ttsCloudDB = null;
+function _isCloudVoice(){ try { return (S.get('tehillim_settings')||{}).ttsVoice === 'cloud'; } catch(e){ return false; } }
+function _ensureAudioEl(){ if (!_ttsAudioEl) { _ttsAudioEl = new Audio(); _ttsAudioEl.preload = 'auto'; } return _ttsAudioEl; }
+// "שחרור" נגן האודיו בתוך מחוות-המשתמש (חיוני לאוטופליי בנייד)
+function _ttsUnlockAudio(){ try { const a=_ensureAudioEl(); a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; const p=a.play(); if(p&&p.catch)p.catch(function(){}); } catch(e){} }
+function _ttsCloudOpenDB(){ return new Promise(function(res,rej){ if(_ttsCloudDB)return res(_ttsCloudDB); try{ const r=indexedDB.open('mishnayon_tts',1); r.onupgradeneeded=function(e){ const db=e.target.result; if(!db.objectStoreNames.contains('audio'))db.createObjectStore('audio'); }; r.onsuccess=function(e){ _ttsCloudDB=e.target.result; res(_ttsCloudDB); }; r.onerror=function(e){ rej(e); }; }catch(e){ rej(e); } }); }
+function _cloudCacheGet(key){ return _ttsCloudOpenDB().then(function(db){ return new Promise(function(res){ try{ const r=db.transaction('audio').objectStore('audio').get(key); r.onsuccess=function(){ res(r.result||null); }; r.onerror=function(){ res(null); }; }catch(e){ res(null); } }); }).catch(function(){ return null; }); }
+function _cloudCachePut(key,blob){ _ttsCloudOpenDB().then(function(db){ try{ db.transaction('audio','readwrite').objectStore('audio').put(blob,key); }catch(e){} }).catch(function(){}); }
+async function _cloudTtsAudio(text){
+  const voice='he-IL-Wavenet-B';
+  const k=voice+'|'+text;
+  const cached=await _cloudCacheGet(k);
+  if(cached && cached.size>200) return cached;
+  const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:-3, rate:0.9 }) });
+  if(!resp.ok) throw new Error('tts http '+resp.status);
+  const blob=await resp.blob();
+  if(!blob || blob.size<200) throw new Error('tts empty');
+  _cloudCachePut(k,blob);
+  return blob;
+}
+function _ttsHighlight(unit, verseEls){
+  const el = verseEls[unit.vIdx];
+  if(!el) return;
+  el.classList.add('tts-speaking');
+  const ta=document.getElementById('textArea');
+  const er=el.getBoundingClientRect();
+  const cr=ta?ta.getBoundingClientRect():{ top:0, bottom:(window.innerHeight||0) };
+  if(er.top<cr.top || er.bottom>cr.bottom) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function _ttsAdvance(unit){
+  _ttsIdx++;
+  if(_ttsMode==='repeat'){
+    const pause=Math.max(1400, _stripForTts(unit.text).length*45);
+    _ttsTimer=setTimeout(function(){ if(_ttsOn)_ttsSpeakNext(); }, pause);
+  } else { _ttsSpeakNext(); }
+}
+function _ttsCloudUnit(unit, verseEls){
+  _ttsAnySpoke=true;
+  _cloudTtsAudio(_stripForTts(unit.text)).then(function(blob){
+    if(!_ttsOn) return;
+    _ttsHighlight(unit, verseEls);
+    const url=URL.createObjectURL(blob);
+    const a=_ensureAudioEl();
+    a.onended=function(){ try{URL.revokeObjectURL(url);}catch(e){} _ttsAdvance(unit); };
+    a.onerror=function(){ try{URL.revokeObjectURL(url);}catch(e){} _cloudFail(unit, verseEls); };
+    a.src=url;
+    const p=a.play(); if(p&&p.catch)p.catch(function(){ _cloudFail(unit, verseEls); });
+  }).catch(function(){ _cloudFail(unit, verseEls); });
+}
+function _cloudFail(unit, verseEls){
+  if(!_ttsCloudFailed){ _ttsCloudFailed=true; showToast(_rLang()==='en'?'☁️ Cloud voice unavailable — using device voice':'☁️ הקול האיכותי לא זמין כעת — עובר לקול המכשיר'); }
+  if(!_ttsOn) return;
+  _ttsSpeakSS(unit, verseEls);
+}
 function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
 function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
 // קולות עבריים זמינים במכשיר
@@ -1708,7 +1763,7 @@ function _applyTtsVoice(u){
     const choice = s.ttsVoice || 'male';
     const he = _hebrewVoices();
     let v = null, pitch = 1, rate = 0.9;
-    if (choice === 'male') {
+    if (choice === 'male' || choice === 'cloud') {
       v = he.find(x => !_isFemaleVoiceName(x.name)) || he[0] || null;
       pitch = 0.5; rate = 0.86; // גובה נמוך מאוד — נשמע גברי גם כשהקול הזמין נשי (כמו Carmit)
     } else if (choice === 'female') {
@@ -1751,13 +1806,14 @@ function _ttsStop(){
   _releaseWakeLock();
   if (_ttsTimer) { clearTimeout(_ttsTimer); _ttsTimer = null; }
   try { speechSynthesis.cancel(); } catch(e){}
+  if (_ttsAudioEl) { try { _ttsAudioEl.pause(); } catch(e){} _ttsAudioEl.onended = null; _ttsAudioEl.onerror = null; }
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
   const b = document.getElementById('ttsBtn'); if(b) b.classList.remove('tts-on');
   document.querySelectorAll('.audio-opt.playing').forEach(el=>el.classList.remove('playing'));
 }
 // 🔊 — פתח/סגור את סרגל האודיו (קרא / אמור אחריי / לולאה)
 function toggleTTS(){
-  if (!_ttsSupported()){ showToast(_rLang()==='en'?'Speech not supported here':'הקראה קולית לא נתמכת במכשיר זה'); return; }
+  if (!_ttsSupported() && !_isCloudVoice()){ showToast(_rLang()==='en'?'Speech not supported here':'הקראה קולית לא נתמכת במכשיר זה'); return; }
   const bar = document.getElementById('audioBar');
   const open = bar.classList.toggle('open');
   document.getElementById('ttsBtn').classList.toggle('active', open);
@@ -1765,8 +1821,9 @@ function toggleTTS(){
 }
 // התחל מצב אודיו: 'read' רצף · 'repeat' אמור-אחריי · 'loop' בלולאה
 function ttsStart(mode){
-  if (!_ttsSupported()){ _ttsNoVoice(); return; }
+  if (!_ttsSupported() && !_isCloudVoice()){ _ttsNoVoice(); return; }
   _ttsStop();
+  if (_isCloudVoice()) _ttsUnlockAudio(); // שחרור אוטופליי בתוך מחוות-המשתמש
   const cached = S.get('mishnah_cache_' + curId());
   const verses = (cached && cached.he) ? cached.he : (_shinunVerses.length ? _shinunVerses : null);
   if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
@@ -1777,7 +1834,7 @@ function ttsStart(mode){
   } else {
     verses.forEach((v, vi) => _ttsUnits.push({ text:v, vIdx:vi }));
   }
-  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null;
+  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null; _ttsCloudFailed = false;
   // המשך מהמשנה שבה נעצר (אם יש נקודת-המשך לפרק הזה)
   let _resumed = false;
   if (_ttsResume && _ttsResume.chapId === curId()) {
@@ -1803,6 +1860,12 @@ function _ttsSpeakNext(){
   _ttsCurVIdx = unit.vIdx;
   const verseEls = document.querySelectorAll('#textArea .verse');
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
+  // קול ענן איכותי (אם נבחר ולא נכשל) — אחרת קול המכשיר
+  if (_isCloudVoice() && !_ttsCloudFailed) { _ttsCloudUnit(unit, verseEls); return; }
+  _ttsSpeakSS(unit, verseEls);
+}
+// השמעה דרך קול המכשיר (Web Speech)
+function _ttsSpeakSS(unit, verseEls){
   const u = new SpeechSynthesisUtterance(_stripForTts(unit.text));
   u.lang = 'he-IL'; u.rate = 0.9;
   _applyTtsVoice(u);
@@ -1810,28 +1873,14 @@ function _ttsSpeakNext(){
   u.onstart = function(){
     _started = true; _ttsAnySpoke = true;
     _uT0 = (window.performance && performance.now) ? performance.now() : Date.now();
-    const el = verseEls[unit.vIdx];
-    if (el){
-      el.classList.add('tts-speaking');
-      // גלול רק אם המשנה מחוץ לתצוגה, וב-'nearest' כדי לא לקפוץ עד התחתית
-      const ta = document.getElementById('textArea');
-      const er = el.getBoundingClientRect();
-      const cr = ta ? ta.getBoundingClientRect() : { top: 0, bottom: (window.innerHeight || 0) };
-      if (er.top < cr.top || er.bottom > cr.bottom) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    }
+    _ttsHighlight(unit, verseEls);
   };
   u.onend = function(){
     if (!_started && !_ttsAnySpoke && _ttsIdx === 0){ _ttsStop(); _ttsNoVoice(); return; }
     // הקראה שהסתיימה מיידית = אין קול עברי בפועל; עצור והזהר במקום לגלול את כל הפרק בשקט
     const _dur = _uT0 ? (((window.performance && performance.now) ? performance.now() : Date.now()) - _uT0) : 999;
     if (_ttsIdx === 0 && _started && _dur < 140 && _stripForTts(unit.text).length > 8){ _ttsStop(); _ttsNoVoice(); return; }
-    _ttsIdx++;
-    if (_ttsMode === 'repeat') {
-      const pause = Math.max(1400, _stripForTts(unit.text).length * 45); // המתנה לחזרת המשתמש
-      _ttsTimer = setTimeout(function(){ if (_ttsOn) _ttsSpeakNext(); }, pause);
-    } else {
-      _ttsSpeakNext();
-    }
+    _ttsAdvance(unit);
   };
   u.onerror = function(){
     if (!_ttsAnySpoke){ _ttsStop(); _ttsNoVoice(); return; }
