@@ -338,6 +338,27 @@ function _ccFlatSegs(he){
   return [String(he)];
 }
 let _ccPos = 0, _ccCache = {};
+// שולף את כל סעיפי הכלל מ-Sefaria. ה-ref של "כלל N" מתפצל לסעיף א בלבד — לכן אוספים סעיף-סעיף.
+async function _ccFetchPieces(base){
+  if(_ccCache[base]) return _ccCache[base];
+  var clean=function(x){return String(x).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();};
+  var api=function(r){return 'https://www.sefaria.org/api/texts/'+encodeURIComponent(r)+'?lang=he&context=0';};
+  var segs=[];
+  try{ var d=await fetch(api(base)).then(function(r){return r.json();}); segs=_ccFlatSegs(d.he).map(clean).filter(Boolean); }catch(e){}
+  if(segs.length<=1){           // ה-ref התפצל לסעיף בודד — אסוף את כל הסעיפים
+    var all=[];
+    for(var i=1;i<=40;i++){
+      var ss=[];
+      try{ var dd=await fetch(api(base+':'+i)).then(function(r){return r.json();}); ss=_ccFlatSegs(dd.he).map(clean).filter(Boolean); }catch(e){ break; }
+      if(!ss.length) break;
+      all=all.concat(ss);
+    }
+    if(all.length>segs.length) segs=all;
+  }
+  if(!segs.length) segs=[''];
+  _ccCache[base]=segs;
+  return segs;
+}
 async function renderCC(){
   var ref=document.getElementById('ccRef'), txt=document.getElementById('ccText'), info=document.getElementById('ccDailyInfo');
   if(!ref||!txt) return;
@@ -346,24 +367,13 @@ async function renderCC(){
   if(info) info.textContent=(_ccPos===_ccToday())?'📅 הלימוד של היום · מחזור א׳ אלול–כ״ט אב':'יום '+(_ccPos+1)+' מתוך '+_CC_TOTAL+' במחזור';
   txt.textContent='⏳ טוען...';
   try{
-    var data=_ccCache[sec.ref];
-    if(!data){
-      var r=await fetch('https://www.sefaria.org/api/texts/'+encodeURIComponent(sec.ref)+'?lang=he&context=0');
-      data=await r.json(); _ccCache[sec.ref]=data;
-    }
-    var segs=_ccFlatSegs(data.he).map(function(s){return String(s).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();}).filter(Boolean);
-    if(!segs.length){ txt.textContent='לא ניתן לטעון כעת. נסה שוב.'; return; }
-    // פצל את כל טקסט החלק למשפטים, וחלק לפי הימים — כך כל יום מתקדם (גם בחלקים קצרים)
-    var full = segs.join(' ').replace(/\s+/g,' ').trim();
-    var units=[], buf='';
-    for(var ci=0; ci<full.length; ci++){ var ch=full[ci]; buf+=ch; if(ch==='.'||ch==='׃'||ch===':'||ch==='!'||ch==='?'){ var u=buf.trim(); if(u) units.push(u); buf=''; } }
-    { var u2=buf.trim(); if(u2) units.push(u2); }
-    if(!units.length) units=[full];
-    var U=units.length, n=Math.max(1, sec.days), t;
-    if(U>=n){ var a=Math.floor(at.off/n*U), b=Math.floor((at.off+1)/n*U); if(b<=a) b=a+1; t=units.slice(a,b).join(' '); }
-    else { t=units[at.off % U]; }   // פחות משפטים מימים — מחזוריות כדי שכל יום עוקב יהיה שונה
+    var pieces = await _ccFetchPieces(sec.ref);
+    if(!pieces.length || (pieces.length===1 && !pieces[0])){ txt.textContent='לא ניתן לטעון כעת. נסה שוב.'; return; }
+    var P=pieces.length, pi=at.off % P;   // סעיף ליום — מתחלף בכל יום/לחיצה (מחזורי בתוך הכלל)
+    var t=pieces[pi];
+    if(t.length<160 && pieces[(pi+1)%P]) t+=' '+pieces[(pi+1)%P]; // סעיף קצר — צרף את הבא
     if(t.length>1800) t=t.slice(0,1800)+'…';
-    if(ref) ref.textContent = sec.label + ' · יום ' + (at.off+1) + '/' + n;
+    if(ref) ref.textContent = sec.label + (P>1 ? ' · סעיף '+(pi+1)+'/'+P : '');
     txt.textContent=t;
     try{ applyBlessingFont(); }catch(e){}
   }catch(e){ txt.textContent='לא ניתן לטעון כעת — בדוק חיבור לאינטרנט.'; }
