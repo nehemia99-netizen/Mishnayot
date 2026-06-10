@@ -353,15 +353,15 @@ async function renderCC(){
     }
     var segs=_ccFlatSegs(data.he).map(function(s){return String(s).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();}).filter(Boolean);
     if(!segs.length){ txt.textContent='לא ניתן לטעון כעת. נסה שוב.'; return; }
-    // חלק את כל טקסט החלק ל-N מנות יומיות (N=ימי החלק), מיושרות לסוף-משפט — כך כל יום באמת מתקדם
+    // פצל את כל טקסט החלק למשפטים, וחלק לפי הימים — כך כל יום מתקדם (גם בחלקים קצרים)
     var full = segs.join(' ').replace(/\s+/g,' ').trim();
-    var n = Math.max(1, sec.days);
-    var snapEnd = function(idx){ var j=Math.max(0,Math.min(idx, full.length)); while(j<full.length && !/[\.׃:!?]/.test(full[j])) j++; while(j<full.length && /[\.׃:!?\s]/.test(full[j])) j++; return j; };
-    var start = at.off<=0    ? 0          : snapEnd(Math.floor(at.off     / n * full.length));
-    var end   = at.off>=n-1  ? full.length: snapEnd(Math.floor((at.off+1) / n * full.length));
-    if(end<=start) end = full.length;
-    var t = full.slice(start, end).trim();
-    if(!t) t = full.slice(0, 1200);
+    var units=[], buf='';
+    for(var ci=0; ci<full.length; ci++){ var ch=full[ci]; buf+=ch; if(ch==='.'||ch==='׃'||ch===':'||ch==='!'||ch==='?'){ var u=buf.trim(); if(u) units.push(u); buf=''; } }
+    { var u2=buf.trim(); if(u2) units.push(u2); }
+    if(!units.length) units=[full];
+    var U=units.length, n=Math.max(1, sec.days), t;
+    if(U>=n){ var a=Math.floor(at.off/n*U), b=Math.floor((at.off+1)/n*U); if(b<=a) b=a+1; t=units.slice(a,b).join(' '); }
+    else { t=units[at.off % U]; }   // פחות משפטים מימים — מחזוריות כדי שכל יום עוקב יהיה שונה
     if(t.length>1800) t=t.slice(0,1800)+'…';
     if(ref) ref.textContent = sec.label + ' · יום ' + (at.off+1) + '/' + n;
     txt.textContent=t;
