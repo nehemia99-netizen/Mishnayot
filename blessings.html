@@ -353,9 +353,10 @@ async function renderCC(){
     }
     var segs=_ccFlatSegs(data.he).map(function(s){return String(s).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();}).filter(Boolean);
     if(!segs.length){ txt.textContent='לא ניתן לטעון כעת. נסה שוב.'; return; }
-    var si=Math.min(segs.length-1, Math.floor(at.off / sec.days * segs.length));
+    var si = at.off % segs.length;   // קטע ליום — מתקדם בכל יום/לחיצה (מחזורי בתוך החלק)
+    if(ref) ref.textContent = sec.label + (segs.length>1 ? ' · קטע ' + (si+1) + '/' + segs.length : '');
     var t=segs[si];
-    if(t.length<160 && segs[si+1]) t+=' '+segs[si+1]; // משפט קצר — צרף את הבא
+    if(t.length<160 && segs[(si+1)%segs.length]) t+=' '+segs[(si+1)%segs.length]; // קטע קצר — צרף את הבא
     if(t.length>1800) t=t.slice(0,1800)+'…';
     txt.textContent=t;
     try{ applyBlessingFont(); }catch(e){}
