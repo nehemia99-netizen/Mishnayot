@@ -313,10 +313,10 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 
   <!-- Audio bar — הקראה / אמור אחריי / לולאה -->
   <div class="audio-bar" id="audioBar">
-    <button class="audio-opt" id="aopt_read"   onclick="ttsStart('read')">▶<br>קרא ברצף</button>
+    <button class="audio-opt stop" onclick="_ttsStop()">⏹<br>עצור</button>
     <button class="audio-opt" id="aopt_repeat" onclick="ttsStart('repeat')">🗣️<br>אמור אחריי</button>
     <button class="audio-opt" id="aopt_loop"   onclick="ttsStart('loop')">🔁<br>בלולאה</button>
-    <button class="audio-opt stop" onclick="_ttsStop()">⏹<br>עצור</button>
+    <button class="audio-opt" id="aopt_read"   onclick="ttsStart('read')">▶<br>קרא ברצף</button>
   </div>
 
   <!-- Text area -->
