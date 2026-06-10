@@ -95,6 +95,30 @@ html.dark .shinun-bar{background:#1C1235;border-bottom-color:#4A3080;}
 .rt-word.revealed{border-bottom:none;color:var(--primary);}
 html.dark .shinun-lvl{border-color:#5B3090;color:#9B6FE0;}
 .shinun-lvl.active{background:#7B2FF7;color:#fff;border-color:#7B2FF7;}
+/* ── שינון: שבב מצב פעיל + גיליון תחתון (במקום שורת כפתורים תמידית) ── */
+.shinun-chip-wrap{display:none;padding:6px 12px;background:#F5F0FF;border-bottom:.5px solid #C8B0F0;justify-content:center;}
+html.dark .shinun-chip-wrap{background:#1C1235;border-bottom-color:#4A3080;}
+.shinun-chip-wrap.open{display:flex;}
+.shinun-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;border:none;background:#7B2FF7;color:#fff;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;}
+.shinun-chip .chip-help{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+#shinunSheetOv{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9400;opacity:0;pointer-events:none;transition:opacity .25s;}
+#shinunSheetOv.open{opacity:1;pointer-events:auto;}
+#shinunSheet{position:fixed;left:0;right:0;bottom:0;z-index:9401;background:var(--card);border-radius:20px 20px 0 0;box-shadow:0 -4px 32px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);max-height:82vh;overflow-y:auto;padding:0 0 24px;}
+#shinunSheet.open{transform:translateY(0);}
+.shinun-sheet-grip{width:40px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px;}
+.shinun-sheet-title{text-align:center;font-size:15px;font-weight:800;color:var(--text);padding:4px 16px 2px;}
+.shinun-sheet-sub{text-align:center;font-size:12px;color:var(--text-muted);padding:0 22px 8px;line-height:1.5;}
+.shinun-sheet-row{display:flex;align-items:flex-start;gap:12px;padding:11px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;border-top:.5px solid var(--border);}
+.shinun-sheet-row:active{background:var(--surface);}
+.shinun-sheet-row.active{background:#F5F0FF;}
+html.dark .shinun-sheet-row.active{background:#1C1235;}
+.ssr-icon{font-size:21px;line-height:1.3;flex-shrink:0;width:26px;text-align:center;}
+.ssr-body{flex:1;min-width:0;}
+.ssr-name{font-size:14px;font-weight:700;color:var(--text);}
+.shinun-sheet-row.active .ssr-name{color:#7B2FF7;}
+.ssr-desc{font-size:12px;color:var(--text-muted);line-height:1.45;margin-top:2px;}
+.ssr-check{color:#7B2FF7;font-weight:800;font-size:16px;align-self:center;opacity:0;}
+.shinun-sheet-row.active .ssr-check{opacity:1;}
 /* Cover block (level 2) */
 .cover-block{display:inline-block;background:#7B2FF7;border-radius:4px;color:transparent;cursor:pointer;user-select:none;padding:0 4px;min-width:40px;transition:all .25s;vertical-align:baseline;}
 .cover-block.revealed{background:transparent;color:var(--text);}
@@ -264,15 +288,20 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     </div>
   </div>
 
-  <!-- Shinun mode level selector -->
-  <div class="shinun-bar" id="shinunBar">
-    <button class="shinun-lvl active" id="slvl1" onclick="setShinunLevel(1)" data-i18n="read.shinun_review">📖<br>חזרה</button>
-    <button class="shinun-lvl"        id="slvl2" onclick="setShinunLevel(2)" data-i18n="read.shinun_hide_ends">🔲<br>הסתר סיומות</button>
-    <button class="shinun-lvl"        id="slvl5" onclick="setShinunLevel(5)" data-i18n="read.shinun_rashei">🔡<br>ראשי תיבות</button>
-    <button class="shinun-lvl"        id="slvl6" onclick="setShinunLevel(6)" data-i18n="read.shinun_blanks">⬚<br>השלמת מילים</button>
-    <button class="shinun-lvl"        id="slvl3" onclick="setShinunLevel(3)" data-i18n="read.shinun_hint">💡<br>רמז ראשון</button>
-    <button class="shinun-lvl"        id="slvl7" onclick="setShinunLevel(7)" data-i18n="read.shinun_flash">⚡<br>בקיאות</button>
-    <button class="shinun-lvl"        id="slvl4" onclick="setShinunLevel(4)" data-i18n="read.shinun_test">🎯<br>מבחן</button>
+  <!-- Shinun mode — שבב פעיל + גיליון תחתון -->
+  <div class="shinun-chip-wrap" id="shinunChipWrap">
+    <button class="shinun-chip" id="shinunChip" onclick="openShinunSheet()" title="מצב שינון">
+      <span class="chip-help">?</span>
+      <span id="shinunChipLabel">📖 חזרה</span>
+      <span>▾</span>
+    </button>
+  </div>
+  <div id="shinunSheetOv" onclick="closeShinunSheet()"></div>
+  <div id="shinunSheet">
+    <div class="shinun-sheet-grip"></div>
+    <div class="shinun-sheet-title">🧠 מצב שינון</div>
+    <div class="shinun-sheet-sub">בחרו איך לתרגל את המשנה בעל-פה. אפשר להחליף מצב בכל רגע. ליד כל משנה יש גם 🎙️ להקליט את עצמכם ולהשמיע.</div>
+    <div id="shinunSheetList"></div>
   </div>
   <div class="shinun-score-banner" id="shinunBanner"></div>
 
@@ -540,7 +569,7 @@ async function loadChapter(tractateId, perek) {
   // אפס מצב שינון בעת מעבר פרק
   if (shinunActive) {
     shinunLevel = 1;
-    [1,2,3,4].forEach(i => document.getElementById('slvl'+i)?.classList.toggle('active', i===1));
+    if (typeof updateShinunChip === 'function') updateShinunChip(1);
     document.getElementById('shinunBanner').style.display = 'none';
     _testResults = {};
   }
@@ -1981,21 +2010,63 @@ async function delRec(verseNum, btn) {
 })();
 window.addEventListener('pagehide', ()=>{ if(_recMR){ try{_recMR.stop();}catch(e){} } if(_recAudio){ try{_recAudio.pause();}catch(e){} } });
 
+/* ── מצבי שינון: נתונים + גיליון תחתון ── */
+const SHINUN_MODES = {
+  1:{ icon:'📖', he:'חזרה',        en:'Review',       dHe:'קריאה רגילה של המשנה — לחזרה ולשינון בקול.',                 dEn:'Plain reading of the Mishnah — for review and reciting aloud.' },
+  2:{ icon:'🔲', he:'הסתר סיומות', en:'Hide endings', dHe:'סוף כל משנה מוסתר — נסו להשלים בעצמכם, הקישו לחשוף.',          dEn:'The end of each Mishnah is hidden — try to complete it, tap to reveal.' },
+  5:{ icon:'🔡', he:'ראשי תיבות',  en:'Initials',     dHe:'כל מילה מוצגת באות הראשונה בלבד; הקישו לחשוף מילה-מילה.',      dEn:'Each word shows only its first letter; tap to reveal word by word.' },
+  6:{ icon:'⬚',  he:'השלמת מילים', en:'Fill blanks',  dHe:'חלק מהמילים מוסתרות באקראי; הקישו לחשוף כל אחת.',             dEn:'Some words are randomly hidden; tap to reveal each.' },
+  3:{ icon:'💡', he:'רמז ראשון',   en:'First hint',   dHe:'רק המילה הראשונה מוצגת; הקישו לגלות את כל המשנה.',             dEn:'Only the first word shows; tap to reveal the whole Mishnah.' },
+  7:{ icon:'⚡', he:'בקיאות',      en:'Flash',        dHe:'הבזק מהיר — המשנה מוצגת ל-3 שניות ואז נעלמת.',                 dEn:'Quick flash — the Mishnah shows for 3 seconds then disappears.' },
+  4:{ icon:'🎯', he:'מבחן',        en:'Test',         dHe:'מבחן משפט-משפט עם ניקוד ומאסטרי.',                            dEn:'Sentence-by-sentence test with score and mastery.' }
+};
+const SHINUN_ORDER = [1,2,5,6,3,7,4];
+function _shName(m){ return _rLang()==='en' ? m.en : m.he; }
+function _shDesc(m){ return _rLang()==='en' ? m.dEn : m.dHe; }
+function renderShinunSheet(){
+  const list = document.getElementById('shinunSheetList'); if (!list) return;
+  list.innerHTML = SHINUN_ORDER.map(function(n){
+    const m = SHINUN_MODES[n];
+    return '<div class="shinun-sheet-row" id="ssr'+n+'" onclick="setShinunLevel('+n+')">'
+      + '<span class="ssr-icon">'+m.icon+'</span>'
+      + '<span class="ssr-body"><div class="ssr-name">'+_shName(m)+'</div><div class="ssr-desc">'+_shDesc(m)+'</div></span>'
+      + '<span class="ssr-check">✓</span></div>';
+  }).join('');
+}
+function updateShinunChip(lvl){
+  const m = SHINUN_MODES[lvl] || SHINUN_MODES[1];
+  const lbl = document.getElementById('shinunChipLabel'); if (lbl) lbl.textContent = m.icon + ' ' + _shName(m);
+  SHINUN_ORDER.forEach(function(n){ const r = document.getElementById('ssr'+n); if (r) r.classList.toggle('active', n===lvl); });
+}
+function openShinunSheet(){
+  renderShinunSheet(); updateShinunChip(shinunLevel);
+  const ov = document.getElementById('shinunSheetOv'), sh = document.getElementById('shinunSheet');
+  if (ov) ov.classList.add('open'); if (sh) sh.classList.add('open');
+}
+function closeShinunSheet(){
+  const ov = document.getElementById('shinunSheetOv'), sh = document.getElementById('shinunSheet');
+  if (ov) ov.classList.remove('open'); if (sh) sh.classList.remove('open');
+}
+
 function toggleShinunMode() {
   shinunActive = !shinunActive;
   const btn = document.getElementById('shinunModeBtn');
-  const bar = document.getElementById('shinunBar');
   btn.classList.toggle('active', shinunActive);
-  bar.classList.toggle('open', shinunActive);
+  document.getElementById('shinunChipWrap').classList.toggle('open', shinunActive);
   document.body.classList.toggle('reader-shinun', shinunActive); // הצג כפתורי הקלטה רק במצב שינון
   document.getElementById('shinunBanner').style.display = 'none';
   _ttsStop();
 
   if (shinunActive) {
-    // אין לסמן אוטומטית "ידעתי בע״פ" עם הכניסה למצב שינון — זהו תרגול בלבד
-    setShinunLevel(1);
-    showToast(_rLang()==='en' ? '🧠 Memorization mode is on — 4 hide levels, plus a 🎙️ button on each Mishnah to record yourself and play it back' : '🧠 מצב שינון פעיל — 4 שלבי הסתרה, ולצד כל משנה כפתור 🎙️ להקליט את עצמך ולהשמיע', { big:true, dur:5500 });
+    renderShinunSheet();
+    setShinunLevel(1);            // ברירת מחדל: חזרה
+    // בפעם הראשונה — פתח את הגיליון כדי שהמשתמש יראה את ההסברים
+    if (!localStorage.getItem('shinun_sheet_seen')) {
+      try { localStorage.setItem('shinun_sheet_seen', '1'); } catch(e){}
+      openShinunSheet();
+    }
   } else {
+    closeShinunSheet();
     shinunLevel = 1;
     // Restore normal view
     const cached = S.get('mishnah_cache_' + curId());
@@ -2007,10 +2078,8 @@ function setShinunLevel(lvl) {
   shinunLevel = lvl;
   _reviewSet = null; _passNum = 0;   // איפוס לולאת החזרה
   _ttsStop();
-  [1,2,3,4,5,6,7].forEach(i => {
-    const el = document.getElementById('slvl'+i);
-    if (el) el.classList.toggle('active', i===lvl);
-  });
+  updateShinunChip(lvl);   // עדכן את השבב + סמן את המצב הפעיל בגיליון
+  closeShinunSheet();      // אחרי בחירה — סגור את הגיליון, אזור הקריאה נשאר נקי
   document.getElementById('shinunBanner').style.display = 'none';
   const cached = S.get('mishnah_cache_' + curId());
   if (cached && cached.he) renderShinunVerses(cached.he, lvl);
