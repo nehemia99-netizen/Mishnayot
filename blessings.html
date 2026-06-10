@@ -353,11 +353,17 @@ async function renderCC(){
     }
     var segs=_ccFlatSegs(data.he).map(function(s){return String(s).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();}).filter(Boolean);
     if(!segs.length){ txt.textContent='לא ניתן לטעון כעת. נסה שוב.'; return; }
-    var si = at.off % segs.length;   // קטע ליום — מתקדם בכל יום/לחיצה (מחזורי בתוך החלק)
-    if(ref) ref.textContent = sec.label + (segs.length>1 ? ' · קטע ' + (si+1) + '/' + segs.length : '');
-    var t=segs[si];
-    if(t.length<160 && segs[(si+1)%segs.length]) t+=' '+segs[(si+1)%segs.length]; // קטע קצר — צרף את הבא
+    // חלק את כל טקסט החלק ל-N מנות יומיות (N=ימי החלק), מיושרות לסוף-משפט — כך כל יום באמת מתקדם
+    var full = segs.join(' ').replace(/\s+/g,' ').trim();
+    var n = Math.max(1, sec.days);
+    var snapEnd = function(idx){ var j=Math.max(0,Math.min(idx, full.length)); while(j<full.length && !/[\.׃:!?]/.test(full[j])) j++; while(j<full.length && /[\.׃:!?\s]/.test(full[j])) j++; return j; };
+    var start = at.off<=0    ? 0          : snapEnd(Math.floor(at.off     / n * full.length));
+    var end   = at.off>=n-1  ? full.length: snapEnd(Math.floor((at.off+1) / n * full.length));
+    if(end<=start) end = full.length;
+    var t = full.slice(start, end).trim();
+    if(!t) t = full.slice(0, 1200);
     if(t.length>1800) t=t.slice(0,1800)+'…';
+    if(ref) ref.textContent = sec.label + ' · יום ' + (at.off+1) + '/' + n;
     txt.textContent=t;
     try{ applyBlessingFont(); }catch(e){}
   }catch(e){ txt.textContent='לא ניתן לטעון כעת — בדוק חיבור לאינטרנט.'; }
