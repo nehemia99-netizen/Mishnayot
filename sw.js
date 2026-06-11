@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════
-   משנתי — Service Worker v1.5.62
+   משנתי — Service Worker v1.5.63
    (מבוסס על מנוע תהילהון 2.7.83 — מזלג עצמאי)
    • קבצי האפליקציה (HTML/JS) → Network-First (רענון מיידי, fallback לcache)
    • Sefaria API → Network-First
    • CDN (Chart.js וכו') → Cache-First
 ═══════════════════════════════════════════════════ */
 
-const CACHE_VER  = 'mishnayon-v1.5.62';
+const CACHE_VER  = 'mishnayon-v1.5.63';
 const SEFARIA    = 'www.sefaria.org';
 
 const APP_SHELL  = [
@@ -24,6 +24,7 @@ const APP_SHELL  = [
   './terms.html',
   './manifest.json',
   './utils.js',
+  './errlog.js',
   './corpus.js',
   './bottomnav.js',
   './i18n.js',

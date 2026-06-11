@@ -5,7 +5,7 @@
  */
 
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, addDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
   getAuth,
@@ -224,6 +224,40 @@ export async function signOutUser() {
 }
 
 /* ════════════════════════════════════════════
+   ERROR LOGS — העלאת מאגר השגיאות (errlog.js) ל-Firestore
+════════════════════════════════════════════ */
+export async function flushErrorLogs(uid) {
+  let arr;
+  try {
+    const raw = localStorage.getItem('tehillim_errlog');
+    if (!raw) return;
+    arr = JSON.parse(raw) || [];
+  } catch (e) { return; }
+  if (!arr.length) return;
+  const owner = uid || (auth.currentUser && auth.currentUser.uid) || 'anon';
+  for (let i = 0; i < arr.length; i++) {
+    const r = arr[i] || {};
+    try {
+      await addDoc(collection(db, 'errorLogs'), {
+        kind:     String(r.kind  || '').slice(0, 20),
+        msg:      String(r.msg   || '').slice(0, 500),
+        stack:    String(r.stack || '').slice(0, 1500),
+        url:      String(r.url   || '').slice(0, 200),
+        ua:       String(r.ua    || '').slice(0, 200),
+        ver:      String(r.ver   || '').slice(0, 40),
+        n:        (r.n || 1),
+        clientTs: r.ts || Date.now(),
+        uid:      owner,
+        ts:       serverTimestamp()
+      });
+    } catch (e) {
+      return; // נחסם (rules לא פרוסים / אופליין) — השאר במאגר לניסיון הבא
+    }
+  }
+  try { localStorage.removeItem('tehillim_errlog'); } catch (e) {}
+}
+
+/* ════════════════════════════════════════════
    INIT AUTH — נקרא מכל דף
 ════════════════════════════════════════════ */
 export async function initAuth() {
@@ -241,12 +275,14 @@ export async function initAuth() {
             await downloadFromCloud(user.uid);
           }
         }
+        flushErrorLogs(user.uid); // העלה שגיאות שנאספו (אם יש)
         resolve(user);
       } else {
         // אין משתמש — כניסה אנונימית
         try {
           const cred = await signInAnonymously(auth);
           S.set('tehillim_uid', cred.user.uid);
+          flushErrorLogs(cred.user.uid); // העלה שגיאות שנאספו (אם יש)
           resolve(cred.user);
         } catch(e) {
           console.warn('Anonymous auth failed:', e.code);

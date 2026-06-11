@@ -51,6 +51,13 @@ service cloud.firestore {
       allow read, write: if isOwner(uid);
     }
 
+    // ── errorLogs — לוג שגיאות; כל מחובר יכול ליצור, אך אסור לקרוא/לשנות/למחוק מהלקוח
+    //    (קוראים את הלוגים רק בקונסולת Firebase כאדמין). שדות מוגבלים בגודל/סוג. ──
+    match /errorLogs/{doc} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if false;
+    }
+
     // ── ברירת מחדל: חסום הכל ──
     match /{document=**} {
       allow read, write: if false;
