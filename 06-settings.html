@@ -120,7 +120,7 @@ html.dark .account-card{box-shadow:none;}
 .google-btn:active{transform:scale(.97);}
 html.dark .google-btn{background:var(--surface);}
 </style>
-<script src="errlog.js?v=1.5.64"></script>
+<script src="errlog.js?v=1.5.65"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="notifications.js?v=2.2.33" defer></script>
 <script src="fcm.js?v=3"></script>
@@ -459,7 +459,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.64 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.65 BETA · © 2026</div>
 </div>
 
 <script>
@@ -937,7 +937,9 @@ function inviteFriend() {
   }
 }
 function rateApp() {
-  alert('דרוג האפליקציה יהיה זמין לאחר פרסום בחנויות.\n\nבינתיים — תודה שאתה משתמש במשנתי!');
+  // דירוג בחנויות עדיין לא זמין — מפנים לסקר (שם יש דירוג ⭐ + משוב)
+  if (typeof openSurvey === 'function') openSurvey();
+  else alert('תודה! מוזמנים למלא את הסקר הקצר בהגדרות 🙏');
 }
 async function togglePush() {
   const t = document.getElementById('tRemPush');
