@@ -258,6 +258,29 @@ export async function flushErrorLogs(uid) {
 }
 
 /* ════════════════════════════════════════════
+   SURVEY — שליחת תשובות סקר ל-Firestore (collection: surveys)
+════════════════════════════════════════════ */
+export async function submitSurvey(answers) {
+  const uid = (auth.currentUser && auth.currentUser.uid) || 'anon';
+  let ver = '';
+  try { const v = document.querySelector('.app-version, .version-note'); ver = v ? (v.textContent || '').trim().slice(0, 40) : ''; } catch (e) {}
+  await addDoc(collection(db, 'surveys'), {
+    app:          'mishnati',
+    freq:         String(answers.freq || ''),
+    use:          (answers.use || []).slice(0, 12).map(s => String(s).slice(0, 30)),
+    fav:          (answers.fav || []).slice(0, 3).map(s => String(s).slice(0, 30)),
+    satisfaction: Number(answers.satisfaction) || 0,
+    nps:          (answers.nps === '' || answers.nps == null) ? -1 : Number(answers.nps),
+    source:       String(answers.source || ''),
+    missing:      String(answers.missing || '').slice(0, 1000),
+    problems:     String(answers.problems || '').slice(0, 1000),
+    comments:     String(answers.comments || '').slice(0, 1000),
+    ver, uid,
+    ts: serverTimestamp()
+  });
+}
+
+/* ════════════════════════════════════════════
    INIT AUTH — נקרא מכל דף
 ════════════════════════════════════════════ */
 export async function initAuth() {

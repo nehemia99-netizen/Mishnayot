@@ -120,7 +120,7 @@ html.dark .account-card{box-shadow:none;}
 .google-btn:active{transform:scale(.97);}
 html.dark .google-btn{background:var(--surface);}
 </style>
-<script src="errlog.js?v=1.5.63"></script>
+<script src="errlog.js?v=1.5.64"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="notifications.js?v=2.2.33" defer></script>
 <script src="fcm.js?v=3"></script>
@@ -422,6 +422,10 @@ html.dark .google-btn{background:var(--surface);}
       <div class="row-left"><span class="row-icon">⭐</span><div class="row-label" data-i18n="set.rate">דרג אותנו</div></div>
       <span class="chevron">‹</span>
     </div>
+    <div class="row" onclick="openSurvey()" style="cursor:pointer;">
+      <div class="row-left"><span class="row-icon">📝</span><div class="row-label">ספרו לנו מה דעתכם<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">סקר קצר (2 דק׳) — עוזר לנו להשתפר 🙏</div></div></div>
+      <span class="chevron">‹</span>
+    </div>
     <a class="row" href="terms.html" style="text-decoration:none;color:inherit;">
       <div class="row-left"><span class="row-icon">📋</span><div class="row-label" data-i18n="set.terms">תנאי שימוש ופרטיות</div></div>
       <span class="chevron">‹</span>
@@ -455,7 +459,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.63 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.64 BETA · © 2026</div>
 </div>
 
 <script>
@@ -1046,8 +1050,9 @@ function showSettingsToast(msg) {
 </script>
 
 <script type="module">
-import { initAuth, signInWithGoogle, signOutUser, isGoogleUser, getGoogleUserInfo, uploadToCloud, startAutoSync }
+import { initAuth, signInWithGoogle, signOutUser, isGoogleUser, getGoogleUserInfo, uploadToCloud, startAutoSync, submitSurvey }
   from './auth.js';
+window.submitSurvey = submitSurvey; // לזמינות מתוך מודאל הסקר (onclick גלובלי)
 
 let _authUser = null;
 
@@ -1184,6 +1189,146 @@ document.addEventListener('DOMContentLoaded', function() {
   // loadSettings חייב תמיד לרוץ — בכל מוד!
   if (typeof loadSettings === 'function') loadSettings();
 });
+</script>
+<!-- ══ מודאל סקר משתמשים ══ -->
+<style>
+#surveyOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:18px 0;-webkit-tap-highlight-color:transparent;}
+#surveyOverlay.open{display:flex;}
+.sv-card{background:var(--card);border-radius:20px;width:min(440px,93vw);margin:auto;box-shadow:0 16px 48px rgba(0,0,0,.3);overflow:hidden;}
+.sv-head{position:sticky;top:0;background:var(--card);padding:16px 20px 12px;border-bottom:.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.sv-title{font-size:16px;font-weight:800;color:var(--text);}
+.sv-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.sv-x{background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;line-height:1;padding:0 4px;}
+.sv-q{padding:15px 20px 3px;}
+.sv-q-t{font-size:14px;font-weight:700;color:var(--text);margin-bottom:9px;}
+.sv-opts{display:flex;flex-wrap:wrap;gap:7px;}
+.sv-opt input{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+.sv-opt label{display:inline-block;padding:7px 13px;border-radius:18px;border:1px solid var(--border);background:var(--surface);font-size:13px;color:var(--text);cursor:pointer;transition:all .12s;}
+.sv-opt input:checked + label{background:var(--primary);color:#fff;border-color:var(--primary);}
+.sv-cat{font-size:11px;color:var(--primary);margin:11px 0 5px;font-weight:700;}
+.sv-text{width:100%;min-height:50px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;font-family:inherit;font-size:14px;color:var(--text);background:var(--surface);resize:vertical;box-sizing:border-box;}
+.sv-submit{width:calc(100% - 40px);margin:18px 20px 4px;padding:14px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sv-submit:disabled{opacity:.5;}
+</style>
+<div id="surveyOverlay" onclick="if(event.target===this)closeSurvey()">
+  <div class="sv-card">
+    <div class="sv-head">
+      <div><div class="sv-title">📝 ספרו לנו מה דעתכם</div><div class="sv-sub">סקר קצר (~2 דק׳) · אנונימי · עוזר לנו להשתפר</div></div>
+      <button class="sv-x" onclick="closeSurvey()">✕</button>
+    </div>
+    <div id="svBody">
+
+      <div class="sv-q"><div class="sv-q-t">1. כל כמה זמן אתם משתמשים?</div><div class="sv-opts">
+        <span class="sv-opt"><input type="radio" name="sv_freq" id="f1" value="כמה פעמים ביום"><label for="f1">כמה פעמים ביום</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_freq" id="f2" value="כל יום"><label for="f2">כל יום</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_freq" id="f3" value="כמה פעמים בשבוע"><label for="f3">כמה פעמים בשבוע</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_freq" id="f4" value="מדי פעם"><label for="f4">מדי פעם</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_freq" id="f5" value="פעם ראשונה"><label for="f5">פעם ראשונה</label></span>
+      </div></div>
+
+      <div class="sv-q"><div class="sv-q-t">2. מה השימוש העיקרי שלכם? (אפשר כמה)</div><div class="sv-opts" id="svUse">
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u1" value="משנה יומית"><label for="u1">משנה יומית</label></span>
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u2" value="שינון בעל-פה"><label for="u2">שינון בעל-פה</label></span>
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u3" value="לעילוי נשמה/רפואה"><label for="u3">לעילוי נשמה/רפואה</label></span>
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u4" value="מעקב והישגים"><label for="u4">מעקב והישגים</label></span>
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u5" value="לימוד בקבוצה"><label for="u5">לימוד בקבוצה</label></span>
+        <span class="sv-opt"><input type="checkbox" class="sv_use" id="u6" value="ברכות ולימוד יומי"><label for="u6">ברכות ולימוד יומי</label></span>
+      </div></div>
+
+      <div class="sv-q"><div class="sv-q-t">3. מה הכי אהוב עליכם? <b>בחרו עד 3</b></div>
+        <div class="sv-cat">📖 לימוד ובחירה</div><div class="sv-opts">
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v1" value="משנה אקראית"><label for="v1">🎲 משנה אקראית</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v2" value="שקשוק לאקראי"><label for="v2">שקשוק לאקראי</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v3" value="דרכים לבחור פרק"><label for="v3">דרכים לבחור פרק</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v4" value="המשנה שלי"><label for="v4">המשנה שלי</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v5" value="מועדפים"><label for="v5">מועדפים</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v6" value="משניות שמורות"><label for="v6">משניות שמורות</label></span>
+        </div>
+        <div class="sv-cat">🧠 שינון</div><div class="sv-opts">
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v7" value="מצבי שינון"><label for="v7">מצבי שינון</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v8" value="הקלטה עצמית"><label for="v8">הקלטה עצמית</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v9" value="הקראה קולית"><label for="v9">הקראה קולית</label></span>
+        </div>
+        <div class="sv-cat">📊 מעקב והישגים</div><div class="sv-opts">
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v10" value="רצף יומי"><label for="v10">רצף יומי</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v11" value="גרפים ומעקבים"><label for="v11">גרפים ומעקבים</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v12" value="היסטוריית קריאה"><label for="v12">היסטוריית קריאה</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v13" value="צבירת זכויות"><label for="v13">צבירת זכויות</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v14" value="אתגרים"><label for="v14">אתגרים</label></span>
+        </div>
+        <div class="sv-cat">👥 קהילה</div><div class="sv-opts">
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v15" value="לוח מובילים"><label for="v15">לוח מובילים</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v16" value="פרקים לוהטים"><label for="v16">פרקים לוהטים</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v17" value="קבוצות ואתגרי קבוצה"><label for="v17">קבוצות ואתגרי קבוצה</label></span>
+        </div>
+        <div class="sv-cat">✨ ייעודי וכללי</div><div class="sv-opts">
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v18" value="מחולל רצף"><label for="v18">מחולל רצף</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v19" value="לימוד לעילוי נשמה/רפואה"><label for="v19">לעילוי נשמה/רפואה</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v20" value="לימוד לאזכרה"><label for="v20">לימוד לאזכרה</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v21" value="ברכות ולימוד יומי"><label for="v21">ברכות ולימוד יומי</label></span>
+          <span class="sv-opt"><input type="checkbox" class="sv_fav" onchange="_svLimitFav(this)" id="v22" value="העיצוב והנוחות"><label for="v22">העיצוב והנוחות</label></span>
+        </div>
+      </div>
+
+      <div class="sv-q"><div class="sv-q-t">4. עד כמה אתם מרוצים?</div><div class="sv-opts">
+        <span class="sv-opt"><input type="radio" name="sv_sat" id="s1" value="1"><label for="s1">1</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_sat" id="s2" value="2"><label for="s2">2</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_sat" id="s3" value="3"><label for="s3">3</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_sat" id="s4" value="4"><label for="s4">4</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_sat" id="s5" value="5"><label for="s5">5 ⭐</label></span>
+      </div></div>
+
+      <div class="sv-q"><div class="sv-q-t">5. מה הכי חסר לכם? מה נוסיף?</div><textarea class="sv-text" id="sv_missing" placeholder="כתבו כאן…"></textarea></div>
+
+      <div class="sv-q"><div class="sv-q-t">6. משהו שמפריע / לא עובד טוב?</div><textarea class="sv-text" id="sv_problems" placeholder="כתבו כאן…"></textarea></div>
+
+      <div class="sv-q"><div class="sv-q-t">7. עד כמה סביר שתמליצו לחבר? (0–10)</div><div class="sv-opts" id="svNps"></div></div>
+
+      <div class="sv-q"><div class="sv-q-t">8. איך הגעתם לאפליקציה?</div><div class="sv-opts">
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o1" value="חבר/משפחה"><label for="o1">חבר/משפחה</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o2" value="וואטסאפ"><label for="o2">וואטסאפ</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o3" value="חיפוש בגוגל"><label for="o3">חיפוש בגוגל</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o4" value="רב/מורה"><label for="o4">רב/מורה</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o5" value="בית כנסת"><label for="o5">בית כנסת</label></span>
+        <span class="sv-opt"><input type="radio" name="sv_source" id="o6" value="אחר"><label for="o6">אחר</label></span>
+      </div></div>
+
+      <div class="sv-q"><div class="sv-q-t">9. משהו נוסף שתרצו לומר? (לא חובה)</div><textarea class="sv-text" id="sv_comments" placeholder="כתבו כאן…"></textarea></div>
+
+      <button class="sv-submit" id="svSubmitBtn" onclick="_svSubmit()">שליחה</button>
+    </div>
+  </div>
+</div>
+<script>
+// בניית כפתורי NPS 0-10
+(function(){ var n=document.getElementById('svNps'); if(n){ var h=''; for(var i=0;i<=10;i++){ h+='<span class="sv-opt"><input type="radio" name="sv_nps" id="n'+i+'" value="'+i+'"><label for="n'+i+'" style="padding:7px 11px;">'+i+'</label></span>'; } n.innerHTML=h; } })();
+function openSurvey(){ var o=document.getElementById('surveyOverlay'); if(o){ o.classList.add('open'); o.scrollTop=0; } }
+function closeSurvey(){ var o=document.getElementById('surveyOverlay'); if(o) o.classList.remove('open'); }
+function _svToast(m){ try{ if(typeof _miniToast==='function'){ _miniToast(m); return; } }catch(e){} alert(m); }
+function _svLimitFav(cb){
+  if(document.querySelectorAll('.sv_fav:checked').length > 3){ cb.checked=false; _svToast('אפשר לבחור עד 3 ⭐'); }
+}
+function _svCollect(){
+  var pick=function(name){ var el=document.querySelector('input[name="'+name+'"]:checked'); return el?el.value:''; };
+  var multi=function(cls){ return Array.prototype.slice.call(document.querySelectorAll('.'+cls+':checked')).map(function(e){return e.value;}); };
+  var val=function(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; };
+  return { freq:pick('sv_freq'), use:multi('sv_use'), fav:multi('sv_fav'), satisfaction:pick('sv_sat'), nps:pick('sv_nps'), source:pick('sv_source'), missing:val('sv_missing'), problems:val('sv_problems'), comments:val('sv_comments') };
+}
+async function _svSubmit(){
+  var data=_svCollect();
+  // דרוש מינימום משהו אחד כדי לא לשלוח ריק
+  if(!data.freq && !data.use.length && !data.fav.length && !data.satisfaction && !data.nps && !data.missing && !data.problems && !data.comments){ _svToast('סמנו לפחות תשובה אחת 🙂'); return; }
+  var btn=document.getElementById('svSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent='שולח…'; }
+  try{
+    if(typeof window.submitSurvey!=='function') throw new Error('not ready');
+    await window.submitSurvey(data);
+    try{ localStorage.setItem('survey_done', new Date().toISOString().slice(0,10)); }catch(e){}
+    document.getElementById('svBody').innerHTML='<div style="text-align:center;padding:44px 24px;"><div style="font-size:50px;">🙏</div><div style="font-size:19px;font-weight:800;color:var(--text);margin-top:12px;">תודה רבה!</div><div style="font-size:14px;color:var(--text-muted);margin-top:8px;line-height:1.6;">המשוב שלכם עוזר לנו מאוד לשפר את האפליקציה.</div><button onclick="closeSurvey()" style="margin-top:24px;padding:12px 34px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">סגירה</button></div>';
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='שליחה'; }
+    _svToast('השליחה נכשלה — בדקו חיבור לאינטרנט ונסו שוב');
+  }
+}
 </script>
 <script src="bottomnav.js?v=2.2.0"></script>
 </body>

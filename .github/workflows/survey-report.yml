@@ -1,0 +1,20 @@
+name: Survey report (manual)
+on:
+  workflow_dispatch: {}
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm i firebase-admin@12
+      - name: Generate survey report
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+        run: node scripts/survey-report.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-report
+          path: survey-report.md
