@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="errlog.js?v=1.5.65"></script>
+<script src="errlog.js?v=1.5.66"></script>
 <script>(function(){try{var u=new URLSearchParams(location.search).get('lang');if(u==='en'||u==='he'){var s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(s.lang!==u){s.lang=u;localStorage.setItem('tehillim_settings',JSON.stringify(s));}}}catch(e){}}());</script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3A7D44">
@@ -19,7 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.65"></script>
+<script src="gamification.js?v=1.5.66"></script>
 <script src="notifications.js?v=2.2.33"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.65 BETA</div>
+          <div class="app-version">גרסה 1.5.66 BETA</div>
         </div>
       </div>
     </div>
@@ -1109,6 +1109,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   }
   setTimeout(() => _tryShowMyChapterBanner(0), 1500);
+  setTimeout(() => { try { if (typeof _maybeSurveyPrompt === 'function') _maybeSurveyPrompt(); } catch(e){} }, 4500);
   try{ if(typeof renderSrsCard==='function')renderSrsCard(); }catch(e){}
   try{ if(typeof updateGamStrip==='function')updateGamStrip(); }catch(e){}
   // leaderboard — ברירת מחדל ON בטעינה ראשונה
@@ -1400,6 +1401,44 @@ function _removeMyChapter(){
   const b = document.getElementById('_myChapBanner'); if (b) b.remove();
   showToast('סימון "המשנה שלי" הוסר');
 }
+
+/* ── הזמנה למילוי סקר — למשתמש מעורב (≥10 קריאות ו-≥5 ימים שונים) ── */
+const SURVEY_MIN_READINGS = 10;   // ניתן לשנות
+const SURVEY_MIN_DAYS     = 5;    // מספר ימים שונים שבהם למד
+function _dPlus(days){ const d = new Date(); d.setDate(d.getDate() + days); return localDateStr(d); }
+function _maybeSurveyPrompt(){
+  try{
+    if (localStorage.getItem('survey_done')) return;                 // כבר מילא
+    const st = localStorage.getItem('survey_prompt') || '';
+    if (st === 'no') return;                                          // ביקש לא להציג
+    if (st.indexOf('snooze:') === 0 && localDateStr() < st.slice(7)) return; // בדחייה
+    const readings = (S.get('tehillim_readings') || []).filter(r => r && !r.partial);
+    if (readings.length < SURVEY_MIN_READINGS) return;
+    const days = new Set(readings.map(r => r.date)).size;
+    if (days < SURVEY_MIN_DAYS) return;
+    if (document.getElementById('_myChapBanner') || document.getElementById('_surveyPrompt')) return; // לא להתנגש בבאנר אחר
+    _showSurveyPrompt();
+  }catch(e){}
+}
+function _showSurveyPrompt(){
+  const d = document.createElement('div');
+  d.id = '_surveyPrompt';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;display:flex;align-items:center;justify-content:center;';
+  d.innerHTML = '<div style="background:var(--card);border-radius:22px;padding:26px 22px;max-width:330px;width:88%;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.3);">'
+    + '<div style="font-size:42px;margin-bottom:8px;">🙏</div>'
+    + '<div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">נשמח לדעת מה דעתך</div>'
+    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">אתה כבר משתמש קבוע 🙂 סקר קצר של 2 דקות יעזור לנו מאוד לשפר את האפליקציה.</div>'
+    + '<button onclick="_surveyPromptGo()" style="width:100%;padding:12px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">מלא עכשיו ←</button>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button onclick="_surveyPromptSnooze()" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">אחר כך</button>'
+    + '<button onclick="_surveyPromptNo()" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text-muted);font-size:13px;cursor:pointer;font-family:inherit;">לא תודה</button>'
+    + '</div></div>';
+  d.onclick = function(e){ if (e.target === d) _surveyPromptSnooze(); };
+  document.body.appendChild(d);
+}
+function _surveyPromptGo(){ try{ localStorage.setItem('survey_prompt', 'snooze:' + _dPlus(30)); }catch(e){} location.href = '06-settings.html?survey=1'; }
+function _surveyPromptSnooze(){ try{ localStorage.setItem('survey_prompt', 'snooze:' + _dPlus(4)); }catch(e){} const p = document.getElementById('_surveyPrompt'); if (p) p.remove(); }
+function _surveyPromptNo(){ try{ localStorage.setItem('survey_prompt', 'no'); }catch(e){} const p = document.getElementById('_surveyPrompt'); if (p) p.remove(); }
 
 function showToast(msg) {
   var t = document.getElementById('_dash_toast');

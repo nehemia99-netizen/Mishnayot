@@ -120,7 +120,7 @@ html.dark .account-card{box-shadow:none;}
 .google-btn:active{transform:scale(.97);}
 html.dark .google-btn{background:var(--surface);}
 </style>
-<script src="errlog.js?v=1.5.65"></script>
+<script src="errlog.js?v=1.5.66"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="notifications.js?v=2.2.33" defer></script>
 <script src="fcm.js?v=3"></script>
@@ -459,7 +459,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.65 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.66 BETA · © 2026</div>
 </div>
 
 <script>
@@ -1304,6 +1304,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // בניית כפתורי NPS 0-10
 (function(){ var n=document.getElementById('svNps'); if(n){ var h=''; for(var i=0;i<=10;i++){ h+='<span class="sv-opt"><input type="radio" name="sv_nps" id="n'+i+'" value="'+i+'"><label for="n'+i+'" style="padding:7px 11px;">'+i+'</label></span>'; } n.innerHTML=h; } })();
+// פתיחה אוטומטית כשמגיעים מהפופ-אפ בדף הבית (?survey=1)
+try{ if(new URLSearchParams(location.search).get('survey')==='1') setTimeout(function(){ openSurvey(); }, 350); }catch(e){}
 function openSurvey(){ var o=document.getElementById('surveyOverlay'); if(o){ o.classList.add('open'); o.scrollTop=0; } }
 function closeSurvey(){ var o=document.getElementById('surveyOverlay'); if(o) o.classList.remove('open'); }
 function _svToast(m){ try{ if(typeof _miniToast==='function'){ _miniToast(m); return; } }catch(e){} alert(m); }
