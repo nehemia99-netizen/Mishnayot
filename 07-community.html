@@ -110,7 +110,7 @@ html.dark .group-header-card{background:linear-gradient(135deg,#16401E,#122E18);
 @keyframes spin{to{transform:rotate(360deg);}}
 .section-label{font-size:11px;color:var(--text-muted);padding:12px 16px 5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
 </style>
-<script src="errlog.js?v=1.5.68"></script>
+<script src="errlog.js?v=1.5.69"></script>
 <script src="shake.js?v=2.2.32"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=2.2.0"></script>
@@ -159,7 +159,20 @@ html.dark .group-header-card{background:linear-gradient(135deg,#16401E,#122E18);
     <div class="divider"></div>
 
     <div class="section">
-      <div class="section-title" data-i18n="comm.leaderboard">🏆 לוח המובילים — השבוע</div>
+      <div class="section-title" data-i18n="comm.leaderboard">🏆 לוחות מובילים</div>
+      <style>
+        .lb-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+        .lb-tabs::-webkit-scrollbar{display:none;}
+        .lb-tab{flex:0 0 auto;font-size:12px;padding:6px 12px;border-radius:18px;border:.5px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;white-space:nowrap;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:all .12s;}
+        .lb-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:700;}
+      </style>
+      <div class="lb-tabs">
+        <button class="lb-tab active" onclick="switchLb('score',this)">🏆 מעלות</button>
+        <button class="lb-tab" onclick="switchLb('medals',this)">🎖️ מדליות</button>
+        <button class="lb-tab" onclick="switchLb('streak',this)">🔥 רצף</button>
+        <button class="lb-tab" onclick="switchLb('monthly',this)">🗓️ החודש</button>
+        <button class="lb-tab" onclick="switchLb('memorized',this)">📚 בקיאות</button>
+      </div>
       <div id="leaderboard"></div>
     </div>
   </div>
@@ -305,6 +318,54 @@ function avatarColor(str) {
   return colors[h % colors.length];
 }
 
+/* ── לוחות מובילים מרובי-מדדים ── */
+let _lbCtx = null, _lbMetric = 'score';
+const LB_METRICS = {
+  score:    { field:'score',     icon:'⭐',  sub:'זכויות כוללות' },
+  medals:   { field:'medals',    icon:'🎖️', sub:'מדליות' },
+  streak:   { field:'streak',    icon:'🔥',  sub:'ימי רצף' },
+  monthly:  { field:'monthly',   icon:'🗓️', sub:'זכויות החודש' },
+  memorized:{ field:'memorized', icon:'📚',  sub:'משניות בע״פ' }
+};
+async function _ensureLbCtx() {
+  if (_lbCtx) return _lbCtx;
+  const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const { getFirestore, collection, getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const { getAuth, onAuthStateChanged, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const FB_CFG = { apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA", authDomain:"mishnayot-71073.firebaseapp.com", projectId:"mishnayot-71073", storageBucket:"mishnayot-71073.firebasestorage.app", messagingSenderId:"445059664136", appId:"1:445059664136:web:fec8a4f338fd326d3b04bd" };
+  const app = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  await new Promise(res => { onAuthStateChanged(auth, async u => { if (u) return res(u); try { const c = await signInAnonymously(auth); res(c.user); } catch(e){ res(null); } }); });
+  _lbCtx = { db, collection, getDocs, query, orderBy, limit };
+  return _lbCtx;
+}
+async function renderLeaderboard(metric) {
+  const cfg = LB_METRICS[metric] || LB_METRICS.score;
+  const el = document.getElementById('leaderboard');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען...</div>';
+  try {
+    const { db, collection, getDocs, query, orderBy, limit } = await _ensureLbCtx();
+    const snap = await getDocs(query(collection(db, 'leaderboard'), orderBy(cfg.field, 'desc'), limit(10)));
+    const ranks = ['🥇','🥈','🥉'];
+    const docs = snap.docs.filter(d => d.data().displayName && (+(d.data()[cfg.field] || 0) > 0));
+    if (!docs.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">עדיין אין נתונים בלוח הזה 🌱<br>היה הראשון!</div>'; return; }
+    el.innerHTML = docs.map((d, i) => {
+      const u = d.data(); const name = u.displayName; const init = name[0] || '?'; const bg = avatarColor(d.id);
+      const medal = i < 3 ? ranks[i] : '';
+      const val = (+(u[cfg.field] || 0)).toLocaleString();
+      return `<div class="user-row"><span class="rank-num">${i+1}</span><div class="avatar" style="background:${bg}">${init}</div><div class="user-info"><div class="user-name">${name} ${medal}</div><div class="user-sub">${cfg.sub}</div></div><span class="user-pts">${cfg.icon} ${val}</span></div>`;
+    }).join('');
+  } catch(e) { console.warn('renderLeaderboard:', e); el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⚠️ שגיאה בטעינה</div>'; }
+}
+function switchLb(metric, btn) {
+  _lbMetric = metric;
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderLeaderboard(metric);
+}
+
 // מצב טעינה
 document.getElementById('hotList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען נתונים...</div>';
 document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">⏳ טוען נתונים...</div>';
@@ -363,31 +424,10 @@ async function loadCommunityData() {
       if (sd) sd.textContent = todayChaps.toLocaleString();
     } catch(e2) { /* אגרגציה לא זמינה — לא סורקים את כל הקולקציה */ }
 
-    // ── לוח מובילים ──
-    const lbSnap = await getDocs(query(collection(db,'leaderboard'), orderBy('score','desc'), limit(10)));
-    const ranks = ['🥇','🥈','🥉'];
-    // סנן רק מי שהסכים להופיע (יש displayName)
-    const lbDocs = lbSnap.docs.filter(d => d.data().displayName);
-    if (lbDocs.length === 0) {
-      document.getElementById('leaderboard').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">עדיין אין משתמשים בלוח 🌱<br>היה הראשון!</div>';
-    } else {
-      document.getElementById('leaderboard').innerHTML = lbDocs.map((d,i) => {
-        const u = d.data();
-        const name = u.displayName;
-        const init = name[0] || '?';
-        const bg   = avatarColor(d.id);
-        const medal = i < 3 ? ranks[i] : '';
-        return `<div class="user-row">
-          <span class="rank-num">${i+1}</span>
-          <div class="avatar" style="background:${bg}">${init}</div>
-          <div class="user-info">
-            <div class="user-name">${name} ${medal}</div>
-            <div class="user-sub">זכויות כוללות</div>
-          </div>
-          <span class="user-pts">⭐ ${(u.score||0).toLocaleString()}</span>
-        </div>`;
-      }).join('');
-    }
+    // ── לוח מובילים (מרובה-מדדים) ──
+    // הזרק את ההקשר שכבר אותחל כדי שלא נצטרך אימות/import חוזר
+    _lbCtx = { db, collection, getDocs, query, orderBy, limit };
+    await renderLeaderboard(_lbMetric);
 
     // ── פרקים חמים ──
     const crSnap = await getDocs(query(collection(db,'chapReads'), orderBy('count','desc'), limit(5)));
