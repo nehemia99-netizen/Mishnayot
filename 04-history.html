@@ -234,7 +234,7 @@ html.dark .cm-cell.fav{background:#2A1010;}
 .book-count-sm{font-size:11px;color:var(--text-muted);min-width:54px;text-align:left;}
 
 </style>
-<script src="errlog.js?v=1.5.69"></script>
+<script src="errlog.js?v=1.5.70"></script>
 <script src="shake.js?v=2.2.32"></script>
 <script src="corpus.js?v=2.2.0"></script>
 <script src="utils.js?v=2.2.0"></script>
@@ -302,6 +302,9 @@ html.dark .cm-cell.fav{background:#2A1010;}
     </div>
 
     <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- הפרקים הכי נצפים בתקופה (אישי) -->
+    <div id="topChaps"></div>
   </div>
 
   <!-- ── Tab 3: Yesterday ── -->
@@ -374,6 +377,9 @@ html.dark .cm-cell.fav{background:#2A1010;}
       <div id="booksProgress"></div>
     </div>
 
+
+    <!-- הישג: מקום ראשון בלוח המובילים -->
+    <div id="lbNo1Card"></div>
 
     <div class="medals-header">
       <div class="medals-title" data-i18n="hist.medals">🏅 המדליות שלי</div>
@@ -1366,6 +1372,17 @@ function renderAchievements() {
     .filter(([d]) => d>=from && d<=to)
     .forEach(([,v]) => mins += v);
 
+  // כניסות לאפליקציה — מסונן לפי התקופה (byDay חדש; נפילה ל-count הגלובלי רק ב"הכל")
+  let visitN;
+  if (visits.byDay) {
+    visitN = Object.entries(visits.byDay)
+      .filter(([d]) => d>=from && d<=to)
+      .reduce((a,[,v]) => a + (+v||0), 0);
+    if (currentPeriod === 'all') visitN = Math.max(visitN, visits.count||0);
+  } else {
+    visitN = (currentPeriod === 'all') ? (visits.count||0) : 0;
+  }
+
   const statsData = [
     { num: doneCh.size,         lbl: '📖 פרקים נלמדו'           },
     { num: '+' + pts,           lbl: '⭐ זכויות',    color:'#C07A00' },
@@ -1373,7 +1390,7 @@ function renderAchievements() {
     { num: mem.length,          lbl: '🧠 משניות בע"פ'            },
     { num: (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })(),
                                 lbl: '📊 מכסת המשנה', wide:false  },
-    { num: visits.count || 0,  lbl: '📱 כניסות לאפליקציה', wide:true },
+    { num: visitN,  lbl: '📱 כניסות לאפליקציה', wide:true },
   ];
 
   document.getElementById('statsGrid').innerHTML = statsData.map(s =>
@@ -1383,10 +1400,62 @@ function renderAchievements() {
     '</div>'
   ).join('');
 
+  renderTopChaps(recs);
   renderMedals();
 }
 
+// 3 הפרקים הכי נצפים בתקופה הנבחרת (אישי)
+function renderTopChaps(recs) {
+  const el = document.getElementById('topChaps');
+  if (!el) return;
+  const chLabel = id => {
+    if (typeof Corpus === 'undefined') return 'פרק ' + id;
+    const p = Corpus.parseChapId(String(id)); if (!p) return String(id);
+    const t = Corpus.getTractate(p.tractate);
+    return (t ? t.he : p.tractate) + ' · פרק ' + toGem(p.perek);
+  };
+  const cnt = {};
+  recs.forEach(r => { if (r.chap != null) cnt[r.chap] = (cnt[r.chap]||0) + 1; });
+  const top = Object.entries(cnt).sort((a,b) => b[1]-a[1]).slice(0,3);
+  if (!top.length) { el.innerHTML = ''; return; }
+  const medals = ['🥇','🥈','🥉'];
+  el.innerHTML =
+    '<div class="section-title" style="margin-top:16px;">🔝 הפרקים שצפית בהם הכי הרבה</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;padding:0 2px;">' +
+    top.map((t,i) =>
+      '<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:10px 12px;">' +
+        '<span style="font-size:18px;flex-shrink:0;">' + medals[i] + '</span>' +
+        '<span style="flex:1;font-size:14px;font-weight:600;color:var(--text);">' + chLabel(t[0]) + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap;">' + t[1] + ' צפיות</span>' +
+      '</div>'
+    ).join('') +
+    '</div>';
+}
+
+// הישג: מקום ראשון בלוח המובילים (נצבר ע"י עמוד הקהילה, לכל היותר פעם בשבוע)
+function renderLbNo1() {
+  const el = document.getElementById('lbNo1Card');
+  if (!el) return;
+  const rec = S.get('tehillim_lb_no1') || {};
+  const dates = Array.isArray(rec.dates) ? rec.dates : [];
+  if (!dates.length) { el.innerHTML = ''; return; }
+  const last = dates[dates.length - 1];
+  const fmt = d => { const p = String(d).split('-'); return p.length===3 ? (+p[2])+'/'+(+p[1]) : d; };
+  el.innerHTML =
+    '<div style="margin:0 16px 14px;padding:14px 16px;border-radius:14px;' +
+      'background:linear-gradient(135deg,#C9A227,#9C7A12);color:#fff;display:flex;align-items:center;gap:12px;">' +
+      '<span style="font-size:30px;flex-shrink:0;">👑</span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:15px;font-weight:800;">מקום ראשון בלוח המובילים!</div>' +
+        '<div style="font-size:12px;opacity:.9;margin-top:2px;">' +
+          dates.length + ' פעמים · אחרון: ' + fmt(last) +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
 function renderMedals() {
+  renderLbNo1();
   const earned = S.get('tehillim_medals_earned') || [];
 
   // Aggregate per level
