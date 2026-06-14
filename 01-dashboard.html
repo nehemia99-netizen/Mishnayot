@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="errlog.js?v=1.5.72"></script>
+<script src="errlog.js?v=1.5.73"></script>
 <script>(function(){try{var u=new URLSearchParams(location.search).get('lang');if(u==='en'||u==='he'){var s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(s.lang!==u){s.lang=u;localStorage.setItem('tehillim_settings',JSON.stringify(s));}}}catch(e){}}());</script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3A7D44">
@@ -19,7 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.72"></script>
+<script src="gamification.js?v=1.5.73"></script>
 <script src="notifications.js?v=2.2.33"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.72 BETA</div>
+          <div class="app-version">גרסה 1.5.73 BETA</div>
         </div>
       </div>
     </div>
@@ -1808,7 +1808,20 @@ function getRealData(tab,metric){
     }
     if(labels.length<2){labels.push('כעת');data.push(0);}
     if(labels.length>12){const step=Math.ceil(labels.length/12);const sL=[labels[0]],sD=[data[0]];for(let i=step;i<labels.length-1;i+=step){sL.push(labels[i]);sD.push(data[i]);}sL.push(labels[labels.length-1]);sD.push(data[data.length-1]);labels.length=0;data.length=0;sL.forEach((l,i)=>{labels.push(l);data.push(sD[i]);});}
-    const total=running;
+    let total=running;
+    // סנכרון "מעלות היום" עם מקור-האמת (gamification.byDay) — כולל בונוס יומי/מדליות שלא נכנסים ל-readings/dailyEvents
+    if(metric==='score'){
+      try{
+        if(typeof Gamification!=='undefined'&&Gamification.load){
+          const _g=Gamification.load();
+          const _bd=(_g&&_g['ma\'alot']&&_g['ma\'alot'].byDay)||{};
+          if(_bd[todayStr]!==undefined){
+            total=+_bd[todayStr];
+            if(data.length)data[data.length-1]=Math.round(total*10)/10;
+          }
+        }
+      }catch(e){}
+    }
     const yestVal=v(ds(1));
     const pct=yestVal>0?Math.round((total-yestVal)/yestVal*100):0;
     const {trend2,trend2up}=trendVsLastSession(total);
