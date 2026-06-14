@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="errlog.js?v=1.5.67"></script>
+<script src="errlog.js?v=1.5.68"></script>
 <script>(function(){try{var u=new URLSearchParams(location.search).get('lang');if(u==='en'||u==='he'){var s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(s.lang!==u){s.lang=u;localStorage.setItem('tehillim_settings',JSON.stringify(s));}}}catch(e){}}());</script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3A7D44">
@@ -19,7 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.67"></script>
+<script src="gamification.js?v=1.5.68"></script>
 <script src="notifications.js?v=2.2.33"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -192,9 +192,9 @@ function claimChallenge(key,reward){
     } catch(e){}
     if(Gamification.showMaalotToast)Gamification.showMaalotToast(meta);
     renderChallenges();updateGamStrip();
-    // 2.2.12: רענן גרף כדי שהזכויות מהאתגר יופיעו מיד
-    const activeTab=document.querySelector('.tab.active');
-    if(typeof buildChart==='function')buildChart(activeTab?activeTab.dataset.tab:'day');
+    // גבית זכויות — הצג את גרף הזכויות (ולא דקות), כדי שהגבייה תיראה מיד בגרף
+    if(typeof setMetric==='function'){ setMetric('score'); }
+    else if(typeof buildChart==='function'){ const a=document.querySelector('.tab.active'); buildChart(a?a.dataset.tab:'day'); }
   }
 }
 async function shareGraph(ev){
@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.67 BETA</div>
+          <div class="app-version">גרסה 1.5.68 BETA</div>
         </div>
       </div>
     </div>
