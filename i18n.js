@@ -254,7 +254,7 @@ const DICT = {
   'comm.tab_mine':           { he: '👥 הקבוצה שלי',           en: '👥 My Group' },
   'comm.users_registered':   { he: '👥 משתמשים רשומים',       en: '👥 Registered users' },
   'comm.online_now':         { he: 'מחוברים עכשיו',           en: 'Online now' },
-  'comm.chaps_today':        { he: '📖 פרקים נלמדו היום',     en: '📖 Chapters studied today' },
+  'comm.chaps_today':        { he: '📖 פרקים נלמדו',          en: '📖 Chapters studied' },
   'comm.mins_today':         { he: '⏱ דקות לימוד היום',       en: '⏱ Minutes today' },
   'comm.hot_chaps':          { he: '🔥 פרקים לוהטים השבוע',    en: '🔥 Hot chapters this week' },
   'comm.leaderboard':        { he: '🏆 לוח המובילים — השבוע',  en: '🏆 Leaderboard - this week' },

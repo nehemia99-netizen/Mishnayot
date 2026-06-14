@@ -224,7 +224,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 .chap-cell.mem-chap{border-color:var(--green);color:var(--green);}
 .picker-close{margin-top:12px;padding:11px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);width:100%;cursor:pointer;font-size:14px;color:var(--text-sec);}
 </style>
-<script src="errlog.js?v=1.5.71"></script>
+<script src="errlog.js?v=1.5.72"></script>
 <script src="shake.js?v=2.2.32"></script>
 <script src="i18n.js?v=2.2.90" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -2592,8 +2592,6 @@ async function _flushChapReads() {
 async function _syncLeaderboard() {
   try {
     const today = localDateStr();
-    const lastSent = localStorage.getItem(_LEADER_SENT_KEY);
-    if (lastSent === today) return; // כבר שלחנו היום
     const uid = _getUid2();
     if (!uid) return;
     const sc   = _S2.get('tehillim_score') || {};
@@ -2615,10 +2613,17 @@ async function _syncLeaderboard() {
       }
       memorized = (JSON.parse(localStorage.getItem('tehillim_mem_m') || '[]') || []).length;
     } catch(e){}
+    // ספירת פרקים לסטטיסטיקות הקהילה (סך-הכל + היום)
+    let chaps = 0, todayChaps = 0;
+    try {
+      const readings = _S2.get('tehillim_readings') || [];
+      chaps      = new Set(readings.filter(r => !r.partial).map(r => r.chap)).size;
+      todayChaps = new Set(readings.filter(r => r.date === today && !r.partial).map(r => r.chap)).size;
+    } catch(e){}
     await setDoc(doc(_db2, 'leaderboard', uid), {
-      displayName, score: sc.total || 0, medals, streak, monthly, memorized, updatedAt: Date.now()
+      displayName, score: sc.total || 0, medals, streak, monthly, memorized,
+      chaps, todayChaps, lastDate: today, updatedAt: Date.now()
     }, { merge: true });
-    localStorage.setItem(_LEADER_SENT_KEY, today);
   } catch(e) { console.warn('syncLeaderboard:', e); }
 }
 
