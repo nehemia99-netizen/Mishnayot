@@ -5,7 +5,7 @@
 **פרויקט:** משנתי (שם עבודה קודם: "משניון"). מזלג עצמאי של "תהילהון" שהוסב מלימוד תהילים ללימוד משניות.
 **Stack:** HTML/CSS/JavaScript טהור (ללא framework) · Firebase (Auth אנונימי + Firestore) · PWA (Service Worker) · פריסה: Vercel (מ-`main`) · טקסטים: Sefaria API · קול גברי איכותי: Google Cloud TTS (אופציונלי, דרך פונקציית Vercel).
 **ריפו:** github.com/nehemia99-netizen/Mishnayot · ענף `main` · פרוס ב-`mishnayot-alpha.vercel.app`.
-**גרסה נוכחית:** 1.5.69 · **אפליקציית אחות:** תהילהון (ריפו Tehilon, פרויקט Firebase `tehilhon`, `tehilon.vercel.app`) — מנוע כמעט זהה; ראה הבדלים בסוף.
+**גרסה נוכחית:** 1.5.70 · **אפליקציית אחות:** תהילהון (ריפו Tehilon, פרויקט Firebase `tehilhon`, `tehilon.vercel.app`) — מנוע כמעט זהה; ראה הבדלים בסוף.
 
 ---
 
@@ -83,7 +83,7 @@
 
 ---
 
-## 4. מוכנות להשקה לציבור — צ'קליסט עם סטטוס (נכון ל-1.5.69)
+## 4. מוכנות להשקה לציבור — צ'קליסט עם סטטוס (נכון ל-1.5.70)
 
 | פריט | סטטוס | הערה |
 |---|---|---|
