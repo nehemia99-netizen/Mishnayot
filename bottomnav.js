@@ -6,7 +6,7 @@
    לא מוצג ב-05-yizkor — תהליך ממוקד עם כפתורי ניווט משלו.
    בקורא (03-reader) מוצג, אך ה-padding מוסף ל-.bottombar ולא ל-body.
 
-   שימוש: <script src="bottomnav.js?v=2.2.0"></script>
+   שימוש: <script src="bottomnav.js?v=1.5.75"></script>
    אין צורך בשום קוד נוסף — הסקריפט מזריק את כל מה שצריך.
    ════════════════════════════════════════════════════════════ */
 (function () {
@@ -135,8 +135,19 @@
     /* padding לתוכן שלא יחסום מאחורי הפס */
     var bottombar = document.querySelector('.bottombar');
     if (bottombar) {
-      /* עמוד קורא — has-bnav מוסיף padding לdoneBtn מעל הניווט */
+      /* עמוד קורא — מודדים את גובה הניווט *בפועל* ומפנים מקום לבר התחתון
+         (המונה + כפתור הסיום) מעליו. עובד בכל מכשיר/דפדפן, בלי מספר קבוע. */
       bottombar.classList.add('has-bnav');
+      var _clearBnav = function () {
+        var h = (nav && nav.getBoundingClientRect().height) || 62;
+        bottombar.style.setProperty('padding-bottom', Math.ceil(h + 16) + 'px', 'important');
+      };
+      requestAnimationFrame(_clearBnav);
+      setTimeout(_clearBnav, 300);
+      setTimeout(_clearBnav, 1000);
+      window.addEventListener('resize', _clearBnav, { passive: true });
+      window.addEventListener('orientationchange', function () { setTimeout(_clearBnav, 250); });
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', _clearBnav, { passive: true });
     } else {
       var existing = document.body.style.paddingBottom;
       var numPx = parseInt(existing || '0', 10) || 0;

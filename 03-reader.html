@@ -53,7 +53,7 @@ html.dark #memBtn{color:#9B6FE0;}
 .toggle-sw.on::after{transform:translateX(-14px);}
 
 /* Text area */
-.text-area{flex:1;overflow-y:auto;padding:16px;background:var(--verse-bg);}
+.text-area{flex:1;min-height:0;overflow-y:auto;padding:16px;background:var(--verse-bg);}
 .loading-msg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text-muted);}
 .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -224,7 +224,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 .chap-cell.mem-chap{border-color:var(--green);color:var(--green);}
 .picker-close{margin-top:12px;padding:11px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);width:100%;cursor:pointer;font-size:14px;color:var(--text-sec);}
 </style>
-<script src="errlog.js?v=1.5.74"></script>
+<script src="errlog.js?v=1.5.75"></script>
 <script src="shake.js?v=2.2.32"></script>
 <script src="i18n.js?v=2.2.90" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -347,6 +347,43 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- מונה חי קבוע — שני שבבים בקצוות ("משקפי RayBan"), מרכז פתוח כדי לא להסתיר את הכפתור/הכיתוב -->
+<div id="liveCounter" style="position:fixed;z-index:499;left:50%;transform:translateX(-50%);width:100%;max-width:430px;box-sizing:border-box;bottom:64px;display:none;justify-content:space-between;align-items:center;padding:0 12px;pointer-events:none;direction:ltr;">
+  <span style="background:var(--card,#fff);border:1px solid var(--border,rgba(0,0,0,.14));border-radius:18px;padding:5px 13px;box-shadow:0 3px 14px rgba(0,0,0,.18);font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:#c8960c;">✡ <span id="lcScore">+0</span></span>
+  <span style="background:var(--card,#fff);border:1px solid var(--border,rgba(0,0,0,.14));border-radius:18px;padding:5px 13px;box-shadow:0 3px 14px rgba(0,0,0,.18);font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text,#1a1a1a);">⏱ <span id="lcTime">0:00</span></span>
+</div>
+<script>
+/* מסנכרן את המונה הצף עם המונה שבכפתור הסיום, וממקם אותו מעל הניווט שנמדד בפועל.
+   מוצג רק כשסרגל הניווט קיים (מצב מתקדם) — אז הוא מחליף את המונה המוסתר שבבר. */
+(function(){
+  var lc=document.getElementById('liveCounter'),
+      lcT=document.getElementById('lcTime'), lcS=document.getElementById('lcScore');
+  function place(){
+    var nav=document.getElementById('_bnav');
+    var toast=document.getElementById('toast');
+    if(!nav){ lc.style.display='none'; if(toast){ toast.style.bottom=''; toast.style.zIndex=''; } return; }
+    var navH=Math.ceil(nav.getBoundingClientRect().height);
+    lc.style.bottom = (navH + 8) + 'px';
+    lc.style.display = 'flex';
+    // הטוסט מתחת למונה (מעל הניווט) — z-index גבוה כדי שיוצג; מותר שיכסה רגע את הניווט, רק לא את הכפתור
+    if(toast){ toast.style.bottom = '10px'; toast.style.zIndex = '501'; }
+    var meta=document.querySelector('.done-btn-meta'); // הסתר את הכפול שבבר
+    if(meta) meta.style.visibility='hidden';
+  }
+  function sync(){
+    var tn=document.getElementById('timerNum'), sn=document.getElementById('scoreNum');
+    if(tn&&lcT) lcT.textContent=tn.textContent;
+    if(sn&&lcS) lcS.textContent=sn.textContent;
+  }
+  setTimeout(function(){ place(); sync(); }, 450);
+  setTimeout(place, 1300);
+  setInterval(sync, 500);
+  window.addEventListener('resize', place, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(place,250); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize', place, {passive:true});
+})();
+</script>
 
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
@@ -792,6 +829,9 @@ function reachedBottom() {
   bar.classList.add('full');
   unlockDoneBtn();
   if (!isDone) showToast(_rLang()==='en' ? '✅ End of chapter!' : '✅ הגעת לסוף הפרק!');
+  // הגענו לסוף הפרק — עצור את הטיימר אחרי 10 שניות (אלא אם המשתמש במצב שינון)
+  try { clearTimeout(window._endStopTimer); } catch(e){}
+  window._endStopTimer = setTimeout(function(){ try { if (!shinunActive) stopTimer(); } catch(e){} }, 10000);
 }
 
 function updateReadProgress() {
@@ -1314,9 +1354,9 @@ function startTimer() {
     }
     timerSec++;
     document.getElementById('timerNum').textContent = fmt(timerSec);
-    // מגבלת זמן מקסימלית: 7 דק' לפרק משנה (פרקי משנה ארוכים מפרקי תהילים)
+    // מגבלת זמן מקסימלית: 7 דק' לפרק משנה — לא חלה במצב שינון
     const MAX_SECS = 420;
-    if (timerSec >= MAX_SECS) {
+    if (!shinunActive && timerSec >= MAX_SECS) {
       idlePaused = true;
       document.getElementById('idleWarning').style.display = 'block';
       return;
@@ -2060,6 +2100,13 @@ function toggleShinunMode() {
   _ttsStop();
 
   if (shinunActive) {
+    // בשינון הטיימר ממשיך — בטל עצירה ממתינה וחדש את הספירה אם נעצרה
+    try {
+      clearTimeout(window._endStopTimer);
+      idlePaused = false; lastActivity = Date.now();
+      const iw = document.getElementById('idleWarning'); if (iw) iw.style.display = 'none';
+      startTimer();
+    } catch(e){}
     renderShinunSheet();
     setShinunLevel(1);            // ברירת מחדל: חזרה
     // בפעם הראשונה — פתח את הגיליון כדי שהמשתמש יראה את ההסברים
@@ -2712,7 +2759,7 @@ if (_grp && _grp.code) {
   };
 }
 </script>
-<script src="bottomnav.js?v=2.2.0"></script>
+<script src="bottomnav.js?v=1.5.75"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}

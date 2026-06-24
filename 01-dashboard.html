@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="errlog.js?v=1.5.74"></script>
+<script src="errlog.js?v=1.5.75"></script>
 <script>(function(){try{var u=new URLSearchParams(location.search).get('lang');if(u==='en'||u==='he'){var s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(s.lang!==u){s.lang=u;localStorage.setItem('tehillim_settings',JSON.stringify(s));}}}catch(e){}}());</script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3A7D44">
@@ -19,7 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="corpus.js?v=1.0.1"></script>
-<script src="gamification.js?v=1.5.74"></script>
+<script src="gamification.js?v=1.5.75"></script>
 <script src="notifications.js?v=2.2.33"></script>
 <script src="onboarding.js?v=2.2.84"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.74 BETA</div>
+          <div class="app-version">גרסה 1.5.75 BETA</div>
         </div>
       </div>
     </div>
@@ -577,6 +577,40 @@ html.dark .lottery-trigger{opacity:.85;}
       </div>
     </div>
   </div>
+
+  <!-- באנר התקנת PWA — מופיע רק כשהדפדפן מאפשר התקנה (אנדרואיד/כרום). נדחה ע"י המשתמש -->
+  <div id="installBanner" style="display:none;align-items:center;gap:10px;margin:8px 16px 0;padding:10px 14px;border-radius:12px;background:var(--primary-light,#E9F2E9);border:1px solid var(--primary,#3A7D44);">
+    <span style="font-size:20px;flex-shrink:0;">📥</span>
+    <span style="flex:1;font-size:13.5px;font-weight:600;color:var(--text,#1A1A1A);">התקן את משנתי למסך הבית — גישה מהירה בלחיצה</span>
+    <button id="installBtn" style="flex-shrink:0;padding:7px 15px;border-radius:18px;border:none;background:var(--primary,#3A7D44);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">התקן</button>
+    <button id="installDismiss" aria-label="סגור" style="flex-shrink:0;background:none;border:none;color:var(--text-muted,#9E9E9E);font-size:18px;cursor:pointer;line-height:1;">✕</button>
+  </div>
+  <script>
+  (function(){
+    let _deferred=null;
+    const ban=()=>document.getElementById('installBanner');
+    window.addEventListener('beforeinstallprompt',function(e){
+      e.preventDefault(); _deferred=e;
+      try{
+        if(localStorage.getItem('tehillim_install_dismissed')==='1') return;
+        if(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches) return;
+        if(navigator.standalone) return;
+        const b=ban(); if(b) b.style.display='flex';
+      }catch(_){}
+    });
+    window.addEventListener('appinstalled',function(){ const b=ban(); if(b) b.style.display='none'; _deferred=null; });
+    document.addEventListener('DOMContentLoaded',function(){
+      const btn=document.getElementById('installBtn'), dis=document.getElementById('installDismiss');
+      if(btn) btn.addEventListener('click',async function(){
+        if(!_deferred) return;
+        _deferred.prompt();
+        try{ await _deferred.userChoice; }catch(_){}
+        _deferred=null; const b=ban(); if(b) b.style.display='none';
+      });
+      if(dis) dis.addEventListener('click',function(){ const b=ban(); if(b) b.style.display='none'; try{localStorage.setItem('tehillim_install_dismissed','1');}catch(_){} });
+    });
+  })();
+  </script>
 
   <!-- חזרה מרווחת — מוצג רק כשיש פרקים לחזרה היום -->
   <a id="srsReviewCard" href="#" style="display:none;margin:8px 16px 0;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#7B2FF7,#5B1FB0);color:#fff;text-decoration:none;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(123,47,247,.25);">
@@ -3116,6 +3150,6 @@ window.loadDashCommunity = async function loadDashCommunity(){
 }
   if (typeof _syncPublicStats === 'function') _syncPublicStats();
 </script>
-<script src="bottomnav.js?v=2.2.0"></script>
+<script src="bottomnav.js?v=1.5.75"></script>
 </body>
 </html>

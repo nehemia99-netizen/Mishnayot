@@ -120,7 +120,7 @@ html.dark .account-card{box-shadow:none;}
 .google-btn:active{transform:scale(.97);}
 html.dark .google-btn{background:var(--surface);}
 </style>
-<script src="errlog.js?v=1.5.74"></script>
+<script src="errlog.js?v=1.5.75"></script>
 <script src="shake.js?v=2.2.32"></script>
 <script src="utils.js?v=2.2.0"></script>
 <script src="notifications.js?v=2.2.33" defer></script>
@@ -146,6 +146,18 @@ html.dark .google-btn{background:var(--surface);}
   <div class="topbar">
     <a href="01-dashboard.html" class="home-btn" data-i18n="set.back_home">← בית</a>
     <div class="topbar-title" data-i18n="set.title">⚙️ הגדרות</div>
+  </div>
+
+  <!-- ══ התקנת האפליקציה ══ -->
+  <div class="group-label">📥 התקנה</div>
+  <div class="group">
+    <div class="row" id="rowInstall" style="cursor:pointer;" onclick="installAppFromSettings()">
+      <div class="row-left">
+        <span class="row-icon">📥</span>
+        <div><div class="row-label">התקן אפליקציה</div><div class="row-sub" id="installSub">הוסף את משנתי למסך הבית — פתיחה מהירה במסך מלא, בלי דפדפן</div></div>
+      </div>
+      <button class="backup-btn primary" onclick="event.stopPropagation();installAppFromSettings()">התקן</button>
+    </div>
   </div>
 
   <!-- ══ 1. חשבון ══ -->
@@ -460,7 +472,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.74 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.75 BETA · © 2026</div>
 </div>
 
 <script>
@@ -1335,7 +1347,37 @@ async function _svSubmit(){
   }
 }
 </script>
-<script src="bottomnav.js?v=2.2.0"></script>
+<script src="bottomnav.js?v=1.5.75"></script>
+<script>
+/* כפתור "התקן אפליקציה" קבוע בהגדרות — לוכד את אירוע ההתקנה של הדפדפן (אנדרואיד/כרום),
+   ובמכשירים שלא תומכים (אייפון / כבר מותקן) מציג הוראות. */
+(function(){
+  var _deferred = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); _deferred = e; });
+  function _installed(){
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  }
+  window.addEventListener('appinstalled', function(){ var r=document.getElementById('rowInstall'); if(r) r.style.display='none'; });
+  document.addEventListener('DOMContentLoaded', function(){
+    if (_installed()){ var r=document.getElementById('rowInstall'); if(r) r.style.display='none'; }
+  });
+  window.installAppFromSettings = async function(){
+    if (_installed()){ alert('האפליקציה כבר מותקנת ✓'); return; }
+    if (_deferred){
+      _deferred.prompt();
+      try { await _deferred.userChoice; } catch(_){}
+      _deferred = null;
+      return;
+    }
+    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var msg = ios
+      ? 'באייפון (Safari): לחץ על כפתור השיתוף ⬆️ ובחר "הוסף למסך הבית".'
+      : 'פתח את תפריט הדפדפן (⋮ בפינה) ובחר "התקן אפליקציה" / "הוספה למסך הבית".';
+    var sub = document.getElementById('installSub'); if (sub) sub.textContent = msg;
+    alert('📥 ' + msg);
+  };
+})();
+</script>
 </body>
 </html>
 
