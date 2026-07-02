@@ -562,18 +562,54 @@ const SAVED_KEY = 'tehillim_saved_verses';
 /* ── Sefaria API + cache ── */
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
+/* ── טקסט מקומי פר-מסכת (mishnah-text/<id>.js) — קריאה אופליין לכל המשנה ──
+   כל מסכת נטענת על-פי דרישה רק כשצריך (אופליין/כשל רשת), כדי לא להאט את הקורא. */
+const _tractateLoads = {}; // id -> Promise<boolean>
+function loadTractateText(tractateId) {
+  if (_tractateLoads[tractateId]) return _tractateLoads[tractateId];
+  _tractateLoads[tractateId] = new Promise(function(resolve){
+    if (window.MISHNAH_TEXT && window.MISHNAH_TEXT[tractateId]) return resolve(true);
+    var s = document.createElement('script');
+    s.src = 'mishnah-text/' + tractateId + '.js';
+    s.onload  = function(){ resolve(!!(window.MISHNAH_TEXT && window.MISHNAH_TEXT[tractateId])); };
+    s.onerror = function(){ resolve(false); }; // אופליין וטרם נשמר בקאש
+    document.head.appendChild(s);
+  });
+  return _tractateLoads[tractateId];
+}
+function _localChapter(tractateId, perek) {
+  const tr = (typeof window !== 'undefined' && window.MISHNAH_TEXT) ? window.MISHNAH_TEXT[tractateId] : null;
+  const t  = tr ? tr[perek] : null;
+  return (t && t.he && t.he.length) ? { he: t.he, heRef: t.heRef || '', ts: 0 } : null;
+}
 async function fetchChapter(tractateId, perek) {
   const cKey = 'mishnah_cache_' + Corpus.chapId(tractateId, perek);
   const cached = S.get(cKey);
   if (cached && cached.he && (Date.now() - (cached.ts||0) < CACHE_TTL)) return cached;
-  const resp = await fetch(
-    'https://www.sefaria.org/api/texts/' + Corpus.apiRef(tractateId, perek) + '?lang=he&commentary=0&context=0'
-  );
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  const data = await resp.json();
-  const entry = { he: data.he, heRef: data.heRef, ts: Date.now() };
-  S.set(cKey, entry);
-  return entry;
+  // אופליין: אל תנסה רשת — קאש או טקסט מקומי (נשמר לקאש כדי שפירוש/שינון/הערות יעבדו)
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    if (cached && cached.he) return cached;
+    await loadTractateText(tractateId);
+    const lo = _localChapter(tractateId, perek);
+    if (lo) { try { S.set(cKey, lo); } catch(e){} return lo; }
+  }
+  try {
+    const resp = await fetch(
+      'https://www.sefaria.org/api/texts/' + Corpus.apiRef(tractateId, perek) + '?lang=he&commentary=0&context=0'
+    );
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const entry = { he: data.he, heRef: data.heRef, ts: Date.now() };
+    S.set(cKey, entry);
+    return entry;
+  } catch (e) {
+    // הרשת נכשלה — קאש ישן, ואז טקסט מקומי
+    if (cached && cached.he) return cached;
+    await loadTractateText(tractateId);
+    const lf = _localChapter(tractateId, perek);
+    if (lf) { try { S.set(cKey, lf); } catch(e2){} return lf; }
+    throw e;
+  }
 }
 
 /* ── Commentary API + cache (ברטנורא כברירת מחדל) ── */

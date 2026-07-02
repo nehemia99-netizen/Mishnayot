@@ -6,7 +6,7 @@
    • CDN (Chart.js וכו') → Cache-First
 ═══════════════════════════════════════════════════ */
 
-const CACHE_VER  = 'mishnayon-v1.5.75';
+const CACHE_VER  = 'mishnayon-v1.5.76';
 const SEFARIA    = 'www.sefaria.org';
 
 const APP_SHELL  = [
@@ -34,11 +34,40 @@ const APP_SHELL  = [
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 
+/* ── טקסט המשנה המלא לאופליין: 63 קבצים פר-מסכת (~3MB, נטענים על-פי דרישה בקורא) ──
+   נשמרים best-effort בהתקנה כדי שכל המשנה תהיה זמינה גם בלי רשת. */
+const MISHNAH_TEXT_FILES = [
+  './mishnah-text/Arakhin.js', './mishnah-text/AvodahZarah.js', './mishnah-text/BavaBatra.js',
+  './mishnah-text/BavaKamma.js', './mishnah-text/BavaMetzia.js', './mishnah-text/Beitzah.js',
+  './mishnah-text/Bekhorot.js', './mishnah-text/Berakhot.js', './mishnah-text/Bikkurim.js',
+  './mishnah-text/Chagigah.js', './mishnah-text/Challah.js', './mishnah-text/Chullin.js',
+  './mishnah-text/Demai.js', './mishnah-text/Eduyot.js', './mishnah-text/Eruvin.js',
+  './mishnah-text/Gittin.js', './mishnah-text/Horayot.js', './mishnah-text/Kelim.js',
+  './mishnah-text/Keritot.js', './mishnah-text/Ketubot.js', './mishnah-text/Kiddushin.js',
+  './mishnah-text/Kilayim.js', './mishnah-text/Kinnim.js', './mishnah-text/MaaserSheni.js',
+  './mishnah-text/Maasrot.js', './mishnah-text/Makhshirin.js', './mishnah-text/Makkot.js',
+  './mishnah-text/Megillah.js', './mishnah-text/Meilah.js', './mishnah-text/Menachot.js',
+  './mishnah-text/Middot.js', './mishnah-text/Mikvaot.js', './mishnah-text/MoedKatan.js',
+  './mishnah-text/Nazir.js', './mishnah-text/Nedarim.js', './mishnah-text/Negaim.js',
+  './mishnah-text/Niddah.js', './mishnah-text/Oholot.js', './mishnah-text/Oktzin.js',
+  './mishnah-text/Orlah.js', './mishnah-text/Parah.js', './mishnah-text/Peah.js',
+  './mishnah-text/Pesachim.js', './mishnah-text/PirkeiAvot.js',
+  './mishnah-text/RoshHashanah.js', './mishnah-text/Sanhedrin.js', './mishnah-text/Shabbat.js',
+  './mishnah-text/Shekalim.js', './mishnah-text/Sheviit.js', './mishnah-text/Shevuot.js',
+  './mishnah-text/Sotah.js', './mishnah-text/Sukkah.js', './mishnah-text/Taanit.js',
+  './mishnah-text/Tahorot.js', './mishnah-text/Tamid.js', './mishnah-text/Temurah.js',
+  './mishnah-text/Terumot.js', './mishnah-text/TevulYom.js', './mishnah-text/Yadayim.js',
+  './mishnah-text/Yevamot.js', './mishnah-text/Yoma.js', './mishnah-text/Zavim.js',
+  './mishnah-text/Zevachim.js',
+];
+
 /* ── Install: cache the entire app shell ── */
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VER)
-      .then(cache => cache.addAll(APP_SHELL))
+      .then(cache => cache.addAll(APP_SHELL)
+        // טקסט המשנה best-effort — כישלון בקובץ בודד לא ישבור את ההתקנה
+        .then(() => Promise.allSettled(MISHNAH_TEXT_FILES.map(u => cache.add(u)))))
       .then(() => self.skipWaiting())
       .catch(err => console.warn('[SW] Install cache error:', err))
   );
