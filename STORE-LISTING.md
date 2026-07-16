@@ -38,7 +38,7 @@
 ## פרטים נוספים לקונסולה
 - **קטגוריה:** חינוך / Education (או Books & Reference).
 - **תגיות מומלצות:** משנה, לימוד תורה, שינון, יהדות.
-- **דוא"ל ליצירת קשר:** nehemia99@gmail.com
+- **דוא"ל ליצירת קשר:** tehilon2026@gmail.com
 - **מדיניות פרטיות (URL — חובה):** https://mishnayot-alpha.vercel.app/terms.html
 - **צילומי מסך:** דף הבית, הקורא, מצבי שינון, קהילה, הישגים, היסטוריה. Google Play דורש לפחות 2, מומלץ 4–8, ביחס טלפון.
 - **גרפיקה ראשית (Feature graphic · 1024×500):** נדרשת — אפשר לעצב פשוט עם הלוגו והשם על רקע ירוק.
@@ -79,4 +79,4 @@ Made with love, for the honor of the Torah.
 
 ## Notes
 - Privacy policy URL: https://mishnayot-alpha.vercel.app/terms.html
-- Contact email: nehemia99@gmail.com
+- Contact email: tehilon2026@gmail.com

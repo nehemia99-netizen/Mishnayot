@@ -10,7 +10,7 @@
 - **Is all of the user data collected by your app encrypted in transit?** → **Yes** (כל התעבורה דרך HTTPS/Firebase).
 - **Do you provide a way for users to request that their data is deleted?** → **Yes**
   (המשתמש יכול לכבות "הצטרפות ללוח המובילים" ולהסיר את שמו, ולנקות את הנתונים המקומיים במכשיר;
-  לפנייה למחיקה מלאה — דוא"ל nehemia99@gmail.com).
+  לפנייה למחיקה מלאה — דוא"ל tehilon2026@gmail.com).
 
 ## האם הנתונים "Shared" (משותפים עם צד שלישי)?
 → **No.** הנתונים מעובדים רק ע"י Firebase/Google כספק תשתית (service provider), לא "משותפים" לפי הגדרת Google,
