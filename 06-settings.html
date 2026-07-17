@@ -459,8 +459,16 @@ html.dark .google-btn{background:var(--surface);}
       <div class="row-left"><span class="row-icon">📨</span><div class="row-label">הזמן חבר<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">שתפו את משנתי וזכו ב-3 מעלות 🎁</div></div></div>
       <span class="chevron">‹</span>
     </div>
+  </div>
+
+  <div class="group-label">האפליקציות שלנו</div>
+  <div class="group">
     <div class="row" onclick="openSisterApp()" style="cursor:pointer;">
-      <div class="row-left"><span class="row-icon">📜</span><div class="row-label">לומדים גם תהילים?<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">נסו את תהילהון — אפליקציית האחות ✨</div></div></div>
+      <div class="row-left"><span class="row-icon">📖</span><div class="row-label">תהילהון<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">לימוד ושינון תהילים יומי ✨</div></div></div>
+      <span class="chevron">‹</span>
+    </div>
+    <div class="row" onclick="openTimelineApp()" style="cursor:pointer;">
+      <div class="row-left"><span class="row-icon">🕯️</span><div class="row-label">עמוד הזמן<div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;">מסע בציר ההיסטוריה היהודית 🕯️</div></div></div>
       <span class="chevron">‹</span>
     </div>
   </div>
@@ -472,7 +480,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.77 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.78 BETA · © 2026</div>
 </div>
 
 <script>
@@ -923,8 +931,12 @@ function resetData() {
 }
 
 /* ── Rate us / Terms of use (2.0.5) ── */
-// כתובת אפליקציית האחות (תהילהון) — TODO: לאמת כתובת סופית
-const SISTER_APP_URL = 'https://tehilon.vercel.app/01-dashboard.html';
+// משפחת האפליקציות (תהילהון · עמוד הזמן)
+const SISTER_APP_URL   = 'https://tehilon.vercel.app';
+const TIMELINE_APP_URL = 'https://jewish-timeline.vercel.app';
+function openTimelineApp() {
+  window.open(TIMELINE_APP_URL, '_blank', 'noopener');
+}
 function openSisterApp() {
   window.open(SISTER_APP_URL, '_blank', 'noopener');
 }
