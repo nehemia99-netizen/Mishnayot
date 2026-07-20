@@ -613,16 +613,23 @@ async function fetchChapter(tractateId, perek) {
 }
 
 /* ── Commentary API + cache (ברטנורא כברירת מחדל) ── */
+/* ⚠️ מלכודת מתועדת (אותה מלכודת של חפץ חיים #6): הפירושים הם טקסט בעומק 3
+   (פרק→משנה→קטע). ה-API הישן (v1) מצמצם ref חד-רמתי אוטומטית לתת-הסעיף הראשון —
+   כלומר החזיר את הפירוש על **משנה א׳ בלבד**, והקוד פיזר את קטעיו לפי אינדקס על
+   שאר המשניות (→ ~83% מהפירוש נעלם, והשאר שויך למשנה הלא-נכונה).
+   v3 מחזיר את הפרק המלא: מערך באורך מספר המשניות, כל איבר = מערך קטעי הפירוש. */
 async function fetchCommentary(tractateId, perek, type) {
-  const cKey = 'mishnah_comm_' + type + '_' + Corpus.chapId(tractateId, perek);
+  const cKey = 'mishnah_comm_v2_' + type + '_' + Corpus.chapId(tractateId, perek); // v2: מבטל קאש פגום
   const cached = S.get(cKey);
   if (cached && cached.data && (Date.now() - (cached.ts||0) < CACHE_TTL)) return cached.data;
   const resp = await fetch(
-    'https://www.sefaria.org/api/texts/' + Corpus.commentaryRef(tractateId, perek, type) + '?lang=he&commentary=0&context=0'
+    'https://www.sefaria.org/api/v3/texts/' + Corpus.commentaryRef(tractateId, perek, type)
   );
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const json = await resp.json();
-  const data = json.he || [];
+  const vers = json.versions || [];
+  const ver  = vers.find(v => v && v.language === 'he') || vers[0] || {};
+  const data = Array.isArray(ver.text) ? ver.text : [];
   S.set(cKey, { data, ts: Date.now() });
   return data;
 }
@@ -631,7 +638,8 @@ function commTextForVerse(commData, idx) {
   if (!commData || idx >= commData.length) return '';
   const v = commData[idx];
   if (!v) return '';
-  if (Array.isArray(v)) return v.filter(Boolean).join(' ');
+  // למשנה אחת יכולים להיות כמה קטעי פירוש (דיבורי-מתחיל שונים) — להפריד בשורה
+  if (Array.isArray(v)) return v.filter(Boolean).join('<br>');
   return String(v);
 }
 
