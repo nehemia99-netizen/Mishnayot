@@ -57,7 +57,10 @@
   var CSS = [
     '#_bnav {',
     '  position: fixed;',
-    '  bottom: 0; left: 0; right: 0;',
+    /* ממורכז ומוגבל לרוחב עמודת התוכן — אחרת בטאבלט/מחשב הכפתורים
+       נמתחים על כל המסך ומתפזרים. הרוחב המדויק נמדד ב-JS (matchAppWidth). */
+    '  bottom: 0; left: 50%; transform: translateX(-50%);',
+    '  width: 100%; max-width: 430px;',
     '  z-index: 500;',
     '  display: flex;',
     '  justify-content: space-around;',
@@ -106,6 +109,15 @@
     /* תוכן tabs גלילה — פרקים אחרונים גלויים */
     '.tab-content.has-bnav {',
     '  padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;',
+    '}',
+    /* מסך רחב (טאבלט/מחשב): הבר צר מהמסך — לעגל ולהצמיד ויזואלית לעמודת התוכן */
+    '@media (min-width: 500px) {',
+    '  #_bnav {',
+    '    border-left: 0.5px solid var(--border, rgba(0,0,0,.12));',
+    '    border-right: 0.5px solid var(--border, rgba(0,0,0,.12));',
+    '    border-radius: 16px 16px 0 0;',
+    '    box-shadow: 0 -3px 18px rgba(0,0,0,.07);',
+    '  }',
     '}'
   ].join('\n');
 
@@ -131,6 +143,24 @@
     nav.setAttribute('aria-label', 'ניווט ראשי');
     nav.innerHTML = html;
     document.body.appendChild(nav);
+
+    /* התאמת רוחב הניווט לעמודת התוכן.
+       הדפים אינם אחידים (דשבורד 390px, שאר הדפים 430px), ובנייד .app תופס
+       את כל המסך — לכן מודדים בפועל במקום להניח מספר קבוע. */
+    var _matchAppWidth = function () {
+      var app = document.querySelector('.app');
+      if (!app) { nav.style.maxWidth = '430px'; return; }
+      var r = app.getBoundingClientRect();
+      if (!r.width) return;
+      nav.style.maxWidth = Math.round(r.width) + 'px';
+      /* מיישרים למרכז עמודת התוכן בפועל ולא למרכז המסך — בחלק מהדפים
+         העמודה אינה ממורכזת לחלוטין, וזה גרם להיסט של כמה פיקסלים. */
+      nav.style.left = Math.round(r.left + r.width / 2) + 'px';
+    };
+    requestAnimationFrame(_matchAppWidth);
+    setTimeout(_matchAppWidth, 300);
+    window.addEventListener('resize', _matchAppWidth, { passive: true });
+    window.addEventListener('orientationchange', function () { setTimeout(_matchAppWidth, 250); });
 
     /* padding לתוכן שלא יחסום מאחורי הפס */
     var bottombar = document.querySelector('.bottombar');
