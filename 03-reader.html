@@ -363,14 +363,20 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     var nav=document.getElementById('_bnav');
     var toast=document.getElementById('toast');
     if(!nav){ lc.style.display='none'; if(toast){ toast.style.bottom=''; toast.style.zIndex=''; } return; }
-    var navH=Math.ceil(nav.getBoundingClientRect().height);
-    lc.style.bottom = (navH + 8) + 'px';
+    var btn=document.getElementById('doneBtn');
+    if(!btn){ lc.style.display='none'; return; }
+    // ממקמים את המונה הצף בדיוק *על* כפתור הסיום — שני השבבים יושבים בקצוותיו
+    // (הכיתוב במרכז), כך שנראה כבר אחד. לא ביחס לניווט — כי הכפתור עשוי לזוז.
+    var r=btn.getBoundingClientRect();
+    lc.style.top    = Math.round(r.top) + 'px';
+    lc.style.bottom = 'auto';
+    lc.style.height = Math.round(r.height) + 'px';
     lc.style.display = 'flex';
-    // הטוסט מתחת למונה (מעל הניווט) — z-index גבוה כדי שיוצג; מותר שיכסה רגע את הניווט, רק לא את הכפתור
-    if(toast){ toast.style.bottom = '10px'; toast.style.zIndex = '501'; }
+    if(toast){ toast.style.bottom='10px'; toast.style.zIndex='501'; }
     var meta=document.querySelector('.done-btn-meta'); // הסתר את הכפול שבבר
     if(meta) meta.style.visibility='hidden';
   }
+  window._placeLiveCounter = place;
   function sync(){
     var tn=document.getElementById('timerNum'), sn=document.getElementById('scoreNum');
     if(tn&&lcT) lcT.textContent=tn.textContent;
@@ -378,7 +384,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   }
   setTimeout(function(){ place(); sync(); }, 450);
   setTimeout(place, 1300);
-  setInterval(sync, 500);
+  setInterval(function(){ sync(); place(); }, 500); // place כל 0.5ש' — נשאר על הכפתור גם כשמצבו/הגובה משתנה
   window.addEventListener('resize', place, {passive:true});
   window.addEventListener('orientationchange', function(){ setTimeout(place,250); });
   if(window.visualViewport) window.visualViewport.addEventListener('resize', place, {passive:true});
@@ -392,8 +398,11 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   var app = document.querySelector('.app');
   if(!app) return;
   function setAppH(){
-    var h = window.visualViewport ? Math.round(window.visualViewport.height) : window.innerHeight;
-    if(h > 0) app.style.height = h + 'px';
+    var vv = window.visualViewport;
+    // בזמן פינץ'-זום (scale>1) לא נוגעים בגובה — אחרת ה-app מתכווץ והפריסה קורסת.
+    if(vv && vv.scale > 1.01) return;
+    var h = vv ? Math.round(vv.height) : window.innerHeight;
+    if(h > 0){ app.style.height = h + 'px'; if(window._placeLiveCounter) requestAnimationFrame(window._placeLiveCounter); }
   }
   setAppH();
   window.addEventListener('resize', setAppH, {passive:true});
