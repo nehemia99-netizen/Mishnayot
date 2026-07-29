@@ -383,6 +383,23 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   window.addEventListener('orientationchange', function(){ setTimeout(place,250); });
   if(window.visualViewport) window.visualViewport.addEventListener('resize', place, {passive:true});
 })();
+
+/* ── גובה ה-app = אזור התצוגה הנראה בפועל ──
+   ב-100dvh יש מכשירים (בעיקר סמסונג/אנדרואיד) שבהם הגובה חורג מהאזור הנראה,
+   ואז הבר התחתון (כפתור הסיום) נדחף חלקית מתחת לקצה ומאחורי הניווט הקבוע.
+   הצמדה ל-visualViewport מונעת זאת — בלי לשנות את מבנה הגלילה/הכפתור. */
+(function(){
+  var app = document.querySelector('.app');
+  if(!app) return;
+  function setAppH(){
+    var h = window.visualViewport ? Math.round(window.visualViewport.height) : window.innerHeight;
+    if(h > 0) app.style.height = h + 'px';
+  }
+  setAppH();
+  window.addEventListener('resize', setAppH, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(setAppH, 250); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize', setAppH, {passive:true});
+})();
 </script>
 
 <script src="utils.js?v=2.2.0"></script>
@@ -821,7 +838,7 @@ function reattachBottomObserver() {
   const sentinel = document.getElementById('bottomSentinel');
   if (!sentinel) return;
   const taRect = ta.getBoundingClientRect(), senRect = sentinel.getBoundingClientRect();
-  if (senRect.bottom <= taRect.bottom + 4) { reachedBottom(); return; }
+  if (senRect.bottom <= taRect.bottom + 4) { reachedBottom(true); return; }
   bottomObserver = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) reachedBottom();
   }, { root: ta, threshold: 0.01, rootMargin: '0px 0px 40px 0px' });
@@ -851,7 +868,7 @@ function resetReadProgress() {
     const taRect  = ta.getBoundingClientRect();
     const senRect = sentinel.getBoundingClientRect();
     if (senRect.bottom <= taRect.bottom + 4) {
-      reachedBottom();
+      reachedBottom(true); // פרק קצר שנכנס במסך — ללא עצירת-סוף אגרסיבית
       return;
     }
 
@@ -864,7 +881,7 @@ function resetReadProgress() {
   }, delay);
 }
 
-function reachedBottom() {
+function reachedBottom(immediate) {
   if (hasReachedBottom) return;
   hasReachedBottom = true;
   if (bottomObserver) { bottomObserver.disconnect(); bottomObserver = null; }
@@ -873,9 +890,12 @@ function reachedBottom() {
   bar.classList.add('full');
   unlockDoneBtn();
   if (!isDone) showToast(_rLang()==='en' ? '✅ End of chapter!' : '✅ הגעת לסוף הפרק!');
-  // הגענו לסוף הפרק — עצור את הטיימר אחרי 10 שניות (אלא אם המשתמש במצב שינון)
   try { clearTimeout(window._endStopTimer); } catch(e){}
-  window._endStopTimer = setTimeout(function(){ try { if (!shinunActive) stopTimer(); } catch(e){} }, 10000);
+  // עצירת הטיימר 10ש' אחרי סוף — רק כשהמשתמש באמת גלל לסוף (פרק ארוך), ולא בשינון.
+  // בפרק קצר שנכנס במסך אחד (immediate) אין "סוף גלילה" — נשאיר לטיימר לרוץ.
+  if (!immediate) {
+    window._endStopTimer = setTimeout(function(){ try { if (!shinunActive) stopTimer(); } catch(e){} }, 10000);
+  }
 }
 
 function updateReadProgress() {
@@ -1363,6 +1383,9 @@ function resetTimer() {
   idlePaused = false;
   savedTimerSec = 0;
   lastActivity = Date.now();
+  // בטל עצירת-סוף ממתינה מהפרק הקודם — אחרת היא עלולה לירות באמצע הפרק הבא
+  // ולעצור את הטיימר מוקדם (למשל 0:02). (באג ניווט אקראי/רצף.)
+  try { clearTimeout(window._endStopTimer); } catch(e){}
   // עדכן IDLE_MS לפי הפרק הנוכחי
   if (typeof updateIdleMs === 'function') updateIdleMs();
   document.getElementById('timerNum').textContent = '0:00';
