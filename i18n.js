@@ -23,7 +23,7 @@ const DICT = {
   'home.btn_history':        { he: 'היסטוריה',                en: 'History' },
   'home.btn_achievements':   { he: 'הישגים',                  en: 'Achievements' },
   'home.btn_blessings':      { he: 'ברכות',                   en: 'Blessings' },
-  'home.share':              { he: '📤 שתף',                  en: '📤 Share' },
+  'home.share':              { he: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> שתף',                  en: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share' },
   'home.settings_quick':     { he: '⚙️ הגדרות מהיר',          en: '⚙️ Quick settings' },
   'home.dark_mode':          { he: '🌙 מצב לילה',             en: '🌙 Dark mode' },
   'home.reminder':           { he: '🔔 תזכורת יומית',         en: '🔔 Daily reminder' },
@@ -332,7 +332,7 @@ const DICT = {
   'reader.show_endings':     { he: 'הסתר סיומות',             en: 'Hide endings' },
   'reader.show_endings_on':  { he: 'הצג סיומות',              en: 'Show endings' },
   'reader.shinun_btn':       { he: '🧠 שינון',                en: '🧠 Practice' },
-  'reader.share_chap':       { he: '📤 שתף',                  en: '📤 Share' },
+  'reader.share_chap':       { he: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> שתף',                  en: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share' },
   'reader.save_btn':         { he: '🔖 שמור',                 en: '🔖 Save' },
   'reader.font_smaller':     { he: 'א-',                       en: 'A-' },
   'reader.font_bigger':      { he: 'א+',                       en: 'A+' },
@@ -464,7 +464,7 @@ const DICT = {
   'yiz.mother_label':        { he: 'שם האם / אבא',             en: 'Name of mother / father' },
   // פסוקים שמורים
   'saved.empty_state':       { he: 'אין פסוקים שמורים עדיין.\nלחץ ארוך על פסוק בקריאה כדי לשמור.', en: 'No saved mishnayot yet.\nLong-press a verse to save.' },
-  'saved.share':             { he: '📤 שתף',                  en: '📤 Share' },
+  'saved.share':             { he: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> שתף',                  en: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share' },
   'saved.copy':              { he: '📋 העתק',                 en: '📋 Copy' },
   'saved.remove':            { he: '🗑 הסר',                   en: '🗑 Remove' }
 };
