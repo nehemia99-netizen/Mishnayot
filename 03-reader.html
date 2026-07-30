@@ -422,6 +422,11 @@ const S = {
   remove: k      => localStorage.removeItem(k)
 };
 
+/* ── תחילת סשן קריאה ── מאפסים את מצבור המעלות של הסשן (session_acc).
+   טעינת עמוד הקורא = סשן חדש; הניווט בין פרקים מצטבר לתוכו. (גם מנקה מצבור
+   ישן/יתום ממשתמשים קיימים — קודם הוא נכתב אך מעולם לא נצרך/נוקה.) */
+try { localStorage.removeItem('tehillim_session_acc'); } catch(e) {}
+
 /* ── Dark mode ── */
 const cfg = S.get('tehillim_settings') || {};
 if (cfg.darkMode) document.documentElement.classList.add('dark');
@@ -1621,11 +1626,17 @@ function finishChapter() {
   if (earned > alreadyAccrued) {
     addScore(earned - alreadyAccrued); // רק הדלתא החסרה
   }
-  // שמור pending toast להצגה בדשבורד הבא
+  // שמור pending toast להצגה בדשבורד הבא — **סכום כל הסשן**: הפרק הנוכחי +
+  // כל הפרקים שכבר סיימת בביקור הזה (שנצברו ב-session_acc בכל ניווט). כך
+  // הטוסט בדשבורד מסכם את כל מה שקראת עכשיו, ולא רק את הפרק האחרון.
   try {
+    let totalPts = sessionPts, chapsCount = 1;
+    const accRaw = localStorage.getItem('tehillim_session_acc');
+    if (accRaw) { const acc = JSON.parse(accRaw); totalPts += (acc.pts || 0); chapsCount += (acc.chaps || 0); }
     localStorage.setItem('tehillim_pending_toast', JSON.stringify({
-      pts: sessionPts, // sessionPts אחרי ה-addScore הנ"ל = earned
+      pts: totalPts,
       chap: curId(),
+      chaps: chapsCount,
       ts: Date.now()
     }));
   } catch(e) {}
