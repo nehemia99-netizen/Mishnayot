@@ -52,8 +52,12 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .bm-siddur p{margin:0 0 .5em;}
 .bm-rubric{font-family:system-ui,sans-serif;font-size:.72em;color:var(--text-muted);font-weight:700;padding:0 .12em;}
 .bm-inset{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:11px 14px;margin:10px 0;}
-.bm-lbl{font-family:system-ui,sans-serif;font-size:11px;font-weight:800;color:var(--primary);margin-bottom:6px;}
-.bm-inset .bm-siddur{font-size:.95em;}
+.bm-lbl{font-family:system-ui,sans-serif;font-size:11px;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.bm-lbl::after{content:'›';margin-inline-start:auto;font-size:15px;color:var(--text-muted);transition:transform .2s;}
+.bm-inset.open .bm-lbl{margin-bottom:8px;}
+.bm-inset.open .bm-lbl::after{transform:rotate(90deg);}
+.bm-inset .bm-siddur{font-size:.95em;display:none;}
+.bm-inset.open .bm-siddur{display:block;}
 .bm-src{font-size:11px;color:var(--text-muted);margin-top:14px;text-align:center;}
 </style>
 <script>
@@ -536,6 +540,14 @@ function setMazonNusach(n){
   try{ localStorage.setItem('birkat_nusach', sef?'sef':'miz'); }catch(e){}
 }
 try{ setMazonNusach(localStorage.getItem('birkat_nusach')||'sef'); }catch(e){}
+
+/* וילון: פתיחת/סגירת תוספות שבת/ר"ח בברכת המזון */
+document.addEventListener('click', function(e){
+  var lbl = (e.target && e.target.closest) ? e.target.closest('.bm-lbl') : null;
+  if(lbl && lbl.parentElement && lbl.parentElement.classList.contains('bm-inset')){
+    lbl.parentElement.classList.toggle('open');
+  }
+});
 
 function setCemNusach(n) {
   const isA = (n === 'ashk');
