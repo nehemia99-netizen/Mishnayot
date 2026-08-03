@@ -233,6 +233,14 @@ html.dark .cm-cell.fav{background:#2A1010;}
 .book-bar{height:100%;border-radius:3px;transition:width .6s ease;}
 .book-count-sm{font-size:11px;color:var(--text-muted);min-width:54px;text-align:left;}
 
+
+/* === גרף תקופה === */
+.hist-graph-card{margin:12px 16px 4px;background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:12px 14px 8px;}
+.hist-graph-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.hist-graph-lbl{font-size:12px;color:var(--text-muted);font-weight:600;}
+.hist-graph-val{font-size:16px;font-weight:800;color:var(--text);}
+.hist-graph-body{position:relative;height:135px;}
+.hist-graph-body canvas{display:block;width:100%!important;height:100%!important;}
 </style>
 <script src="errlog.js?v=1.5.75"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -299,6 +307,14 @@ html.dark .cm-cell.fav{background:#2A1010;}
       <button class="period-btn" id="pWeek"  onclick="setPeriod('week')" data-i18n="hist.period_week">7 ימים</button>
       <button class="period-btn" id="pMonth" onclick="setPeriod('month')" data-i18n="hist.period_month">30 יום</button>
       <button class="period-btn" id="pAll"   onclick="setPeriod('all')" data-i18n="hist.period_all">הכל</button>
+    </div>
+
+    <div class="hist-graph-card">
+      <div class="hist-graph-head">
+        <span class="hist-graph-lbl" id="histGraphLabel">היום</span>
+        <span class="hist-graph-val" id="histGraphVal">—</span>
+      </div>
+      <div class="hist-graph-body"><canvas id="histChart"></canvas></div>
     </div>
 
     <div class="stats-grid" id="statsGrid"></div>
@@ -1256,6 +1272,182 @@ window.setPeriod = function(p) {
   renderAchievements();
 }
 
+/* === גרף תקופה (מנוע הגרף מעמוד הבית) === */
+const HTD=new Date();
+const HMHE=['ינו׳','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
+const HHE=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+function histGetData(tab,metric){
+  const rd=S.get('tehillim_reading')||{};
+  const sc=S.get('tehillim_score')||{};
+  const dMins=rd.dailyMinutes||{};
+  const dScore=(sc.daily)||{};
+  const unit=metric==='time'?'דק׳':'זכויות';
+
+  function ds(ago){const d=new Date(HTD);d.setDate(d.getDate()-ago);return localDateStr(d);}
+  function v(dateStr){
+    let raw;
+    if (metric === 'time') {
+      raw = dMins[dateStr] || 0;
+    } else {
+      // 2.2.21: gamification.byDay הוא מקור הגרף — לא Math.max עם tehillim_score
+      // (addDashScore הוסר מ-claimChallenge כדי למנוע ספירה כפולה)
+      try {
+        if (typeof Gamification !== 'undefined' && Gamification.load) {
+          const gdata = Gamification.load();
+          const byDay = gdata && gdata['ma\'alot'] && gdata['ma\'alot'].byDay || {};
+          const gamVal = byDay[dateStr];
+          raw = (gamVal !== undefined) ? gamVal : (dScore[dateStr] || 0);
+        } else {
+          raw = dScore[dateStr] || 0;
+        }
+      } catch(e) { raw = dScore[dateStr] || 0; }
+    }
+    return Math.round(raw*10)/10;
+  }
+  function ensureTwo(labels,data){
+    if(data.length<2){labels.unshift('');data.unshift(0);}
+    return{labels,data};
+  }
+
+  // השוואה בין שני הסשנים האחרונים
+  function trendVsLastSession() {
+    const _rdRaw2=S.get('tehillim_readings');const rds=Array.isArray(_rdRaw2)?_rdRaw2:Object.values(_rdRaw2||{});
+    if(rds.length<2)return{trend2:'',trend2up:true};
+    const last=rds[rds.length-1];
+    const prev=rds[rds.length-2];
+    const lastVal=metric==='time'?last.secs/60:last.pts;
+    const prevVal=metric==='time'?prev.secs/60:prev.pts;
+    if(prevVal<=0)return{trend2:'',trend2up:true};
+    const pct=Math.round((lastVal-prevVal)/prevVal*100);
+    return{trend2:Math.abs(pct)+'% מהפרק הקודם',trend2up:pct>=0};
+  }
+  function toGemDash(n){
+    const sp={15:'טו',16:'טז',115:'קטו',116:'קטז'};if(sp[n])return sp[n];
+    const h=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],m=['','ק','ר','ש','ת'];
+    let r='',x=n;if(x>=100){r+=m[Math.floor(x/100)];x%=100;}if(x>=10){r+=t[Math.floor(x/10)];x%=10;}r+=h[x];return r;
+  }
+
+  if(tab==='day'){
+    // גרף יומי מצטבר (cumulative) — כל נקודה = סכום עד אותו רגע
+    const todayStr=localDateStr(HTD);
+    const _rdRaw=S.get('tehillim_readings');const rds=(Array.isArray(_rdRaw)?_rdRaw:Object.values(_rdRaw||{})).filter(r=>r.date===todayStr&&r.ts);
+    const _sc=S.get('tehillim_score')||{};
+    const dailyEvts=((_sc.dailyEvents)||[]).filter(e=>e.date===todayStr&&e.ts);
+    const curHour=HTD.getHours();
+    // כל האירועים של היום עם timestamp
+    const allEvents=[];
+    rds.forEach(r=>allEvents.push({ts:new Date(r.ts).getTime(),val:metric==='time'?r.secs/60:r.pts}));
+    if(metric==='score') dailyEvts.forEach(e=>allEvents.push({ts:new Date(e.ts).getTime(),val:e.pts}));
+    allEvents.sort((a,b)=>a.ts-b.ts);
+    // בנה גרף cumulative לפי שעות
+    const labels=[],data=[];
+    // נקודת פתיחה בשעת האירוע הראשון (או תחילת היום)
+    const startHour = allEvents.length ? new Date(allEvents[0].ts).getHours() : curHour;
+    let running=0;
+    // הוסף נקודת אפס לפני הראשון
+    if(allEvents.length){
+      labels.push(String(startHour).padStart(2,'0')+':00');
+      data.push(0);
+    }
+    allEvents.forEach(evt=>{
+      running+=evt.val;
+      const h=new Date(evt.ts).getHours();
+      const m=new Date(evt.ts).getMinutes();
+      labels.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));
+      data.push(Math.round(running*10)/10);
+    });
+    // הוסף נקודת "כעת" אם עברו יותר מ-10 דקות מהאירוע האחרון
+    if(allEvents.length){
+      const lastTs=allEvents[allEvents.length-1].ts;
+      if(Date.now()-lastTs>10*60*1000){
+        labels.push('כעת');
+        data.push(Math.round(running*10)/10);
+      }
+    }
+    if(labels.length<2){labels.push('כעת');data.push(0);}
+    if(labels.length>12){const step=Math.ceil(labels.length/12);const sL=[labels[0]],sD=[data[0]];for(let i=step;i<labels.length-1;i+=step){sL.push(labels[i]);sD.push(data[i]);}sL.push(labels[labels.length-1]);sD.push(data[data.length-1]);labels.length=0;data.length=0;sL.forEach((l,i)=>{labels.push(l);data.push(sD[i]);});}
+    let total=running;
+    // סנכרון "מעלות היום" עם מקור-האמת (gamification.byDay) — כולל בונוס יומי/מדליות שלא נכנסים ל-readings/dailyEvents
+    if(metric==='score'){
+      try{
+        if(typeof Gamification!=='undefined'&&Gamification.load){
+          const _g=Gamification.load();
+          const _bd=(_g&&_g['ma\'alot']&&_g['ma\'alot'].byDay)||{};
+          if(_bd[todayStr]!==undefined){
+            total=+_bd[todayStr];
+            if(data.length)data[data.length-1]=Math.round(total*10)/10;
+          }
+        }
+      }catch(e){}
+    }
+    const yestVal=v(ds(1));
+    const pct=yestVal>0?Math.round((total-yestVal)/yestVal*100):0;
+    const {trend2,trend2up}=trendVsLastSession(total);
+    return{labels,data,val:Math.round(total*10)/10+' '+unit,label:'היום',trend:Math.abs(pct)+'% מאתמול',up:pct>=0,trend2,trend2up};
+  }
+
+  if(tab==='week'){
+    // 7 ימים אחרונים — כל יום בנפרד
+    const labels=[],data=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(HTD);d.setDate(d.getDate()-i);
+      labels.push(i===0?'היום':HHE[d.getDay()]);
+      data.push(v(ds(i)));
+    }
+    const total=data.reduce((a,b)=>a+b,0);
+    // השוואה לשבוע הקודם
+    let lastWeek=0;for(let i=7;i<14;i++)lastWeek+=v(ds(i));
+    const pct=lastWeek>0?Math.round((total-lastWeek)/lastWeek*100):0;
+    return{labels,data,val:Math.round(total*10)/10+' '+unit,label:'השבוע',trend:Math.abs(pct)+'% משבוע שעבר',up:pct>=0,trend2:'',trend2up:true};
+  }
+
+  if(tab==='month'){
+    // 6 נקודות — כל אחת מייצגת 5 ימים (סך 30 יום)
+    const labels=[],data=[];let total=0;
+    for(let bucket=5;bucket>=0;bucket--){
+      let bt=0;
+      for(let d2=0;d2<5;d2++) bt+=v(ds(bucket*5+d2));
+      total+=bt;
+      const ref=new Date(HTD);ref.setDate(ref.getDate()-bucket*5);
+      labels.push(bucket===0?'היום':(ref.getDate()+'/'+HMHE[ref.getMonth()]));
+      data.push(Math.round(bt*10)/10);
+    }
+    let lastMonth=0;for(let i=30;i<60;i++)lastMonth+=v(ds(i));
+    const pct=lastMonth>0?Math.round((total-lastMonth)/lastMonth*100):0;
+    return{labels,data,val:Math.round(total)+' '+unit,label:'30 יום',trend:Math.abs(pct)+'% מ-30 הימים שקדמו',up:pct>=0,trend2:'',trend2up:true};
+  }
+
+  if(tab==='half'){
+    const labels=[],data=[];let total=0;
+    for(let i=5;i>=0;i--){
+      const d=new Date(HTD.getFullYear(),HTD.getMonth()-i,1);
+      const y2=d.getFullYear(),m=d.getMonth();
+      const days=new Date(y2,m+1,0).getDate();
+      let mt=0;for(let day=1;day<=days;day++)mt+=v(localDateStr(new Date(y2,m,day)));
+      labels.push(HMHE[m]);data.push(Math.round(mt*10)/10);total+=mt;
+    }
+    return{labels,data,val:Math.round(total)+' '+unit,label:'חצי שנה',trend:'',up:true,trend2:'',trend2up:true};
+  }
+}
+function histChartColors(metric,dark){
+  if(metric==='score')return{line:dark?'#F5C842':'#C07A00',fill:dark?'rgba(245,200,66,0.12)':'rgba(192,122,0,0.10)',unit:'זכויות'};
+  return{line:dark?'#6FBF7A':'#3A7D44',fill:dark?'rgba(90,168,232,0.12)':'rgba(24,95,165,0.10)',unit:'דק׳'};
+}
+function histBuildChart(period){
+  const tabMap={today:'day',week:'week',month:'month',all:'half'};
+  const tab=tabMap[period]||'week';
+  let metric='time'; try{metric=(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').graphMetric)||'time';}catch(e){}
+  const d=histGetData(tab,metric)||{labels:[],data:[],val:'',label:''};
+  const canvas=document.getElementById('histChart');
+  if(!canvas||typeof Chart==='undefined')return;
+  const dark=document.documentElement.classList.contains('dark');
+  const c=histChartColors(metric,dark);
+  if(canvas._inst)canvas._inst.destroy();
+  canvas._inst=new Chart(canvas.getContext('2d'),{type:'line',data:{labels:d.labels,datasets:[{data:d.data,borderColor:c.line,backgroundColor:c.fill,borderWidth:2.5,pointRadius:2,pointBackgroundColor:c.line,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{rtl:true,callbacks:{label:x=>x.raw+' '+c.unit}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},color:dark?'#777':'#999'}},y:{display:false,beginAtZero:true}}}});
+  const lbl=document.getElementById('histGraphLabel');if(lbl)lbl.textContent=d.label||'';
+  const val=document.getElementById('histGraphVal');if(val){val.textContent=d.val||'';val.style.color=metric==='score'?(dark?'#F5C842':'#C07A00'):'var(--text)';}
+}
+
 function dateRange(period) {
   const d = _today;
   if (period === 'today') return { from:d, to:d };
@@ -1388,20 +1580,31 @@ function renderAchievements() {
     { num: '+' + pts,           lbl: '⭐ זכויות',    color:'#C07A00' },
     { num: fmtMins(mins),       lbl: '⏱ זמן לימוד'               },
     { num: mem.length,          lbl: '🧠 משניות בע"פ'            },
-    { num: (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })(),
-                                lbl: '📊 מכסת המשנה', wide:false  },
-    { num: visitN,  lbl: '📱 כניסות לאפליקציה', wide:true },
   ];
+  const maalotPct = (function(){ var tot=(typeof Corpus!=='undefined'?Corpus.totalPerakim:525); return doneCh.size>0 ? Math.round(doneCh.size / tot * 100) + '%' : '0%'; })();
+  const _cell = (num, lbl, color) =>
+    '<div style="flex:1;min-width:0;padding:16px 12px;display:flex;flex-direction:column;gap:5px;">' +
+      '<div class="stat-num"' + (color ? ' style="color:'+color+'"' : '') + '>' + num + '</div>' +
+      '<div class="stat-lbl">' + lbl + '</div>' +
+    '</div>';
+  const pairCard =
+    '<div class="stat-card wide" style="flex-direction:row;direction:rtl;gap:0;padding:0;overflow:hidden;">' +
+      _cell(maalotPct, '📊 מכסת המשנה') +
+      '<div style="width:.5px;background:var(--border);flex-shrink:0;align-self:stretch;"></div>' +
+      _cell(visitN, '📱 כניסות לאפליקציה') +
+    '</div>';
+
 
   document.getElementById('statsGrid').innerHTML = statsData.map(s =>
     '<div class="stat-card' + (s.wide?' wide':'') + '">' +
     '<div class="stat-num"' + (s.color?' style="color:'+s.color+'"':'') + '>' + s.num + '</div>' +
     '<div class="stat-lbl">' + s.lbl + '</div>' +
     '</div>'
-  ).join('');
+  ).join('') + pairCard;
 
   renderTopChaps(recs);
   renderMedals();
+  try { histBuildChart(currentPeriod); } catch(e) {}
 }
 
 // 3 הפרקים הכי נצפים בתקופה הנבחרת (אישי)

@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.90 BETA</div>
+          <div class="app-version">גרסה 1.5.91 BETA</div>
         </div>
       </div>
     </div>
@@ -2513,16 +2513,17 @@ async function shareApp(){
   }
 }
 function trackVisit(){
-  const rd=S.get('tehillim_reading')||{};
   const today=localDateStr();
+  // כניסות לאפליקציה — נספר בכל כניסה (לא רק פעם ביום)
+  const vd=S.get('tehillim_visits')||{count:0};
+  vd.count=(vd.count||0)+1;vd.lastDate=today;
+  vd.byDay=vd.byDay||{};vd.byDay[today]=(vd.byDay[today]||0)+1;
+  S.set('tehillim_visits',vd);
+  // פעם ביום בלבד: רצף + בונוס ניקוד
+  const rd=S.get('tehillim_reading')||{};
   if(rd.lastVisit!==today){
     rd.lastVisit=today;rd.visits=(rd.visits||0)+1;
     S.set('tehillim_reading',rd);
-    // שמור גם ב-tehillim_visits לשימוש עמוד ההיסטוריה
-    const vd=S.get('tehillim_visits')||{count:0};
-    vd.count=(vd.count||0)+1;vd.lastDate=today;
-    vd.byDay=vd.byDay||{};vd.byDay[today]=(vd.byDay[today]||0)+1; // ספירה לפי-יום לסינון תקופה
-    S.set('tehillim_visits',vd);
     addDashScore(0.5);
   }
   // בדוק אזהרת רצף — אחרי 20:00 אם לא קראת
