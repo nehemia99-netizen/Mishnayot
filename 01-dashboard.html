@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.91 BETA</div>
+          <div class="app-version">גרסה 1.5.92 BETA</div>
         </div>
       </div>
     </div>
@@ -2524,7 +2524,7 @@ function trackVisit(){
   if(rd.lastVisit!==today){
     rd.lastVisit=today;rd.visits=(rd.visits||0)+1;
     S.set('tehillim_reading',rd);
-    addDashScore(0.5);
+    addDashScore(1);
   }
   // בדוק אזהרת רצף — אחרי 20:00 אם לא קראת
   setTimeout(_checkStreakWarning, 3000);

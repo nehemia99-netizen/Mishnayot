@@ -241,6 +241,14 @@ html.dark .cm-cell.fav{background:#2A1010;}
 .hist-graph-val{font-size:16px;font-weight:800;color:var(--text);}
 .hist-graph-body{position:relative;height:135px;}
 .hist-graph-body canvas{display:block;width:100%!important;height:100%!important;}
+.jump-summary{display:block;width:calc(100% - 32px);margin:12px 16px 2px;padding:11px 14px;border-radius:14px;border:.5px solid var(--primary);background:var(--primary-light);color:var(--primary);font-weight:700;font-size:13px;font-family:inherit;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;}
+.hist-metric-toggle{flex-shrink:0;margin-inline-start:auto;padding:6px 12px;border-radius:20px;border:.5px solid var(--primary);background:transparent;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:system-ui,sans-serif;-webkit-tap-highlight-color:transparent;}
+.week-count{display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;width:54px;padding:5px 4px;border:1px solid #2E6FB0;border-radius:12px;line-height:1.05;background:rgba(46,111,176,.08);}
+.week-count .wc-num{font-size:20px;font-weight:800;color:#2E6FB0;font-family:system-ui,sans-serif;}
+.week-count .wc-lbl{font-size:9px;color:var(--text-muted);margin-top:1px;}
+html.dark .week-count{border-color:#5C9BD8;background:rgba(92,155,216,.14);}
+html.dark .week-count .wc-num{color:#7FB6E8;}
+.hist-graph-trend{font-size:12px;font-weight:700;margin-inline-start:8px;}
 </style>
 <script src="errlog.js?v=1.5.75"></script>
 <script src="shake.js?v=2.2.32"></script>
@@ -274,6 +282,8 @@ html.dark .cm-cell.fav{background:#2A1010;}
   <!-- ── Tab 0: Today ── -->
   <div class="tab-content active" id="tab0">
 
+    <button class="jump-summary" onclick="document.getElementById('periodSummary').scrollIntoView({behavior:'smooth',block:'start'})">📊 סיכומי תקופה — לחצו לצפייה ↓</button>
+
     <div class="summary-row">
       <div class="sum-card">
         <div class="sum-num" id="todayChaps">0</div>
@@ -301,17 +311,18 @@ html.dark .cm-cell.fav{background:#2A1010;}
     <div id="weekList" style="padding-bottom:16px;"></div>
 
 
-    <div class="section-title" style="margin-top:18px;" data-i18n="hist.period_summary">סיכום תקופה</div>
+    <div class="section-title" id="periodSummary" style="margin-top:18px;scroll-margin-top:8px;" data-i18n="hist.period_summary">סיכום תקופה</div>
     <div class="period-sel">
       <button class="period-btn active" id="pToday" onclick="setPeriod('today')" data-i18n="hist.period_today">היום</button>
       <button class="period-btn" id="pWeek"  onclick="setPeriod('week')" data-i18n="hist.period_week">7 ימים</button>
       <button class="period-btn" id="pMonth" onclick="setPeriod('month')" data-i18n="hist.period_month">30 יום</button>
       <button class="period-btn" id="pAll"   onclick="setPeriod('all')" data-i18n="hist.period_all">הכל</button>
+      <button class="hist-metric-toggle" id="histMetricBtn" onclick="toggleHistMetric()" title="החלף מדד גרף">⏱ זמן</button>
     </div>
 
     <div class="hist-graph-card">
       <div class="hist-graph-head">
-        <span class="hist-graph-lbl" id="histGraphLabel">היום</span>
+        <div><span class="hist-graph-lbl" id="histGraphLabel">היום</span><span class="hist-graph-trend" id="histGraphTrend"></span></div>
         <span class="hist-graph-val" id="histGraphVal">—</span>
       </div>
       <div class="hist-graph-body"><canvas id="histChart"></canvas></div>
@@ -1029,15 +1040,15 @@ async function renderWeekHistory() {
     const dayName = dayNames[d.getDay()];
     const dateStr = d.toLocaleDateString('he-IL', {day:'numeric',month:'short'});
     const hebStr = _hebDateCache[date] || '';
-    html += '<a class="read-item" href="03-reader.html" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">' +
-      '<div class="read-left">' +
+    html += '<a class="read-item" href="03-reader.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">' +
+      '<div class="read-left" style="flex:1;min-width:0;">' +
         '<div class="read-dot" style="background:var(--primary)"></div>' +
         '<div>' +
           '<div class="read-chap">יום ' + dayName + ' · ' + dateStr + (hebStr ? '<span style="color:var(--text-muted);font-size:12px;"> | ' + hebStr + '</span>' : '') + '</div>' +
-          '<div class="read-sub">' + b.chaps.size + ' פרקים</div>' +
         '</div>' +
       '</div>' +
-      '<div class="read-right">' +
+      '<div class="week-count"><span class="wc-num">' + b.chaps.size + '</span><span class="wc-lbl">פרקים</span></div>' +
+      '<div class="read-right" style="min-width:46px;text-align:center;flex-shrink:0;">' +
         '<div class="read-dur">' + fmtSecs(b.secs) + '</div>' +
       '</div>' +
     '</a>';
@@ -1433,10 +1444,17 @@ function histChartColors(metric,dark){
   if(metric==='score')return{line:dark?'#F5C842':'#C07A00',fill:dark?'rgba(245,200,66,0.12)':'rgba(192,122,0,0.10)',unit:'זכויות'};
   return{line:dark?'#6FBF7A':'#3A7D44',fill:dark?'rgba(90,168,232,0.12)':'rgba(24,95,165,0.10)',unit:'דק׳'};
 }
+let histMetric=(function(){try{return (JSON.parse(localStorage.getItem('tehillim_settings')||'{}').graphMetric)||'time';}catch(e){return 'time';}})();
+function setHistMetric(m){
+  histMetric=m;
+  try{const s=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');s.graphMetric=m;localStorage.setItem('tehillim_settings',JSON.stringify(s));}catch(e){}
+  histBuildChart(currentPeriod);
+}
+function toggleHistMetric(){ setHistMetric(histMetric==='score'?'time':'score'); }
 function histBuildChart(period){
   const tabMap={today:'day',week:'week',month:'month',all:'half'};
   const tab=tabMap[period]||'week';
-  let metric='time'; try{metric=(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').graphMetric)||'time';}catch(e){}
+  const metric=histMetric;
   const d=histGetData(tab,metric)||{labels:[],data:[],val:'',label:''};
   const canvas=document.getElementById('histChart');
   if(!canvas||typeof Chart==='undefined')return;
@@ -1446,6 +1464,10 @@ function histBuildChart(period){
   canvas._inst=new Chart(canvas.getContext('2d'),{type:'line',data:{labels:d.labels,datasets:[{data:d.data,borderColor:c.line,backgroundColor:c.fill,borderWidth:2.5,pointRadius:2,pointBackgroundColor:c.line,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{rtl:true,callbacks:{label:x=>x.raw+' '+c.unit}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},color:dark?'#777':'#999'}},y:{display:false,beginAtZero:true}}}});
   const lbl=document.getElementById('histGraphLabel');if(lbl)lbl.textContent=d.label||'';
   const val=document.getElementById('histGraphVal');if(val){val.textContent=d.val||'';val.style.color=metric==='score'?(dark?'#F5C842':'#C07A00'):'var(--text)';}
+  const tr=document.getElementById('histGraphTrend');
+  if(tr){ if(d.trend){ tr.textContent=(d.up?'↑ ':'↓ ')+d.trend; tr.style.color=d.up?'var(--green,#3B8C14)':'#C0392B'; } else { tr.textContent=''; } }
+  const _mb=document.getElementById('histMetricBtn');
+  if(_mb)_mb.textContent = metric==='score' ? '✡ זכויות' : '⏱ זמן';
 }
 
 function dateRange(period) {
