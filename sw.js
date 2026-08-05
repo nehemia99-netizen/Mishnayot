@@ -6,7 +6,7 @@
    • CDN (Chart.js וכו') → Cache-First
 ═══════════════════════════════════════════════════ */
 
-const CACHE_VER  = 'mishnayon-v1.5.92';
+const CACHE_VER  = 'mishnayon-v1.5.93';
 const SEFARIA    = 'www.sefaria.org';
 
 const APP_SHELL  = [
@@ -21,6 +21,7 @@ const APP_SHELL  = [
   './09-saved.html',
   './10-sequence.html',
   './blessings.html',
+  './guide.html',
   './terms.html',
   './manifest.json',
   './utils.js',

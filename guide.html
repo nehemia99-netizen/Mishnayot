@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>משנתי — מדריך מלא</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;--gold:#B8860B;--gold-light:#FBF4E0;--purple:#7B2FF7;--purple-light:#F2ECFF;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;--gold:#E0B84A;--gold-light:#241D00;--purple:#9B6FE0;--purple-light:#1C1235;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);direction:rtl;display:flex;justify-content:center;padding-bottom:32px;}
+html[dir=ltr] body{direction:ltr;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10;}
+.back-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 14px;text-decoration:none;font-weight:600;white-space:nowrap;}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text);flex:1;}
+.lang-btn{font-size:13px;color:var(--primary);border:1px solid var(--primary);background:transparent;border-radius:20px;padding:6px 12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+.content{padding:20px 18px 40px;}
+.hero{text-align:center;padding:18px 0 14px;}
+.hero-emoji{font-size:46px;line-height:1;display:block;margin-bottom:10px;}
+.hero-title{font-size:21px;font-weight:800;color:var(--text);margin-bottom:5px;}
+.hero-sub{font-size:13.5px;color:var(--text-muted);line-height:1.6;}
+
+.toc{background:var(--bg);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;margin:8px 0 26px;}
+.toc-title{font-size:13px;font-weight:800;color:var(--primary);margin-bottom:8px;letter-spacing:.02em;}
+.toc a{display:block;font-size:13.5px;color:var(--text-sec);text-decoration:none;padding:4px 0;border-bottom:.5px solid var(--border);}
+.toc a:last-child{border-bottom:none;}
+.toc a:hover{color:var(--primary);}
+
+.section{margin-bottom:30px;scroll-margin-top:64px;}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-size:13px;font-weight:800;margin-inline-end:8px;flex:none;}
+.section-head{display:flex;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid var(--primary-light);}
+.section-title{font-size:17px;font-weight:800;color:var(--text);}
+.section p{font-size:14.5px;color:var(--text-sec);line-height:1.75;margin-bottom:10px;}
+.section p:last-child{margin-bottom:0;}
+.section b,.section strong{color:var(--text);font-weight:700;}
+
+.steps{list-style:none;counter-reset:step;margin:6px 0 10px;}
+.steps li{position:relative;padding-inline-start:30px;margin-bottom:11px;font-size:14.5px;color:var(--text-sec);line-height:1.7;counter-increment:step;}
+.steps li::before{content:counter(step);position:absolute;inset-inline-start:0;top:1px;width:21px;height:21px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+
+.tip{background:var(--gold-light);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;margin:10px 0;}
+.tip p{font-size:13.5px;color:var(--gold);line-height:1.65;margin:0;font-weight:600;}
+
+.note{background:var(--primary-light);border-radius:12px;padding:12px 14px;margin:10px 0;}
+.note p{font-size:13.5px;color:var(--primary);line-height:1.65;margin:0;}
+
+.why{background:var(--primary-light);border:1px dashed var(--primary);border-radius:12px;padding:13px 15px;margin:12px 0;}
+.why p{font-size:13.5px;color:var(--primary);line-height:1.7;margin:0;}
+.why b{color:var(--primary);font-weight:800;}
+
+.modes-box{border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin:12px 0;background:var(--card);}
+.modes-box .mt{font-size:13.5px;font-weight:800;color:var(--text);margin-bottom:9px;}
+.mode2{font-size:13.5px;color:var(--text-sec);line-height:1.65;margin-bottom:8px;}
+.mode2 b{color:var(--text);font-weight:700;}
+.modes-how{font-size:12.5px;color:var(--text-muted);margin-top:2px;line-height:1.5;}
+
+.feat{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px;}
+.feat-ic{font-size:22px;line-height:1.2;flex:none;}
+.feat-tx{font-size:14px;color:var(--text-sec);line-height:1.6;}
+.feat-tx b{display:block;color:var(--text);font-size:14.5px;margin-bottom:1px;}
+
+.mode{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;padding:9px 11px;border-radius:10px;background:var(--purple-light);}
+.mode-ic{font-size:18px;flex:none;line-height:1.4;}
+.mode-tx{font-size:13.5px;color:var(--text-sec);line-height:1.55;}
+.mode-tx b{color:var(--purple);font-weight:800;}
+
+.audio-box{border:1px solid var(--primary);border-radius:12px;padding:6px 12px 12px;margin:12px 0;background:var(--primary-light);}
+.audio-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:.5px solid var(--border);}
+.audio-row:last-child{border-bottom:none;}
+.audio-ic{font-size:19px;flex:none;line-height:1.4;}
+.audio-tx{font-size:13.5px;color:var(--text-sec);line-height:1.55;}
+.audio-tx b{color:var(--text);font-weight:700;}
+
+.faq-q{font-size:14.5px;font-weight:700;color:var(--text);margin:14px 0 4px;}
+.faq-a{font-size:14px;color:var(--text-sec);line-height:1.7;}
+
+.footer-note{text-align:center;font-size:12.5px;color:var(--text-muted);margin-top:30px;line-height:1.9;}
+.footer-note a{color:var(--primary);text-decoration:none;font-weight:600;}
+.lvl-tag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:9px;margin-inline-start:7px;vertical-align:middle;}
+.lvl-basic{background:#EBF5E5;color:#3B8C14;}
+.lvl-adv{background:var(--gold-light);color:var(--gold);}
+html.dark .lvl-basic{background:#0E2400;color:#7FD13F;}
+</style>
+<script>
+try{ if(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').darkMode) document.documentElement.classList.add('dark'); }catch(e){}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <a class="back-btn" href="javascript:history.back()" data-i18n="back">→ חזרה</a>
+    <span class="topbar-title" data-i18n="topTitle">מדריך מלא</span>
+    <button class="lang-btn" id="langToggle" onclick="setLang(document.documentElement.lang==='he'?'en':'he')">EN</button>
+  </div>
+
+  <div class="content">
+
+    <div class="hero">
+      <span class="hero-emoji">📖</span>
+      <div class="hero-title" data-i18n="heroTitle">המדריך המלא למשנתי</div>
+      <div class="hero-sub" data-i18n="heroSub">מהצעד הראשון ועד הניואנסים למתקדמים — כל מה שצריך לדעת.</div>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title" data-i18n="tocTitle">בקצרה — מה יש כאן</div>
+      <a href="#s1" data-i18n="toc1">1 · מה זה משנתי?</a>
+      <a href="#s2" data-i18n="toc2">2 · התקנה והתחברות</a>
+      <a href="#s3" data-i18n="toc3">3 · הלימוד הראשון</a>
+      <a href="#s4" data-i18n="toc4">4 · כלי הקורא</a>
+      <a href="#s5" data-i18n="toc5">5 · הקראה קולית 🔊</a>
+      <a href="#s6" data-i18n="toc6">6 · חיפוש, מועדפים והמשנה שלי</a>
+      <a href="#s7" data-i18n="toc7">7 · שינון ולימוד בעל-פה</a>
+      <a href="#s8" data-i18n="toc8">8 · זכויות, רצף ומדליות</a>
+      <a href="#s9" data-i18n="toc9">9 · קהילה וקבוצות</a>
+      <a href="#s10" data-i18n="toc10">10 · היסטוריה, גרפים ומגמות</a>
+      <a href="#s11" data-i18n="toc11">11 · לעילוי נשמה ומחולל רצף</a>
+      <a href="#s12" data-i18n="toc12">12 · הגדרות</a>
+      <a href="#s13" data-i18n="toc13">13 · טיפים נוספים</a>
+      <a href="#s14" data-i18n="toc14">14 · שאלות נפוצות</a>
+    </div>
+
+    <!-- 1 -->
+    <div class="section" id="s1">
+      <div class="section-head"><span class="section-num">1</span><span class="section-title" data-i18n="s1t">מה זה משנתי?</span><span class="lvl-tag lvl-basic" data-i18n="lvlB1">למתחיל</span></div>
+      <p data-i18n="s1p1"><b>משנתי</b> הוא כל שישה סדרי המשנה — <b>63 מסכתות ומאות פרקים</b>, מנוקדים וברורים — שחיים בתוך הטלפון שלך. הוא חינמי לגמרי, בלי פרסומות ובלי תשלום.</p>
+      <p data-i18n="s1p2">זו לא אפליקציה רגילה שמורידים מחנות — זה <b>אתר חכם (PWA)</b> שאפשר "להתקין" על מסך הבית כמו אפליקציה, והוא עובד <b>גם בלי אינטרנט</b> אחרי הטעינה הראשונה.</p>
+      <p data-i18n="s1p3">אבל משנתי הוא לא רק קורא — הוא <b>עוקב אחר הרגלי הלימוד שלך</b>: מודד כמה פרקים למדת וכמה זמן, ונותן לך תמונה מדויקת עם <b>היסטוריית לימוד וגרפים</b> של כמה למדת ומתי — כולל מגמות לאורך זמן, ממש כמו אתר בורסה.</p>
+      <div class="why"><p data-i18n="s1why">🧭 <b>למה "ה-Waze של המשנה"?</b> כי כמו שב-Waze אתה לא נוסע לבד — גם כאן, ברמת הקהילה אתה רואה אילו פרקים "חמים" עכשיו וכמה אנשים לומדים אותם ברגע זה. אתה תמיד חלק מתנועה גדולה של לומדים.</p></div>
+      <div class="modes-box">
+        <div class="mt" data-i18n="s1modesT">📖 או 🏆 — בחר את סגנון החוויה:</div>
+        <div class="mode2" data-i18n="s1modesSimple"><b>📖 לימוד תמים</b> — ממשק נקי ללימוד בלבד, בלי ניקוד, אתגרים או קהילה. למי שרוצה פשוט ללמוד משנה בשקט.</div>
+        <div class="mode2" data-i18n="s1modesChal"><b>🏆 מסלול אתגרי</b> — החוויה המלאה: זכויות, רצף ימים, אתגרים, מדליות וקהילה. למי שאוהב מוטיבציה, יעדים והתמדה.</div>
+        <div class="modes-how" data-i18n="s1modesHow">↔️ מחליפים בין המודים בכל רגע — בכפתור שבעמוד הבית.</div>
+      </div>
+      <div class="note"><p data-i18n="s1note">💡 חדש למשנה? יש בהגדרות דף <b>"מהי המשנה? הסבר למתחילים"</b>. ולא צריך להירשם — פותחים ומתחילים ללמוד.</p></div>
+    </div>
+
+    <!-- 2 -->
+    <div class="section" id="s2">
+      <div class="section-head"><span class="section-num">2</span><span class="section-title" data-i18n="s2t">התקנה והתחברות</span><span class="lvl-tag lvl-basic" data-i18n="lvlB2">למתחיל</span></div>
+      <p data-i18n="s2p1"><b>התקנה על מסך הבית</b> הופכת את משנתי לאייקון, פותחת אותו במסך מלא, ומאיצה את הטעינה.</p>
+      <p data-i18n="s2p2"><b>בדרך הקלה:</b> כשמופיע באנר "📥 התקן אפליקציה" בדף הבית — לוחצים ומאשרים. תמיד אפשר גם דרך <b>הגדרות ← 📥 התקנה</b>. באנדרואיד (כרום): ⋮ ← "הוסף למסך הבית". באייפון (ספארי): שיתוף ⬆️ ← "הוסף למסך הבית".</p>
+      <div class="why"><p data-i18n="s2why">🔐 <b>למה כדאי להתחבר עם חשבון Google?</b> בלי התחברות, כל ההתקדמות שלך (לימודים, זכויות, רצף, מועדפים, הערות) נשמרת <b>רק במכשיר הזה</b> — אם תחליף או תאבד טלפון, הכל ייעלם. עם <b>"המשך עם Google"</b> (בהגדרות ← חשבון וגיבוי) הנתונים מגובים בענן ו<b>משוחזרים אוטומטית בכל מכשיר</b> שתתחבר בו. התחברות פעם אחת = שקט נפשי.</p></div>
+      <div class="note"><p data-i18n="s2motion">📱 <b>באייפון — בקשת גישה ל"תנועה וכיוון":</b> בכניסה הראשונה ספארי עשוי לשאול אם לאפשר גישה ל<b>תנועה וכיוון</b>. זה נועד <b>אך ורק</b> לתכונת ה<b>"נענוע לפרק אקראי"</b> — מנערים את המכשיר וייפתח פרק משנה אקראי. אפשר <b>לאשר</b> כדי להפעיל, או <b>לבטל</b> — שום דבר אחר באפליקציה לא נפגע, ואין כאן שום מעקב. תמיד אפשר לשנות ב<b>הגדרות</b>.</p></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="section" id="s3">
+      <div class="section-head"><span class="section-num">3</span><span class="section-title" data-i18n="s3t">הלימוד הראשון</span><span class="lvl-tag lvl-basic" data-i18n="lvlB3">למתחיל</span></div>
+      <ol class="steps">
+        <li data-i18n="s3l1">בדף הבית לוחצים <b>"בחירת פרק"</b> ובוחרים <b>סדר ← מסכת ← פרק</b>, או <b>"פרק אקראי"</b> כדי שהאפליקציה תבחר עבורך.</li>
+        <li data-i18n="s3l2">המסך הראשי הוא <b>הקורא</b> — טקסט המשנה המנוקד, נוח לגלילה ולהגדלה.</li>
+        <li data-i18n="s3l3">בזמן הלימוד רץ <b>מונה חי צף</b>: בצד אחד הזכויות (✡) שצברת, בצד השני הזמן (⏱).</li>
+        <li data-i18n="s3l4">בסיום — לחצו על כפתור <b>"✓ סיימתי"</b> (נפתח אחרי שגללתם עד סוף הפרק). <b>זו הלחיצה</b> שמזכה אתכם ב<b>זכויות</b> ורושמת את הלימוד בהיסטוריה.</li>
+      </ol>
+      <div class="note"><p data-i18n="s3reg">📌 <b>חשוב:</b> לימוד נספר ומזכה בזכויות <b>רק אחרי הלחיצה על "✓ סיימתי"</b>. אל תשכחו ללחוץ בסיום — אחרת הלימוד לא יירשם.</p></div>
+      <div class="tip"><p data-i18n="s3tip">🖐️ <b>גלילה אוטומטית:</b> הקש פעמיים (דאבל-קליק) על הטקסט כדי להפעיל או לעצור גלילה אוטומטית — נוח ללימוד בלי ידיים. אפשר גם דרך כפתור האותיות <b>Aa</b> בשורה העליונה, ושם גם לכוון את <b>מהירות הגלילה</b>.</p></div>
+    </div>
+
+    <!-- 4 -->
+    <div class="section" id="s4">
+      <div class="section-head"><span class="section-num">4</span><span class="section-title" data-i18n="s4t">כלי הקורא</span></div>
+      <p data-i18n="s4p1">בתוך הקורא יש כלים שהופכים את הלימוד לעשיר ואישי:</p>
+      <div class="feat"><span class="feat-ic">📖</span><div class="feat-tx"><b data-i18n="s4f1t">פירוש — ברטנורא ותוספות יו"ט</b><span data-i18n="s4f1d">כפתור הפירוש 📖 פותח שורת פירוש מתחת לכל משנה, עם מעבר בין <b>ברטנורא</b> ל<b>תוספות יום טוב</b> — להבנה עמוקה של המשנה.</span></div></div>
+      <div class="feat"><span class="feat-ic">🔖</span><div class="feat-tx"><b data-i18n="s4f2t">משניות שמורות</b><span data-i18n="s4f2d">סמן כל משנה חשובה או אהובה — והיא נשמרת לרשימה אישית לגישה מהירה בכל זמן.</span></div></div>
+      <div class="feat"><span class="feat-ic">💡</span><div class="feat-tx"><b data-i18n="s4f3t">הערות אישיות לכל משנה</b><span data-i18n="s4f3d">אפשר לרשום הערה משלך על כל משנה (מחשבה, חידוש, סיכום) — היא נשמרת ומופיעה מתחת למשנה בכל פעם שתחזור אליה.</span></div></div>
+    </div>
+
+    <!-- 5 · הקראה קולית -->
+    <div class="section" id="s5">
+      <div class="section-head"><span class="section-num">5</span><span class="section-title" data-i18n="s5t">הקראה קולית 🔊</span></div>
+      <p data-i18n="s5p1">משנתי יכול <b>להקריא לך את המשנה בקול</b> — נהדר ללימוד בדרכים, בעיניים עצומות, או כדי לשמוע את הניקוד הנכון. לוחצים על כפתור <b>🔊</b> בשורת הקורא, ונפתחת שורת ההקראה עם ארבעה מצבים:</p>
+      <div class="audio-box">
+        <div class="audio-row"><span class="audio-ic">▶</span><div class="audio-tx"><b data-i18n="s5aReadT">קרא ברצף</b> — <span data-i18n="s5aReadD">מקריא את כל משניות הפרק אחת אחרי השנייה, ומדגיש את המשנה שמתנגנת כרגע.</span></div></div>
+        <div class="audio-row"><span class="audio-ic">🗣️</span><div class="audio-tx"><b data-i18n="s5aRepeatT">אמור אחריי</b> — <span data-i18n="s5aRepeatD">מקריא משנה, ואז עוצר להפסקה כדי שתחזור אחריו בקול — מצוין לשינון ולזיכרון.</span></div></div>
+        <div class="audio-row"><span class="audio-ic">🔁</span><div class="audio-tx"><b data-i18n="s5aLoopT">בלולאה</b> — <span data-i18n="s5aLoopD">חוזר על אותה משנה שוב ושוב — לחזרות עד שהיא נכנסת ללב.</span></div></div>
+        <div class="audio-row"><span class="audio-ic">⏹</span><div class="audio-tx"><b data-i18n="s5aStopT">עצור</b> — <span data-i18n="s5aStopD">עוצר את ההקראה. כשתתחיל שוב, זה ימשיך מהנקודה שבה עצרת.</span></div></div>
+      </div>
+      <div class="feat"><span class="feat-ic">🎙️</span><div class="feat-tx"><b data-i18n="s5f1t">קול איכותי — גברי או נשי</b><span data-i18n="s5f1d">ברירת המחדל היא <b>קול גברי איכותי מהענן</b>. בהגדרות ← <b>קול ההקראה</b> אפשר לעבור לקול נשי, ואף לכוון את סוג הקול ואת עומקו (גובה).</span></div></div>
+      <div class="feat"><span class="feat-ic">🔋</span><div class="feat-tx"><b data-i18n="s5f2t">המסך נשאר דלוק</b><span data-i18n="s5f2d">בזמן הקראה המסך לא נכבה מעצמו, כדי שהלימוד לא ייקטע.</span></div></div>
+      <div class="tip"><p data-i18n="s5tip">📲 <b>עובד גם אופליין:</b> כל משנה שהוקראה פעם אחת <b>נשמרת במכשיר</b> — בפעם הבאה היא תתנגן גם בלי אינטרנט. אם אין רשת בכלל, האפליקציה תשתמש בקול המובנה של המכשיר.</p></div>
+    </div>
+
+    <!-- 6 -->
+    <div class="section" id="s6">
+      <div class="section-head"><span class="section-num">6</span><span class="section-title" data-i18n="s6t">חיפוש, מועדפים והמשנה שלי</span></div>
+      <div class="feat"><span class="feat-ic">🔍</span><div class="feat-tx"><b data-i18n="s6f1t">ניווט וחיפוש נוח</b><span data-i18n="s6f1d">בוררים מהירים של <b>סדר ← מסכת ← פרק</b>, או עיון בעץ המסכתות המלא — והאפליקציה תוביל אותך ישר לפרק.</span></div></div>
+      <div class="feat"><span class="feat-ic">❤️</span><div class="feat-tx"><b data-i18n="s6f2t">מועדפים</b><span data-i18n="s6f2d">סמן ❤️ בזמן הלימוד — פרקים שאתה חוזר אליהם יחכו לך ברשימת "מועדפים", ואפשר אפילו <b>ללמוד את כולם ברצף</b> בלחיצה אחת.</span></div></div>
+      <div class="feat"><span class="feat-ic">⭐</span><div class="feat-tx"><b data-i18n="s6f3t">המשנה שלי</b><span data-i18n="s6f3d">בחר פרק אישי שיקר לליבך — האפליקציה תשמור אותו בהישג יד בדף הבית.</span></div></div>
+    </div>
+
+    <!-- 7 -->
+    <div class="section" id="s7">
+      <div class="section-head"><span class="section-num">7</span><span class="section-title" data-i18n="s7t">שינון ולימוד בעל-פה</span><span class="lvl-tag lvl-adv" data-i18n="lvlA1">למתקדם</span></div>
+      <p data-i18n="s7p1">כפתור <b>🧠 שינון</b> בקורא הופך כל פרק לכלי לימוד בעל-פה, עם <b>7 מצבים</b> מדורגים — מלימוד פשוט ועד מבחן מלא:</p>
+      <div class="mode"><span class="mode-ic">📖</span><div class="mode-tx"><b data-i18n="s7m1n">חזרה</b> — <span data-i18n="s7m1d">לימוד רגיל של הפרק, לחזרה ולשינון בקול.</span></div></div>
+      <div class="mode"><span class="mode-ic">🔲</span><div class="mode-tx"><b data-i18n="s7m2n">הסתר סיומות</b> — <span data-i18n="s7m2d">סוף כל משפט מוסתר; נסה להשלים בעצמך, הקש לחשוף.</span></div></div>
+      <div class="mode"><span class="mode-ic">🔡</span><div class="mode-tx"><b data-i18n="s7m3n">ראשי תיבות</b> — <span data-i18n="s7m3d">כל מילה מוצגת באות הראשונה בלבד; הקש לחשוף מילה-מילה.</span></div></div>
+      <div class="mode"><span class="mode-ic">⬚</span><div class="mode-tx"><b data-i18n="s7m4n">השלמת מילים</b> — <span data-i18n="s7m4d">חלק מהמילים מוסתרות באקראי; הקש לחשוף כל אחת.</span></div></div>
+      <div class="mode"><span class="mode-ic">💡</span><div class="mode-tx"><b data-i18n="s7m5n">רמז ראשון</b> — <span data-i18n="s7m5d">רק המילה הראשונה מוצגת; הקש לגלות את כל המשנה.</span></div></div>
+      <div class="mode"><span class="mode-ic">⚡</span><div class="mode-tx"><b data-i18n="s7m6n">בקיאות (הבזק)</b> — <span data-i18n="s7m6d">המשנה מוצגת לרגע ואז נעלמת — לחידוד הזיכרון המהיר.</span></div></div>
+      <div class="mode"><span class="mode-ic">🎯</span><div class="mode-tx"><b data-i18n="s7m7n">מבחן</b> — <span data-i18n="s7m7d">מבחן משפט-משפט עם ניקוד ומאסטרי — לבדוק שאתה באמת יודע בעל-פה.</span></div></div>
+      <div class="tip"><p data-i18n="s7tip">🎙️ אפשר גם <b>להקליט את עצמך</b> ולהשמיע (במצב שינון). ושים לב — בשינון <b>הטיימר ממשיך לרוץ</b> גם אחרי סוף הפרק (בשונה מלימוד רגיל), כדי לתגמל אותך גם במצב שינון!</p></div>
+    </div>
+
+    <!-- 8 -->
+    <div class="section" id="s8">
+      <div class="section-head"><span class="section-num">8</span><span class="section-title" data-i18n="s8t">זכויות, רצף, רמות ומדליות</span></div>
+      <p data-i18n="s8p1">משנתי הופך את ההתמדה למוחשית. כל לימוד מזכה אותך ב<b>זכויות</b>, עם בונוסים על עקביות.</p>
+      <div class="feat"><span class="feat-ic">✡️</span><div class="feat-tx"><b data-i18n="s8f1t">זכויות</b><span data-i18n="s8f1d">נצברות על כל פרק, עם בונוס יומי ואתגרים. זה ה"ניקוד" המרכזי שלך.</span></div></div>
+      <div class="feat"><span class="feat-ic">🔥</span><div class="feat-tx"><b data-i18n="s8f2t">רצף ימים</b><span data-i18n="s8f2d">כל יום שאתה לומד — הרצף גדל. שמירה על הרצף היא המנוע להרגל יומי.</span></div></div>
+      <div class="feat"><span class="feat-ic">🎖️</span><div class="feat-tx"><b data-i18n="s8f3t">רמות ומדליות</b><span data-i18n="s8f3d">ככל שצוברים זכויות עולים ברמות וזוכים במדליות על הישגים.</span></div></div>
+      <div class="why"><p data-i18n="s8why">🎯 כל הזכויות והתגמולים נועדו למטרה אחת: <b>לעודד אותך להתמיד ולהרבות בלימוד</b>. זו לא תחרות — זה דלק עדין שהופך לימוד משנה להרגל יומי קבוע ומשמח.</p></div>
+    </div>
+
+    <!-- 9 -->
+    <div class="section" id="s9">
+      <div class="section-head"><span class="section-num">9</span><span class="section-title" data-i18n="s9t">קהילה וקבוצות</span></div>
+      <p data-i18n="s9p1"><b>קבוצה פרטית למשפחה:</b> פותחים קבוצה, מצרפים בני משפחה, ויחד <b>מחלקים מסכת שלמה</b> — כל אחד לוקח כמה פרקים ומסיימים ביחד (מצוין לעילוי נשמה או לאירוע).</p>
+      <p data-i18n="s9p2"><b>לוחות מובילים:</b> בעמוד הקהילה יש לוחות בזכויות, מדליות, רצף, אלוף החודש ובקיאות. אפשר להופיע בכינוי — או להישאר פרטי.</p>
+      <p data-i18n="s9p3"><b>מה חם עכשיו:</b> רואים אילו פרקים הכי נלמדים בקהילה ברגע זה, וכמה אנשים לומדים אותם — בדיוק זה מה שהופך את משנתי ל"Waze של המשנה".</p>
+      <div class="note"><p data-i18n="s9note">🔒 ההצטרפות ללוח היא בבחירתך, והשם הוא כינוי שאתה קובע. אפשר תמיד לכבות ולהיעלם מהלוח.</p></div>
+    </div>
+
+    <!-- 10 -->
+    <div class="section" id="s10">
+      <div class="section-head"><span class="section-num">10</span><span class="section-title" data-i18n="s10t">היסטוריה, גרפים ומגמות</span></div>
+      <p data-i18n="s10p1">עמוד ההיסטוריה מראה את הרגלי הלימוד שלך לאורך זמן — עם מתג <b>היום / 7 ימים / 30 יום / הכל</b>, ממש כמו מסך מסחר.</p>
+      <div class="feat"><span class="feat-ic">📊</span><div class="feat-tx"><b data-i18n="s10f1t">הגרף — ⏱ זמן / ✡ זכויות</b><span data-i18n="s10f1d">לגרף שני מבטים שמתחלפים בכפתור הקטן שמשמאל ל"הכל": <b>⏱ זמן</b> (דקות לימוד) ו-<b>✡ זכויות</b>. הגרף מתעדכן לפי מתג התקופה, ולצדו חיצי מגמה (↑/↓) שמראים אם עלית או ירדת.</span></div></div>
+      <div class="feat"><span class="feat-ic">📅</span><div class="feat-tx"><b data-i18n="s10f2t">7 הימים האחרונים</b><span data-i18n="s10f2d">רשימת הימים האחרונים עם מספר הפרקים שלמדת בכל יום, בולט וברור — למוטיבציה יומית.</span></div></div>
+      <div class="feat"><span class="feat-ic">🔝</span><div class="feat-tx"><b data-i18n="s10f3t">הפרקים הכי נלמדים שלי</b><span data-i18n="s10f3d">הפרקים שחזרת אליהם הכי הרבה בתקופה.</span></div></div>
+    </div>
+
+    <!-- 11 -->
+    <div class="section" id="s11">
+      <div class="section-head"><span class="section-num">11</span><span class="section-title" data-i18n="s11t">לעילוי נשמה ומחולל רצף</span></div>
+      <div class="feat"><span class="feat-ic">🕯️</span><div class="feat-tx"><b data-i18n="s11f1t">לימוד לעילוי נשמה</b><span data-i18n="s11f1d">מנהג ישראל ללמוד <b>משניות</b> לעילוי נשמת הנפטרים — ש"<b>מִשְׁנָה</b>" אותיות "<b>נְשָׁמָה</b>". הזן את שם הנפטר, והאפליקציה תסדר לך משניות לפי אותיות השם, מוכנות ללימוד.</span></div></div>
+      <div class="feat"><span class="feat-ic">🎼</span><div class="feat-tx"><b data-i18n="s11f2t">מחולל רצף פרקים</b><span data-i18n="s11f2d">בונה לך <b>סדר לימוד אישי</b> — בוחרים סדר ← מסכת ולוחצים על הפרקים שרוצים, בכל סדר, והאפליקציה מובילה אותך ביניהם אחד-אחד. מושלם לקביעת עתים ולסיום מסכת.</span></div></div>
+    </div>
+
+    <!-- 12 -->
+    <div class="section" id="s12">
+      <div class="section-head"><span class="section-num">12</span><span class="section-title" data-i18n="s12t">הגדרות שכדאי להכיר</span></div>
+      <div class="feat"><span class="feat-ic">🔊</span><div class="feat-tx"><b data-i18n="s12f0t">קול ההקראה</b><span data-i18n="s12f0d">בחירת קול גברי / נשי, וכוונון סוג הקול ועומקו — עבור כפתור ההקראה הקולית.</span></div></div>
+      <div class="feat"><span class="feat-ic">🌙</span><div class="feat-tx"><b data-i18n="s12f1t">מצב כהה</b><span data-i18n="s12f1d">לימוד נוח לעיניים, במיוחד בלילה.</span></div></div>
+      <div class="feat"><span class="feat-ic">🌐</span><div class="feat-tx"><b data-i18n="s12flangT">שפה — עברית / English</b><span data-i18n="s12flangD">האפליקציה זמינה גם באנגלית — כל הממשק מתחלף. מחליפים בהגדרות ← שפה.</span></div></div>
+      <div class="feat"><span class="feat-ic">☁️</span><div class="feat-tx"><b data-i18n="s12f3t">חשבון וגיבוי</b><span data-i18n="s12f3d">התחברות עם Google (גיבוי בענן) + ייצוא/ייבוא קובץ גיבוי ידני.</span></div></div>
+      <div class="feat"><span class="feat-ic">🔔</span><div class="feat-tx"><b data-i18n="s12f4t">תזכורות</b><span data-i18n="s12f4d">תזכורת יומית עדינה לקביעת עתים (מושתקת אוטומטית בשבת).</span></div></div>
+    </div>
+
+    <!-- 13 -->
+    <div class="section" id="s13">
+      <div class="section-head"><span class="section-num">13</span><span class="section-title" data-i18n="s13t">טיפים נוספים</span><span class="lvl-tag lvl-adv" data-i18n="lvlA2">למתקדם</span></div>
+      <div class="feat"><span class="feat-ic">📜</span><div class="feat-tx"><b data-i18n="s13f1t">פרקי אבות — משנה יומית</b><span data-i18n="s13f1d">בדף הבית יש <b>פרקי אבות</b> עם המשנה היומית — לימוד קצר ומחכים בכל יום.</span></div></div>
+      <div class="feat"><span class="feat-ic">📳</span><div class="feat-tx"><b data-i18n="s13f2t">שייק לפרק אקראי</b><span data-i18n="s13f2d">נענוע קל של הטלפון פותח פרק אקראי — מכל מסך באפליקציה.</span></div></div>
+      <div class="feat"><span class="feat-ic">⏱️</span><div class="feat-tx"><b data-i18n="s13f3t">הטיימר החכם</b><span data-i18n="s13f3d">בלימוד רגיל הטיימר נעצר אוטומטית זמן קצר אחרי שהגעת לסוף הפרק — כדי שזמן הלימוד יישאר מדויק.</span></div></div>
+      <div class="feat"><span class="feat-ic">📲</span><div class="feat-tx"><b data-i18n="s13f4t">עבודה אופליין</b><span data-i18n="s13f4d">אחרי הטעינה הראשונה כל הטקסט זמין גם בלי רשת — מושלם לנסיעות ולמטוס.</span></div></div>
+    </div>
+
+    <!-- 14 -->
+    <div class="section" id="s14">
+      <div class="section-head"><span class="section-num">14</span><span class="section-title" data-i18n="s14t">שאלות נפוצות</span></div>
+      <div class="faq-q" data-i18n="q1">האם זה באמת חינם?</div>
+      <div class="faq-a" data-i18n="a1">כן, לגמרי. בלי פרסומות, בלי תשלום, בלי רכישות בתוך האפליקציה.</div>
+      <div class="faq-q" data-i18n="q2">צריך חיבור לאינטרנט?</div>
+      <div class="faq-a" data-i18n="a2">רק לטעינה הראשונה ולסנכרון קהילה. טקסט המשנה זמין גם אופליין, וגם הקראה שכבר התנגנה פעם אחת נשמרת למכשיר.</div>
+      <div class="faq-q" data-i18n="q3">איפה נשמרים הנתונים שלי?</div>
+      <div class="faq-a" data-i18n="a3">רוב הנתונים (לימודים, הגדרות, מועדפים, הערות) נשמרים מקומית במכשיר. אם התחברת עם Google — הם מגובים גם בענן.</div>
+      <div class="faq-q" data-i18n="q4">החלפתי טלפון — איך מעבירים את ההתקדמות?</div>
+      <div class="faq-a" data-i18n="a4">הדרך הבטוחה: התחבר עם <b>חשבון Google</b> (הגדרות ← חשבון וגיבוי) בשני המכשירים — הנתונים משוחזרים אוטומטית. לחלופין אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר החדש.</div>
+    </div>
+
+    <div class="footer-note">
+      <span data-i18n="footer">פותח באהבה לכבוד התורה ולזיכוי הרבים.</span><br>
+      <a href="mailto:tehilon2026@gmail.com" data-i18n="footerMail">📧 שאלה או הצעה? כתבו לנו</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const I18N = {
+  he: {
+    back:"→ חזרה", topTitle:"מדריך מלא", heroTitle:"המדריך המלא למשנתי",
+    heroSub:"מהצעד הראשון ועד הניואנסים למתקדמים — כל מה שצריך לדעת.",
+    tocTitle:"בקצרה — מה יש כאן",
+    toc1:"1 · מה זה משנתי?", toc2:"2 · התקנה והתחברות", toc3:"3 · הלימוד הראשון", toc4:"4 · כלי הקורא", toc5:"5 · הקראה קולית 🔊", toc6:"6 · חיפוש, מועדפים והמשנה שלי", toc7:"7 · שינון ולימוד בעל-פה", toc8:"8 · זכויות, רצף ומדליות", toc9:"9 · קהילה וקבוצות", toc10:"10 · היסטוריה, גרפים ומגמות", toc11:"11 · לעילוי נשמה ומחולל רצף", toc12:"12 · הגדרות", toc13:"13 · טיפים נוספים", toc14:"14 · שאלות נפוצות",
+    lvlB1:"למתחיל", lvlB2:"למתחיל", lvlB3:"למתחיל", lvlA1:"למתקדם", lvlA2:"למתקדם",
+    s1t:"מה זה משנתי?", s1p1:"<b>משנתי</b> הוא כל שישה סדרי המשנה — <b>63 מסכתות ומאות פרקים</b>, מנוקדים וברורים — שחיים בתוך הטלפון שלך. הוא חינמי לגמרי, בלי פרסומות ובלי תשלום.", s1p2:"זו לא אפליקציה רגילה שמורידים מחנות — זה <b>אתר חכם (PWA)</b> שאפשר \"להתקין\" על מסך הבית כמו אפליקציה, והוא עובד <b>גם בלי אינטרנט</b> אחרי הטעינה הראשונה.", s1p3:"אבל משנתי הוא לא רק קורא — הוא <b>עוקב אחר הרגלי הלימוד שלך</b>: מודד כמה פרקים למדת וכמה זמן, ונותן לך תמונה מדויקת עם <b>היסטוריית לימוד וגרפים</b> של כמה למדת ומתי — כולל מגמות לאורך זמן, ממש כמו אתר בורסה.", s1why:"🧭 <b>למה \"ה-Waze של המשנה\"?</b> כי כמו שב-Waze אתה לא נוסע לבד — גם כאן, ברמת הקהילה אתה רואה אילו פרקים \"חמים\" עכשיו וכמה אנשים לומדים אותם ברגע זה. אתה תמיד חלק מתנועה גדולה של לומדים.", s1modesT:"📖 או 🏆 — בחר את סגנון החוויה:", s1modesSimple:"<b>📖 לימוד תמים</b> — ממשק נקי ללימוד בלבד, בלי ניקוד, אתגרים או קהילה. למי שרוצה פשוט ללמוד משנה בשקט.", s1modesChal:"<b>🏆 מסלול אתגרי</b> — החוויה המלאה: זכויות, רצף ימים, אתגרים, מדליות וקהילה. למי שאוהב מוטיבציה, יעדים והתמדה.", s1modesHow:"↔️ מחליפים בין המודים בכל רגע — בכפתור שבעמוד הבית.", s1note:"💡 חדש למשנה? יש בהגדרות דף <b>\"מהי המשנה? הסבר למתחילים\"</b>. ולא צריך להירשם — פותחים ומתחילים ללמוד.",
+    s2t:"התקנה והתחברות", s2p1:"<b>התקנה על מסך הבית</b> הופכת את משנתי לאייקון, פותחת אותו במסך מלא, ומאיצה את הטעינה.", s2p2:"<b>בדרך הקלה:</b> כשמופיע באנר \"📥 התקן אפליקציה\" בדף הבית — לוחצים ומאשרים. תמיד אפשר גם דרך <b>הגדרות ← 📥 התקנה</b>. באנדרואיד (כרום): ⋮ ← \"הוסף למסך הבית\". באייפון (ספארי): שיתוף ⬆️ ← \"הוסף למסך הבית\".", s2why:"🔐 <b>למה כדאי להתחבר עם חשבון Google?</b> בלי התחברות, כל ההתקדמות שלך (לימודים, זכויות, רצף, מועדפים, הערות) נשמרת <b>רק במכשיר הזה</b> — אם תחליף או תאבד טלפון, הכל ייעלם. עם <b>\"המשך עם Google\"</b> (בהגדרות ← חשבון וגיבוי) הנתונים מגובים בענן ו<b>משוחזרים אוטומטית בכל מכשיר</b> שתתחבר בו. התחברות פעם אחת = שקט נפשי.", s2motion:"📱 <b>באייפון — בקשת גישה ל\"תנועה וכיוון\":</b> בכניסה הראשונה ספארי עשוי לשאול אם לאפשר גישה ל<b>תנועה וכיוון</b>. זה נועד <b>אך ורק</b> לתכונת ה<b>\"נענוע לפרק אקראי\"</b> — מנערים את המכשיר וייפתח פרק משנה אקראי. אפשר <b>לאשר</b> כדי להפעיל, או <b>לבטל</b> — שום דבר אחר באפליקציה לא נפגע, ואין כאן שום מעקב. תמיד אפשר לשנות ב<b>הגדרות</b>.",
+    s3t:"הלימוד הראשון", s3l1:"בדף הבית לוחצים <b>\"בחירת פרק\"</b> ובוחרים <b>סדר ← מסכת ← פרק</b>, או <b>\"פרק אקראי\"</b> כדי שהאפליקציה תבחר עבורך.", s3l2:"המסך הראשי הוא <b>הקורא</b> — טקסט המשנה המנוקד, נוח לגלילה ולהגדלה.", s3l3:"בזמן הלימוד רץ <b>מונה חי צף</b>: בצד אחד הזכויות (✡) שצברת, בצד השני הזמן (⏱).", s3l4:"בסיום — לחצו על כפתור <b>\"✓ סיימתי\"</b> (נפתח אחרי שגללתם עד סוף הפרק). <b>זו הלחיצה</b> שמזכה אתכם ב<b>זכויות</b> ורושמת את הלימוד בהיסטוריה.", s3reg:"📌 <b>חשוב:</b> לימוד נספר ומזכה בזכויות <b>רק אחרי הלחיצה על \"✓ סיימתי\"</b>. אל תשכחו ללחוץ בסיום — אחרת הלימוד לא יירשם.", s3tip:"🖐️ <b>גלילה אוטומטית:</b> הקש פעמיים (דאבל-קליק) על הטקסט כדי להפעיל או לעצור גלילה אוטומטית — נוח ללימוד בלי ידיים. אפשר גם דרך כפתור האותיות <b>Aa</b> בשורה העליונה, ושם גם לכוון את <b>מהירות הגלילה</b>.",
+    s4t:"כלי הקורא", s4p1:"בתוך הקורא יש כלים שהופכים את הלימוד לעשיר ואישי:", s4f1t:"פירוש — ברטנורא ותוספות יו\"ט", s4f1d:"כפתור הפירוש 📖 פותח שורת פירוש מתחת לכל משנה, עם מעבר בין <b>ברטנורא</b> ל<b>תוספות יום טוב</b> — להבנה עמוקה של המשנה.", s4f2t:"משניות שמורות", s4f2d:"סמן כל משנה חשובה או אהובה — והיא נשמרת לרשימה אישית לגישה מהירה בכל זמן.", s4f3t:"הערות אישיות לכל משנה", s4f3d:"אפשר לרשום הערה משלך על כל משנה (מחשבה, חידוש, סיכום) — היא נשמרת ומופיעה מתחת למשנה בכל פעם שתחזור אליה.",
+    s5t:"הקראה קולית 🔊", s5p1:"משנתי יכול <b>להקריא לך את המשנה בקול</b> — נהדר ללימוד בדרכים, בעיניים עצומות, או כדי לשמוע את הניקוד הנכון. לוחצים על כפתור <b>🔊</b> בשורת הקורא, ונפתחת שורת ההקראה עם ארבעה מצבים:", s5aReadT:"קרא ברצף", s5aReadD:"מקריא את כל משניות הפרק אחת אחרי השנייה, ומדגיש את המשנה שמתנגנת כרגע.", s5aRepeatT:"אמור אחריי", s5aRepeatD:"מקריא משנה, ואז עוצר להפסקה כדי שתחזור אחריו בקול — מצוין לשינון ולזיכרון.", s5aLoopT:"בלולאה", s5aLoopD:"חוזר על אותה משנה שוב ושוב — לחזרות עד שהיא נכנסת ללב.", s5aStopT:"עצור", s5aStopD:"עוצר את ההקראה. כשתתחיל שוב, זה ימשיך מהנקודה שבה עצרת.", s5f1t:"קול איכותי — גברי או נשי", s5f1d:"ברירת המחדל היא <b>קול גברי איכותי מהענן</b>. בהגדרות ← <b>קול ההקראה</b> אפשר לעבור לקול נשי, ואף לכוון את סוג הקול ואת עומקו (גובה).", s5f2t:"המסך נשאר דלוק", s5f2d:"בזמן הקראה המסך לא נכבה מעצמו, כדי שהלימוד לא ייקטע.", s5tip:"📲 <b>עובד גם אופליין:</b> כל משנה שהוקראה פעם אחת <b>נשמרת במכשיר</b> — בפעם הבאה היא תתנגן גם בלי אינטרנט. אם אין רשת בכלל, האפליקציה תשתמש בקול המובנה של המכשיר.",
+    s6t:"חיפוש, מועדפים והמשנה שלי", s6f1t:"ניווט וחיפוש נוח", s6f1d:"בוררים מהירים של <b>סדר ← מסכת ← פרק</b>, או עיון בעץ המסכתות המלא — והאפליקציה תוביל אותך ישר לפרק.", s6f2t:"מועדפים", s6f2d:"סמן ❤️ בזמן הלימוד — פרקים שאתה חוזר אליהם יחכו לך ברשימת \"מועדפים\", ואפשר אפילו <b>ללמוד את כולם ברצף</b> בלחיצה אחת.", s6f3t:"המשנה שלי", s6f3d:"בחר פרק אישי שיקר לליבך — האפליקציה תשמור אותו בהישג יד בדף הבית.",
+    s7t:"שינון ולימוד בעל-פה", s7p1:"כפתור <b>🧠 שינון</b> בקורא הופך כל פרק לכלי לימוד בעל-פה, עם <b>7 מצבים</b> מדורגים — מלימוד פשוט ועד מבחן מלא:", s7m1n:"חזרה", s7m1d:"לימוד רגיל של הפרק, לחזרה ולשינון בקול.", s7m2n:"הסתר סיומות", s7m2d:"סוף כל משפט מוסתר; נסה להשלים בעצמך, הקש לחשוף.", s7m3n:"ראשי תיבות", s7m3d:"כל מילה מוצגת באות הראשונה בלבד; הקש לחשוף מילה-מילה.", s7m4n:"השלמת מילים", s7m4d:"חלק מהמילים מוסתרות באקראי; הקש לחשוף כל אחת.", s7m5n:"רמז ראשון", s7m5d:"רק המילה הראשונה מוצגת; הקש לגלות את כל המשנה.", s7m6n:"בקיאות (הבזק)", s7m6d:"המשנה מוצגת לרגע ואז נעלמת — לחידוד הזיכרון המהיר.", s7m7n:"מבחן", s7m7d:"מבחן משפט-משפט עם ניקוד ומאסטרי — לבדוק שאתה באמת יודע בעל-פה.", s7tip:"🎙️ אפשר גם <b>להקליט את עצמך</b> ולהשמיע (במצב שינון). ושים לב — בשינון <b>הטיימר ממשיך לרוץ</b> גם אחרי סוף הפרק (בשונה מלימוד רגיל), כדי לתגמל אותך גם במצב שינון!",
+    s8t:"זכויות, רצף, רמות ומדליות", s8p1:"משנתי הופך את ההתמדה למוחשית. כל לימוד מזכה אותך ב<b>זכויות</b>, עם בונוסים על עקביות.", s8f1t:"זכויות", s8f1d:"נצברות על כל פרק, עם בונוס יומי ואתגרים. זה ה\"ניקוד\" המרכזי שלך.", s8f2t:"רצף ימים", s8f2d:"כל יום שאתה לומד — הרצף גדל. שמירה על הרצף היא המנוע להרגל יומי.", s8f3t:"רמות ומדליות", s8f3d:"ככל שצוברים זכויות עולים ברמות וזוכים במדליות על הישגים.", s8why:"🎯 כל הזכויות והתגמולים נועדו למטרה אחת: <b>לעודד אותך להתמיד ולהרבות בלימוד</b>. זו לא תחרות — זה דלק עדין שהופך לימוד משנה להרגל יומי קבוע ומשמח.",
+    s9t:"קהילה וקבוצות", s9p1:"<b>קבוצה פרטית למשפחה:</b> פותחים קבוצה, מצרפים בני משפחה, ויחד <b>מחלקים מסכת שלמה</b> — כל אחד לוקח כמה פרקים ומסיימים ביחד (מצוין לעילוי נשמה או לאירוע).", s9p2:"<b>לוחות מובילים:</b> בעמוד הקהילה יש לוחות בזכויות, מדליות, רצף, אלוף החודש ובקיאות. אפשר להופיע בכינוי — או להישאר פרטי.", s9p3:"<b>מה חם עכשיו:</b> רואים אילו פרקים הכי נלמדים בקהילה ברגע זה, וכמה אנשים לומדים אותם — בדיוק זה מה שהופך את משנתי ל\"Waze של המשנה\".", s9note:"🔒 ההצטרפות ללוח היא בבחירתך, והשם הוא כינוי שאתה קובע. אפשר תמיד לכבות ולהיעלם מהלוח.",
+    s10t:"היסטוריה, גרפים ומגמות", s10p1:"עמוד ההיסטוריה מראה את הרגלי הלימוד שלך לאורך זמן — עם מתג <b>היום / 7 ימים / 30 יום / הכל</b>, ממש כמו מסך מסחר.", s10f1t:"הגרף — ⏱ זמן / ✡ זכויות", s10f1d:"לגרף שני מבטים שמתחלפים בכפתור הקטן שמשמאל ל\"הכל\": <b>⏱ זמן</b> (דקות לימוד) ו-<b>✡ זכויות</b>. הגרף מתעדכן לפי מתג התקופה, ולצדו חיצי מגמה (↑/↓) שמראים אם עלית או ירדת.", s10f2t:"7 הימים האחרונים", s10f2d:"רשימת הימים האחרונים עם מספר הפרקים שלמדת בכל יום, בולט וברור — למוטיבציה יומית.", s10f3t:"הפרקים הכי נלמדים שלי", s10f3d:"הפרקים שחזרת אליהם הכי הרבה בתקופה.",
+    s11t:"לעילוי נשמה ומחולל רצף", s11f1t:"לימוד לעילוי נשמה", s11f1d:"מנהג ישראל ללמוד <b>משניות</b> לעילוי נשמת הנפטרים — ש\"<b>מִשְׁנָה</b>\" אותיות \"<b>נְשָׁמָה</b>\". הזן את שם הנפטר, והאפליקציה תסדר לך משניות לפי אותיות השם, מוכנות ללימוד.", s11f2t:"מחולל רצף פרקים", s11f2d:"בונה לך <b>סדר לימוד אישי</b> — בוחרים סדר ← מסכת ולוחצים על הפרקים שרוצים, בכל סדר, והאפליקציה מובילה אותך ביניהם אחד-אחד. מושלם לקביעת עתים ולסיום מסכת.",
+    s12t:"הגדרות שכדאי להכיר", s12f0t:"קול ההקראה", s12f0d:"בחירת קול גברי / נשי, וכוונון סוג הקול ועומקו — עבור כפתור ההקראה הקולית.", s12f1t:"מצב כהה", s12f1d:"לימוד נוח לעיניים, במיוחד בלילה.", s12flangT:"שפה — עברית / English", s12flangD:"האפליקציה זמינה גם באנגלית — כל הממשק מתחלף. מחליפים בהגדרות ← שפה.", s12f3t:"חשבון וגיבוי", s12f3d:"התחברות עם Google (גיבוי בענן) + ייצוא/ייבוא קובץ גיבוי ידני.", s12f4t:"תזכורות", s12f4d:"תזכורת יומית עדינה לקביעת עתים (מושתקת אוטומטית בשבת).",
+    s13t:"טיפים נוספים", s13f1t:"פרקי אבות — משנה יומית", s13f1d:"בדף הבית יש <b>פרקי אבות</b> עם המשנה היומית — לימוד קצר ומחכים בכל יום.", s13f2t:"שייק לפרק אקראי", s13f2d:"נענוע קל של הטלפון פותח פרק אקראי — מכל מסך באפליקציה.", s13f3t:"הטיימר החכם", s13f3d:"בלימוד רגיל הטיימר נעצר אוטומטית זמן קצר אחרי שהגעת לסוף הפרק — כדי שזמן הלימוד יישאר מדויק.", s13f4t:"עבודה אופליין", s13f4d:"אחרי הטעינה הראשונה כל הטקסט זמין גם בלי רשת — מושלם לנסיעות ולמטוס.",
+    s14t:"שאלות נפוצות", q1:"האם זה באמת חינם?", a1:"כן, לגמרי. בלי פרסומות, בלי תשלום, בלי רכישות בתוך האפליקציה.", q2:"צריך חיבור לאינטרנט?", a2:"רק לטעינה הראשונה ולסנכרון קהילה. טקסט המשנה זמין גם אופליין, וגם הקראה שכבר התנגנה פעם אחת נשמרת למכשיר.", q3:"איפה נשמרים הנתונים שלי?", a3:"רוב הנתונים (לימודים, הגדרות, מועדפים, הערות) נשמרים מקומית במכשיר. אם התחברת עם Google — הם מגובים גם בענן.", q4:"החלפתי טלפון — איך מעבירים את ההתקדמות?", a4:"הדרך הבטוחה: התחבר עם <b>חשבון Google</b> (הגדרות ← חשבון וגיבוי) בשני המכשירים — הנתונים משוחזרים אוטומטית. לחלופין אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר החדש.",
+    footer:"פותח באהבה לכבוד התורה ולזיכוי הרבים.", footerMail:"📧 שאלה או הצעה? כתבו לנו"
+  },
+  en: {
+    back:"← Back", topTitle:"Full Guide", heroTitle:"The Complete Guide to Mishnati",
+    heroSub:"From your very first step to advanced nuances — everything you need to know.",
+    tocTitle:"In short — what's here",
+    toc1:"1 · What is Mishnati?", toc2:"2 · Install & sign in", toc3:"3 · Your first study", toc4:"4 · Reader tools", toc5:"5 · Voice reading 🔊", toc6:"6 · Search, favorites & My Mishnah", toc7:"7 · Memorization & learning by heart", toc8:"8 · Merits, streaks & medals", toc9:"9 · Community & groups", toc10:"10 · History, charts & trends", toc11:"11 · For a soul & sequence builder", toc12:"12 · Settings", toc13:"13 · More tips", toc14:"14 · FAQ",
+    lvlB1:"Beginner", lvlB2:"Beginner", lvlB3:"Beginner", lvlA1:"Advanced", lvlA2:"Advanced",
+    s1t:"What is Mishnati?", s1p1:"<b>Mishnati</b> is all six orders of the Mishnah — <b>63 tractates and hundreds of chapters</b>, fully vocalized and clear — living right inside your phone. It's entirely free, with no ads and no payment.", s1p2:"It's not a regular app you download from a store — it's a <b>smart web app (PWA)</b> you can \"install\" to your home screen like an app, and it works <b>even offline</b> after the first load.", s1p3:"But Mishnati is more than a reader — it <b>tracks your study habits</b>: it measures how many chapters you learned and for how long, and gives you an accurate picture with a <b>study history and charts</b> of how much and when you learned — including trends over time, just like a stock-market site.", s1why:"🧭 <b>Why \"the Waze of the Mishnah\"?</b> Because, just like on Waze you're never driving alone — here too, at the community level you see which chapters are \"hot\" right now and how many people are learning them this very moment. You're always part of a large movement of learners.", s1modesT:"📖 or 🏆 — choose your experience style:", s1modesSimple:"<b>📖 Simple study</b> — a clean study-only interface, with no score, challenges or community. For those who just want to learn Mishnah quietly.", s1modesChal:"<b>🏆 Challenge mode</b> — the full experience: merits, daily streaks, challenges, medals and community. For those who love motivation, goals and consistency.", s1modesHow:"↔️ Switch between modes anytime — with the button on the home page.", s1note:"💡 New to Mishnah? Settings has a <b>\"What is the Mishnah? A beginner's intro\"</b> page. And no sign-up needed — just open it and start learning.",
+    s2t:"Install & sign in", s2p1:"<b>Installing to your home screen</b> turns Mishnati into an icon, opens it full-screen, and speeds up loading.", s2p2:"<b>The easy way:</b> when the \"📥 Install app\" banner appears on the home page — tap it and confirm. You can also always use <b>Settings → 📥 Install</b>. On Android (Chrome): ⋮ → \"Add to Home screen\". On iPhone (Safari): Share ⬆️ → \"Add to Home Screen\".", s2why:"🔐 <b>Why is it worth signing in with a Google account?</b> Without signing in, all your progress (studies, merits, streak, favorites, notes) is saved <b>only on this device</b> — if you switch or lose your phone, it's all gone. With <b>\"Continue with Google\"</b> (Settings → Account & backup) your data is backed up to the cloud and <b>restored automatically on any device</b> you sign in on. Sign in once = peace of mind.", s2motion:"📱 <b>On iPhone — a \"Motion & Orientation\" access request:</b> on first use Safari may ask whether to allow access to <b>Motion & Orientation</b>. This is used <b>only</b> for the <b>\"shake for a random chapter\"</b> feature — shake your phone and a random Mishnah chapter opens. You can <b>Allow</b> it or <b>Cancel</b> — nothing else in the app is affected, and there is no tracking. You can always change it in <b>Settings</b>.",
+    s3t:"Your first study", s3l1:"On the home page tap <b>\"Choose a chapter\"</b> and pick <b>Order → Tractate → Chapter</b>, or <b>\"Random chapter\"</b> to let the app pick for you.", s3l2:"The main screen is <b>the Reader</b> — the vocalized Mishnah text, easy to scroll and enlarge.", s3l3:"While studying, a <b>floating live counter</b> runs: on one side your merits (✡), on the other the time (⏱).", s3l4:"When you finish — tap the <b>\"✓ Done\"</b> button (it unlocks once you scroll to the end). <b>That tap</b> is what awards your <b>merits</b> and logs the study in your history.", s3reg:"📌 <b>Important:</b> a study is counted and rewarded <b>only after you tap \"✓ Done\"</b>. Don't forget to tap it when you finish — otherwise the study won't be recorded.", s3tip:"🖐️ <b>Auto-scroll:</b> double-tap the text to start or stop automatic scrolling — convenient for hands-free study. You can also use the letters button <b>Aa</b> at the top, where you can adjust the <b>scroll speed</b>.",
+    s4t:"Reader tools", s4p1:"Inside the Reader are tools that make study rich and personal:", s4f1t:"Commentary — Bartenura & Tosafot Yom Tov", s4f1d:"The commentary button 📖 opens a commentary line under each mishnah, switching between <b>Bartenura</b> and <b>Tosafot Yom Tov</b> — for a deeper understanding of the mishnah.", s4f2t:"Saved mishnayot", s4f2d:"Bookmark any important or beloved mishnah — it's saved to a personal list for quick access anytime.", s4f3t:"Personal notes on every mishnah", s4f3d:"You can write your own note on any mishnah (a thought, an insight, a summary) — it's saved and appears under the mishnah every time you return to it.",
+    s5t:"Voice reading 🔊", s5p1:"Mishnati can <b>read the mishnah aloud to you</b> — great for studying on the go, with eyes closed, or to hear the correct vocalization. Tap the <b>🔊</b> button in the reader's top row, and the audio bar opens with four modes:", s5aReadT:"Read continuously", s5aReadD:"Reads all the chapter's mishnayot one after another, highlighting the one currently playing.", s5aRepeatT:"Repeat after me", s5aRepeatD:"Reads a mishnah, then pauses so you can repeat it aloud — excellent for memorization.", s5aLoopT:"Loop", s5aLoopD:"Repeats the same mishnah over and over — for review until it sinks in.", s5aStopT:"Stop", s5aStopD:"Stops the reading. When you start again, it resumes from where you stopped.", s5f1t:"A quality voice — male or female", s5f1d:"The default is a <b>high-quality male cloud voice</b>. In Settings → <b>Reading voice</b> you can switch to a female voice, and even tune the voice type and its depth (pitch).", s5f2t:"The screen stays on", s5f2d:"During reading the screen won't turn off by itself, so your study isn't interrupted.", s5tip:"📲 <b>Works offline too:</b> every mishnah that's been read once is <b>saved on your device</b> — next time it plays even without internet. If there's no network at all, the app uses the device's built-in voice.",
+    s6t:"Search, favorites & My Mishnah", s6f1t:"Easy navigation & search", s6f1d:"Quick pickers for <b>Order → Tractate → Chapter</b>, or browse the full tractate tree — and the app takes you straight to the chapter.", s6f2t:"Favorites", s6f2d:"Tap ❤️ while studying — chapters you return to will wait for you in the \"Favorites\" list, and you can even <b>study them all in a row</b> with one tap.", s6f3t:"My Mishnah", s6f3d:"Pick a personal chapter dear to your heart — the app keeps it close at hand on the home page.",
+    s7t:"Memorization & learning by heart", s7p1:"The <b>🧠 Memorization</b> button in the Reader turns any chapter into a tool for learning by heart, with <b>7 graded modes</b> — from plain study to a full test:", s7m1n:"Review", s7m1d:"Plain study of the chapter, for review and reciting aloud.", s7m2n:"Hide endings", s7m2d:"The end of each sentence is hidden; try to complete it, tap to reveal.", s7m3n:"Initials", s7m3d:"Each word shows only its first letter; tap to reveal word by word.", s7m4n:"Fill blanks", s7m4d:"Some words are randomly hidden; tap to reveal each.", s7m5n:"First hint", s7m5d:"Only the first word shows; tap to reveal the whole mishnah.", s7m6n:"Flash (mastery)", s7m6d:"The mishnah shows briefly then disappears — to sharpen quick recall.", s7m7n:"Test", s7m7d:"A sentence-by-sentence test with score and mastery — to check you truly know it by heart.", s7tip:"🎙️ You can also <b>record yourself</b> and play it back (in memorization mode). And note — in memorization the <b>timer keeps running</b> even after the chapter's end (unlike regular study), so you're rewarded in memorization mode too!",
+    s8t:"Merits, streaks, levels & medals", s8p1:"Mishnati makes consistency tangible. Every study earns you <b>merits</b>, with bonuses for consistency.", s8f1t:"Merits", s8f1d:"Earned for every chapter, with a daily bonus and challenges. This is your main \"score\".", s8f2t:"Daily streak", s8f2d:"Every day you learn, your streak grows. Keeping the streak is the engine of a daily habit.", s8f3t:"Levels & medals", s8f3d:"As you accumulate merits you climb levels and earn medals for achievements.", s8why:"🎯 All the merits and rewards serve one goal: <b>to encourage you to persist and learn more</b>. It's not a competition — it's gentle fuel that turns learning Mishnah into a steady, joyful daily habit.",
+    s9t:"Community & groups", s9p1:"<b>A private family group:</b> open a group, add family members, and together <b>split a whole tractate</b> — each takes a few chapters and you finish together (great for a soul's elevation or an event).", s9p2:"<b>Leaderboards:</b> the community page has boards for merits, medals, streak, monthly champion and mastery. You can appear under a nickname — or stay private.", s9p3:"<b>What's hot now:</b> see which chapters the community is learning most right now, and how many people are studying them — that's exactly what makes Mishnati \"the Waze of the Mishnah\".", s9note:"🔒 Joining the board is your choice, and the name is a nickname you set. You can always turn it off and disappear from the board.",
+    s10t:"History, charts & trends", s10p1:"The history page shows your study habits over time — with a <b>Today / 7 days / 30 days / All</b> toggle, just like a trading screen.", s10f1t:"The graph — ⏱ Time / ✡ Merits", s10f1d:"The graph has two views, switched by the small button to the left of \"All\": <b>⏱ Time</b> (study minutes) and <b>✡ Merits</b>. The graph updates with the period toggle, and beside it trend arrows (↑/↓) show whether you went up or down.", s10f2t:"The last 7 days", s10f2d:"A list of recent days with how many chapters you learned each day, bold and clear — for daily motivation.", s10f3t:"My most-studied chapters", s10f3d:"The chapters you returned to most in the period.",
+    s11t:"For a soul & sequence builder", s11f1t:"Learning for an elevation of the soul", s11f1d:"It is a Jewish custom to learn <b>Mishnayot</b> for the elevation of the souls of the departed — for \"<b>Mishnah</b>\" has the same letters as \"<b>Neshamah</b>\" (soul). Enter the name of the deceased, and the app arranges mishnayot by the letters of the name, ready to learn.", s11f2t:"Chapter sequence builder", s11f2d:"Builds a <b>personal study order</b> — pick Order → Tractate and tap the chapters you want, in any order, and the app leads you through them one by one. Perfect for a fixed study and for finishing a tractate.",
+    s12t:"Settings worth knowing", s12f0t:"Reading voice", s12f0d:"Choose a male / female voice, and tune the voice type and depth — for the voice-reading button.", s12f1t:"Dark mode", s12f1d:"Comfortable study for the eyes, especially at night.", s12flangT:"Language — Hebrew / English", s12flangD:"The app is also available in English — the whole interface switches. Change it in Settings → Language.", s12f3t:"Account & backup", s12f3d:"Sign in with Google (cloud backup) + manual export/import of a backup file.", s12f4t:"Reminders", s12f4d:"A gentle daily reminder for fixed study (automatically silenced on Shabbat).",
+    s13t:"More tips", s13f1t:"Pirkei Avot — daily mishnah", s13f1d:"The home page has <b>Pirkei Avot</b> with the daily mishnah — a short, enriching study every day.", s13f2t:"Shake for a random chapter", s13f2d:"A gentle shake of the phone opens a random chapter — from any screen in the app.", s13f3t:"The smart timer", s13f3d:"In regular study the timer stops automatically a short while after you reach the chapter's end — so your study time stays accurate.", s13f4t:"Offline use", s13f4d:"After the first load all the text is available without a network — perfect for travel and flights.",
+    s14t:"FAQ", q1:"Is it really free?", a1:"Yes, completely. No ads, no payment, no in-app purchases.", q2:"Do I need an internet connection?", a2:"Only for the first load and community sync. The Mishnah text is available offline too, and any voice reading that has played once is saved to the device.", q3:"Where is my data stored?", a3:"Most data (studies, settings, favorites, notes) is stored locally on your device. If you signed in with Google — it's backed up to the cloud too.", q4:"I switched phones — how do I transfer my progress?", a4:"The safe way: sign in with a <b>Google account</b> (Settings → Account & backup) on both devices — your data restores automatically. Alternatively, export a backup file and import it on the new device.",
+    footer:"Made with love, for the honor of the Torah.", footerMail:"📧 A question or suggestion? Write to us"
+  }
+};
+function setLang(lang){
+  const d = I18N[lang]; if(!d) return;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang==='he') ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    const k = el.getAttribute('data-i18n');
+    if(d[k]!=null) el.innerHTML = d[k];
+  });
+  document.getElementById('langToggle').textContent = (lang==='he') ? 'EN' : 'עב';
+  document.title = (lang==='he') ? 'משנתי — מדריך מלא' : 'Mishnati — Full Guide';
+  try{ localStorage.setItem('tehillim_guide_lang', lang); }catch(e){}
+}
+(function(){
+  let lang='he';
+  try{
+    const saved = localStorage.getItem('tehillim_guide_lang');
+    if(saved==='he'||saved==='en') lang=saved;
+    else if((navigator.language||'').toLowerCase().indexOf('he')!==0 && (navigator.language||'').toLowerCase().indexOf('iw')!==0) lang='en';
+  }catch(e){}
+  setLang(lang);
+})();
+</script>
+</body>
+</html>

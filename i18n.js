@@ -246,6 +246,7 @@ const DICT = {
   'set.group_name':           { he: 'שם לתצוגה בקבוצה',          en: 'Group display name' },
   'set.group_name_sub':       { he: 'מוצג לחברים בקבוצות שלך',   en: 'Shown to members in your groups' },
   'set.leaderboard_name_ph':  { he: 'כינוי ללוח המובילים',        en: 'Leaderboard nickname' },
+  'set.guide':                { he: 'מדריך מלא',               en: 'Full guide' },
   'set.what_is_tehilim':      { he: 'מהי המשנה? הסבר למתחילים', en: 'What is the Mishnah?' },
 
   // קהילה (07-community)
