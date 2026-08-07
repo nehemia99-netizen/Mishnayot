@@ -254,6 +254,15 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     <button class="icon-btn" id="ttsBtn" onclick="toggleTTS()" title="הקראה קולית">🔊</button>
   </div>
 
+  <!-- Audio bar — צמוד לכפתור 🔊: עצור / אמור אחריי / לולאה / קרא ברצף / מהירות -->
+  <div class="audio-bar" id="audioBar">
+    <button class="audio-opt stop" onclick="_ttsStop()">⏹<br>עצור</button>
+    <button class="audio-opt" id="aopt_repeat" onclick="ttsStart('repeat')">🗣️<br>אמור אחריי</button>
+    <button class="audio-opt" id="aopt_loop"   onclick="ttsStart('loop')">🔁<br>בלולאה</button>
+    <button class="audio-opt" id="aopt_read"   onclick="ttsStart('read')">▶<br>קרא ברצף</button>
+    <button class="audio-opt" id="aopt_speed"  onclick="cycleTtsRate()" title="מהירות ההקראה">⏩<br><span id="ttsRateLbl">רגיל</span></button>
+  </div>
+
   <!-- Nav bar -->
   <div class="navbar">
     <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" title="פרק קודם" data-i18n-title="read.prev_chap">▶</button>
@@ -311,14 +320,6 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   <div class="commentary-bar" id="commBar" style="display:none">
     <button class="comm-type-btn active" id="commBtnBartenura" onclick="setCommType('bartenura')">ברטנורא</button>
     <button class="comm-type-btn" id="commBtnTosafot" onclick="setCommType('tosafot')">תוספות יו"ט</button>
-  </div>
-
-  <!-- Audio bar — הקראה / אמור אחריי / לולאה -->
-  <div class="audio-bar" id="audioBar">
-    <button class="audio-opt stop" onclick="_ttsStop()">⏹<br>עצור</button>
-    <button class="audio-opt" id="aopt_repeat" onclick="ttsStart('repeat')">🗣️<br>אמור אחריי</button>
-    <button class="audio-opt" id="aopt_loop"   onclick="ttsStart('loop')">🔁<br>בלולאה</button>
-    <button class="audio-opt" id="aopt_read"   onclick="ttsStart('read')">▶<br>קרא ברצף</button>
   </div>
 
   <!-- Text area -->
@@ -1865,10 +1866,11 @@ async function _cloudTtsAudio(text){
   const s=S.get('tehillim_settings')||{};
   const voice=s.ttsCloudVoice || 'he-IL-Wavenet-D';
   const pitch=(s.ttsCloudPitch!=null)?s.ttsCloudPitch:-5;
-  const k=voice+'|'+pitch+'|'+text;
+  const rate=(s.ttsRate!=null)?s.ttsRate:0.88;
+  const k=voice+'|'+pitch+'|'+rate+'|'+text;
   const cached=await _cloudCacheGet(k);
   if(cached && cached.size>200) return cached;
-  const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:pitch, rate:0.88 }) });
+  const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:pitch, rate:rate }) });
   if(!resp.ok) throw new Error('tts http '+resp.status);
   const blob=await resp.blob();
   if(!blob || blob.size<200) throw new Error('tts empty');
@@ -1944,7 +1946,7 @@ function _applyTtsVoice(u){
     }
     if (v) u.voice = v;
     u.pitch = pitch;
-    u.rate = rate;
+    u.rate = (s.ttsRate != null) ? s.ttsRate : rate;
   } catch(e){}
 }
 // חימום רשימת הקולות (חלק מהדפדפנים טוענים אסינכרונית)
@@ -1981,13 +1983,28 @@ function _ttsStop(){
   const b = document.getElementById('ttsBtn'); if(b) b.classList.remove('tts-on');
   document.querySelectorAll('.audio-opt.playing').forEach(el=>el.classList.remove('playing'));
 }
-// 🔊 — פתח/סגור את סרגל האודיו (קרא / אמור אחריי / לולאה)
+/* ── מהירות ההקראה (מחזורי: איטי → רגיל → מהיר → מהיר מאוד) ── */
+const _TTS_RATES = [{r:0.72,l:'🐢 איטי'},{r:0.88,l:'רגיל'},{r:1.05,l:'מהיר'},{r:1.25,l:'⚡ מהיר'}];
+function _ttsRateIdx(){
+  let cur = 0.88; try{ const s=S.get('tehillim_settings')||{}; if(s.ttsRate!=null) cur=s.ttsRate; }catch(e){}
+  const i = _TTS_RATES.findIndex(x => Math.abs(x.r-cur) < 0.05);
+  return i < 0 ? 1 : i;
+}
+function _updateRateLabel(){ const el=document.getElementById('ttsRateLbl'); if(el) el.textContent=_TTS_RATES[_ttsRateIdx()].l; }
+function cycleTtsRate(){
+  const s = S.get('tehillim_settings') || {};
+  const ni = (_ttsRateIdx()+1) % _TTS_RATES.length;
+  s.ttsRate = _TTS_RATES[ni].r; S.set('tehillim_settings', s);
+  _updateRateLabel();
+  if (_ttsOn){ const m=_ttsMode; _ttsStop(); ttsStart(m); } // המשך מאותה משנה במהירות החדשה
+}
+// 🔊 — פתח/סגור את סרגל האודיו (קרא / אמור אחריי / לולאה / מהירות)
 function toggleTTS(){
   if (!_ttsSupported() && !_isCloudVoice()){ showToast(_rLang()==='en'?'Speech not supported here':'הקראה קולית לא נתמכת במכשיר זה'); return; }
   const bar = document.getElementById('audioBar');
   const open = bar.classList.toggle('open');
   document.getElementById('ttsBtn').classList.toggle('active', open);
-  if (!open) _ttsStop();
+  if (open) _updateRateLabel(); else _ttsStop();
 }
 // התחל מצב אודיו: 'read' רצף · 'repeat' אמור-אחריי · 'loop' בלולאה
 function ttsStart(mode){
