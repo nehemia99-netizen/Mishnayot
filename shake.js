@@ -57,6 +57,8 @@ function showShakeToast(msg) {
 }
 
 function triggerRandomChapter() {
+  // אל תקפוץ לפרק אקראי בזמן הקראה קולית — קפיצה בכביש לא תפסיק את ההקראה
+  if (typeof window !== 'undefined' && window.__ttsActive) return;
   const now = Date.now();
   if (now - lastShakeTs < COOLDOWN_MS) return;
   lastShakeTs = now;

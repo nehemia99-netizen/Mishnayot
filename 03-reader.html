@@ -225,7 +225,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 .picker-close{margin-top:12px;padding:11px;border-radius:12px;border:.5px solid var(--border);background:var(--surface);width:100%;cursor:pointer;font-size:14px;color:var(--text-sec);}
 </style>
 <script src="errlog.js?v=1.5.75"></script>
-<script src="shake.js?v=2.2.32"></script>
+<script src="shake.js?v=2.2.33"></script>
 <script src="i18n.js?v=2.2.92" defer></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -1910,7 +1910,16 @@ function _cloudFail(unit, verseEls){
   _ttsSpeakSS(unit, verseEls);
 }
 function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
-function _stripForTts(s){ return (s||'').replace(/[֑-֯]/g,''); } // הסר טעמים
+/* ── תיקון קמץ-קטן להקראה (TTS) ──
+   מנוע ההקראה קורא כל קָמץ (ָ) בתנועת A, גם כשצריך O (קמץ-קטן). הנתונים אינם
+   מבחינים בין השניים, לכן ממירים מילים נפוצות: מחליפים את הקמץ בחולם (05B8→05B9)
+   — רק בטקסט הנשלח למנוע, לא בתצוגה. הרשימה ניתנת להרחבה לפי מילים שנשמעות שגוי. */
+function _kamatzKatan(s){
+  // כָּל / כָל — כשעומדת לעצמה או לפני מקף (לא בתוך מילה כמו "כָּלָה") → kol
+  return s.replace(/כּ?ָל(?![ְ-ׇּֿׁׂא-ת])/g,
+                   function(m){ return m.replace('ָ','ֹ'); });
+}
+function _stripForTts(s){ return _kamatzKatan((s||'').replace(/[֑-֯]/g,'')); } // הסר טעמים + תקן קמץ-קטן
 // קולות עבריים זמינים במכשיר
 function _hebrewVoices(){
   try { return (speechSynthesis.getVoices()||[]).filter(v => /^(he|iw)/i.test(v.lang||'')); } catch(e){ return []; }
@@ -1963,6 +1972,7 @@ function _ttsStop(){
     _ttsResume = { chapId: curId(), vIdx: _ttsCurVIdx };
   }
   _ttsOn = false;
+  window.__ttsActive = false; // אפשר שוב שקשוק→פרק אקראי
   _releaseWakeLock();
   if (_ttsTimer) { clearTimeout(_ttsTimer); _ttsTimer = null; }
   try { speechSynthesis.cancel(); } catch(e){}
@@ -1994,7 +2004,7 @@ function ttsStart(mode){
   } else {
     verses.forEach((v, vi) => _ttsUnits.push({ text:v, vIdx:vi }));
   }
-  _ttsOn = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null; _ttsCloudFailed = false;
+  _ttsOn = true; window.__ttsActive = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null; _ttsCloudFailed = false;
   // המשך מהמשנה שבה נעצר (אם יש נקודת-המשך לפרק הזה)
   let _resumed = false;
   if (_ttsResume && _ttsResume.chapId === curId()) {
