@@ -59,7 +59,7 @@ const LEVELS = [
   { key:'ותיק',      en:'Veteran',                min: 500,  icon:'✨' },
   { key:'נאמן',      en:'Faithful',               min: 1000, icon:'🏅' },
   { key:'מובהק',     en:'Distinguished',          min: 2500, icon:'🏆' },
-  { key:'בקי',       en:'Expert',                 min: 5000, icon:'👑' },
+  { key:'בקיא',       en:'Expert',                 min: 5000, icon:'👑' },
   { key:'גדול',      en:'Master',                 min:10000, icon:'💎' },
   { key:'אדיר',      en:'Mighty',                 min:25000, icon:'🌟' },
   { key:'גדול הדור', en:'Sage of the Generation', min:50000, icon:'🕯️' },

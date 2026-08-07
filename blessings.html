@@ -301,6 +301,17 @@ try{var _ds=JSON.parse(localStorage.getItem('tehillim_settings')||'{}');if(_ds.d
     </div>
 
     <!-- b6: איגרת הרמב"ן -->
+    <div class="blessing-item" id="bNefashot">
+      <div class="blessing-header" onclick="toggleBlessing('bNefashot')">
+        <span class="blessing-title">בורא נפשות</span>
+        <span class="blessing-arrow">›</span>
+      </div>
+      <div class="blessing-body">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">ברכה אחרונה על מאכלים ומשקים שאינם משבעת המינים (ירקות, בשר, דגים, שתייה וכו׳)</div>
+        בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, בּוֹרֵא נְפָשׁוֹת רַבּוֹת וְחֶסְרוֹנָן, עַל כֹּל מַה שֶּׁבָּרָאתָ לְהַחֲיוֹת בָּהֶם נֶפֶשׁ כָּל חָי. בָּרוּךְ חֵי הָעוֹלָמִים.
+      </div>
+    </div>
+
     <div class="blessing-item" id="b6">
       <div class="blessing-header" onclick="toggleBlessing('b6')">
         <span class="blessing-title">איגרת הרמב"ן</span>
@@ -356,7 +367,7 @@ const S = TH ? TH.S : {
 };
 
 /* ── כלי: טוגל אקורדיון ── */
-const ALL_BLESSINGS = ['bMazon','b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13','b14','bAsher'];
+const ALL_BLESSINGS = ['bMazon','bNefashot','b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13','b14','bAsher'];
 
 function toggleBlessing(id) {
   const el = document.getElementById(id);
