@@ -1923,7 +1923,12 @@ function _kamatzKatan(s){
   return s.replace(/כּ?ָל(?![ְ-ׇּֿׁׂא-ת])/g,
                    function(m){ return m.replace('ָ','ֹ'); });
 }
-function _stripForTts(s){ return _kamatzKatan((s||'').replace(/[֑-֯]/g,'')); } // הסר טעמים + תקן קמץ-קטן
+function _stripForTts(s){
+  s = (s||'').replace(/[֑-֯]/g,'');            // הסר טעמים
+  s = s.replace(/יְהֹוָה|יְהוָה|יְיָ|יהוה/g, 'אֲדֹנָי'); // שם הו״יה → אֲדֹנָי
+  s = _kamatzKatan(s);
+  return s.replace(/[׀׃־]/g, ' '); // פסיק/סוף-פסוק/מקף → רווח                                // תיקון קמץ-קטן
+}
 // קולות עבריים זמינים במכשיר
 function _hebrewVoices(){
   try { return (speechSynthesis.getVoices()||[]).filter(v => /^(he|iw)/i.test(v.lang||'')); } catch(e){ return []; }
