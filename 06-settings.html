@@ -299,7 +299,7 @@ html.dark .google-btn{background:var(--surface);}
   <!-- ══ 4. תזכורות ══ -->
   <div class="group-label" data-i18n="set.reminders">תזכורות</div>
   <div class="group">
-    <div class="row">
+    <div class="row" id="rowRemPush" style="display:none">
       <div class="row-left">
         <span class="row-icon">📲</span>
         <div><div class="row-label">התראות Push</div><div class="row-sub" id="remPushSub">כבוי — גם כשהאפליקציה סגורה</div></div>
@@ -309,7 +309,7 @@ html.dark .google-btn{background:var(--surface);}
     <div class="row">
       <div class="row-left">
         <span class="row-icon">🔔</span>
-        <div><div class="row-label" data-i18n="set.daily_reminder">תזכורת יומית</div><div class="row-sub" id="remDailySub">כבויה</div><div class="row-sub" data-i18n="set.reminder_note" style="opacity:.7;margin-top:1px;">פועל כשהאפליקציה פתוחה</div></div>
+        <div><div class="row-label" data-i18n="set.daily_reminder">תזכורת יומית</div><div class="row-sub" id="remDailySub">כבויה</div><div class="row-sub" data-i18n="set.reminder_note" style="opacity:.7;margin-top:1px;">פועל גם כשהאפליקציה סגורה</div></div>
       </div>
       <div class="toggle" id="tRemDaily" onclick="toggleDailyRem()"><div class="toggle-knob"></div></div>
     </div>
@@ -484,7 +484,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.102 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.103 BETA · © 2026</div>
 </div>
 
 <script>
@@ -510,7 +510,7 @@ function loadSettings() {
   _loadingSettings = true;
   const s = S.get('tehillim_settings') || {};
   if (s.darkMode)      { document.documentElement.classList.add('dark'); document.getElementById('tDark').classList.add('on'); }
-  if (s.reminderOn)    { document.getElementById('tRemDaily').classList.add('on'); document.getElementById('remTimeRow').style.display='flex'; document.getElementById('remDailySub').textContent='פעילה'; }
+  if (s.reminderOn)    { document.getElementById('tRemDaily').classList.add('on'); document.getElementById('remTimeRow').style.display='flex'; document.getElementById('remDailySub').textContent='פעילה · גם כשהאפליקציה סגורה'; }
   try { if (typeof AppPush !== 'undefined' && AppPush.isOn()) { const _tp=document.getElementById('tRemPush'); if(_tp){ _tp.classList.add('on'); const _sp=document.getElementById('remPushSub'); if(_sp)_sp.textContent='פעיל ✓ — גם כשהאפליקציה סגורה'; } } } catch(e){}
   if (s.remTime)       document.getElementById('remTime').value = s.remTime;
   if (s.hourlyRem)     { document.getElementById('tRemHourly').classList.add('on'); document.getElementById('remHourlyExpand').classList.add('open'); updateHourlySub(s.hourlyInterval||1); }
@@ -743,10 +743,19 @@ function saveGroupName() {
 /* ── Daily reminder ── */
 function toggleDailyRem() {
   const on = document.getElementById('tRemDaily').classList.toggle('on');
-  document.getElementById('remDailySub').textContent = on ? 'פעילה' : 'כבויה';
+  document.getElementById('remDailySub').textContent = on ? 'פעילה · גם כשהאפליקציה סגורה' : 'כבויה';
   document.getElementById('remTimeRow').style.display = on ? 'flex' : 'none';
-  if (on) requestNotifPermission();
+  if (on) { requestNotifPermission(); _ensurePushForReminder(); }
   saveSettings();
+}
+// תזכורת יומית → מפעילה אוטומטית Push (כדי שתגיע גם כשהאפליקציה סגורה)
+async function _ensurePushForReminder(){
+  try {
+    if (typeof AppPush === 'undefined' || AppPush.isOn()) return;
+    const r = await AppPush.enable();
+    const t = document.getElementById('tRemPush'); if (r && r.ok && t) t.classList.add('on');
+    if (!(r && r.ok)) showSettingsToast('⚠️ לא הצלחנו להפעיל התראות ברקע — בדוק הרשאות');
+  } catch(e){}
 }
 
 /* ── השתקת התראות בשבת ── */

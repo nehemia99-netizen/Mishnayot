@@ -76,8 +76,8 @@ html.dark #memBtn{color:#9B6FE0;}
 .done-btn:active{opacity:.85;}
 .done-btn.done{background:var(--green);}
 .done-btn.locked{background:transparent;color:var(--text-muted);border:none;cursor:default;pointer-events:none;}
-@keyframes doneBtnBlink{0%,100%{filter:brightness(1);}50%{filter:brightness(1.5);}}
-.done-btn.blink{animation:doneBtnBlink .9s ease-in-out 5;}
+@keyframes doneBtnBlink{0%,100%{background:var(--primary);color:#fff;}50%{background:#fff;color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary);}}
+.done-btn.blink{animation:doneBtnBlink .8s ease-in-out 6;}
 .done-btn-meta{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;width:100%;opacity:.92;}
 .done-btn-meta .meta-timer{color:#1a1a1a;}
 .done-btn-meta .meta-score{color:#c8960c;}
@@ -906,7 +906,7 @@ function reachedBottom(immediate) {
   bar.style.width = '100%';
   bar.classList.add('full');
   unlockDoneBtn();
-  try { if (!isDone) { var _bb=document.getElementById('doneBtn'); _bb.classList.add('blink'); clearTimeout(window._doneBlinkT); window._doneBlinkT=setTimeout(function(){ _bb.classList.remove('blink'); }, 5000); } } catch(e){}
+  try { clearTimeout(window._doneBlinkT); window._doneBlinkT=setTimeout(function(){ if(!isDone){ var _bb=document.getElementById('doneBtn'); if(_bb && !_bb.classList.contains('locked')){ _bb.classList.add('blink'); setTimeout(function(){ _bb.classList.remove('blink'); }, 5000); } } }, 5000); } catch(e){}
   if (!isDone) showToast(_rLang()==='en' ? '✅ End of chapter!' : '✅ הגעת לסוף הפרק!');
   try { clearTimeout(window._endStopTimer); } catch(e){}
   // עצירת הטיימר 10ש' אחרי סוף — רק כשהמשתמש באמת גלל לסוף (פרק ארוך), ולא בשינון.
@@ -1927,12 +1927,13 @@ function _kamatzKatan(s){
                    function(m){ return m.replace('ָ','ֹ'); });
 }
 function _stripForTts(s){
-  s = (s||'').replace(/[֑-֯]/g,'');                                 // טעמים
-  s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // סימוני עריכה {פ}{ס}[...]
-  s = s.replace(/י[ְ-ֽֿ]*ה[ְ-ֽֿ]*ו[ְ-ֽֿ]*ה/g,'אֲדֹנָי'); // שם הו״יה (כל ניקוד)
-  s = s.replace(/יְיָ|יי׳/g,'אֲדֹנָי');                                 // יװ / יי׳
+  s = (s||'').replace(/<[^>]+>/g,' ');                                       // HTML
+  s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // {פ}{ס}[...]
+  s = s.replace(/[֑-ֽֿ֯]/g,'');                                  // טעמים+מטג+רפה
+  s = s.replace(/י[ְ-ּ]*ה[ְ-ּ]*ו[ְ-ּ]*ה/g,'אֲדֹנָי'); // שם הו״יה
+  s = s.replace(/יְיָ|יי׳/g,'אֲדֹנָי');
   s = _kamatzKatan(s);
-  s = s.replace(/[׀׃־׆|()<>]/g,' ');                          // פסיק/סוף-פסוק/מקף/סוגריים
+  s = s.replace(/[^א-תְ-ּׁׂ ]/g,' ');                     // רק אותיות+ניקוד+שין/שין-שמאלית
   return s.replace(/\s+/g,' ').trim();
 }
 // קולות עבריים זמינים במכשיר
