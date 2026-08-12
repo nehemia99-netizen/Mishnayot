@@ -1927,7 +1927,8 @@ function _kamatzKatan(s){
                    function(m){ return m.replace('ָ','ֹ'); });
 }
 function _stripForTts(s){
-  s = (s||'').replace(/<[^>]+>/g,' ');                                       // HTML
+  s = (s||'').replace(/<[^>]+>/g,' ');
+  s = s.replace(/ׇ/g,'ֹ');                                          // קמץ-קטן תנ"כי (U+05C7) → חולם                                       // HTML
   s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // {פ}{ס}[...]
   s = s.replace(/[֑-ֽֿ֯]/g,'');                                  // טעמים+מטג+רפה
   s = s.replace(/י[ְ-ּ]*ה[ְ-ּ]*ו[ְ-ּ]*ה/g,'אֲדֹנָי'); // שם הו״יה
