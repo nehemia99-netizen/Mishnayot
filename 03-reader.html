@@ -680,6 +680,7 @@ function commTextForVerse(commData, idx) {
 /* ── Load & render chapter ── */
 async function loadChapter(tractateId, perek) {
   isDone = false;
+  try { clearTimeout(window._doneBlinkT); clearTimeout(window._doneBlinkT2); clearTimeout(window._ttsAutoTimer); var _bp=document.getElementById('doneBtn'); if(_bp) _bp.classList.remove('blink'); } catch(e){}
   curTractate = tractateId;
   chapNum = perek;
   if (typeof updateIdleMs === 'function') updateIdleMs();
@@ -752,6 +753,8 @@ async function loadChapter(tractateId, perek) {
     // הפעל שינון אם פעיל, אחרת קריאה רגילה
     if (shinunActive && shinunLevel > 1) renderShinunVerses(data.he, shinunLevel);
     else renderVerses(data.he, commData);
+    // המשך-אוטומטי בהקראה: אחרי טעינת הפרק הבא — התחל להקריא
+    if (window._ttsPendingAutoStart) { window._ttsPendingAutoStart = false; setTimeout(function(){ try{ ttsStart('read'); }catch(e){} }, 500); }
     // קפיצה למשנה ספציפית אם התבקשה דרך ה-URL (?mishnah=N) — פעם אחת בלבד
     if (_pendingMishnah) { const _m = _pendingMishnah; _pendingMishnah = 0; setTimeout(function(){ scrollToMishnah(_m, true); }, 250); }
     if (_pendingReview) { _pendingReview = false; setTimeout(function(){ if (!shinunActive) toggleShinunMode(); setShinunLevel(4); }, 300); }
@@ -906,7 +909,7 @@ function reachedBottom(immediate) {
   bar.style.width = '100%';
   bar.classList.add('full');
   unlockDoneBtn();
-  try { clearTimeout(window._doneBlinkT); window._doneBlinkT=setTimeout(function(){ if(!isDone){ var _bb=document.getElementById('doneBtn'); if(_bb && !_bb.classList.contains('locked')){ _bb.classList.add('blink'); setTimeout(function(){ _bb.classList.remove('blink'); }, 5000); } } }, 5000); } catch(e){}
+  try { clearTimeout(window._doneBlinkT); clearTimeout(window._doneBlinkT2); window._doneBlinkT=setTimeout(function(){ if(!isDone){ var _bb=document.getElementById('doneBtn'); if(_bb && !_bb.classList.contains('locked')){ _bb.classList.add('blink'); window._doneBlinkT2=setTimeout(function(){ _bb.classList.remove('blink'); }, 5000); } } }, 5000); } catch(e){}
   if (!isDone) showToast(_rLang()==='en' ? '✅ End of chapter!' : '✅ הגעת לסוף הפרק!');
   try { clearTimeout(window._endStopTimer); } catch(e){}
   // עצירת הטיימר 10ש' אחרי סוף — רק כשהמשתמש באמת גלל לסוף (פרק ארוך), ולא בשינון.
@@ -1080,6 +1083,7 @@ function saveReadingProgress() {
 
 /* ── Navigation ── */
 function navigate(dir) {
+  window._lastNavRandom = false;
   saveReadingProgress();
   stopTimer();
   // חצים זזים לפרק סמוך ברצף — חוצה גבול מסכת
@@ -1101,6 +1105,7 @@ function navigate(dir) {
 }
 
 function navigateRandom() {
+  window._lastNavRandom = true;
   saveReadingProgress();
   stopTimer();
   const p = pickRandomChap();   // מעדיף פרקים שטרם נלמדו היום
@@ -1482,20 +1487,29 @@ document.getElementById('textArea').addEventListener('scroll', () => {
 });
 
 
-/* ── Double-click / double-tap to toggle auto-scroll ── */
-document.getElementById('textArea').addEventListener('dblclick', () => {
-  toggleAutoScroll();
-});
-// Double-tap support for mobile
-let lastTap = 0;
-document.getElementById('textArea').addEventListener('touchend', e => {
+/* ── כפל-הקשה = גלילה אוטומטית · שלוש-הקשות = הקראה קולית ── */
+let _tapCount = 0, _tapTimer = null, _lastTapTime = 0, _lastTouchEnd = 0;
+function _multiTapAction() {
+  const c = _tapCount; _tapCount = 0;
+  if (c === 2) toggleAutoScroll();
+  else if (c >= 3) { if (!_ttsOn) ttsStart('read'); }
+}
+function _registerTap() {
   const now = Date.now();
-  if (now - lastTap < 300) {
-    e.preventDefault();
-    toggleAutoScroll();
-  }
-  lastTap = now;
+  if (now - _lastTapTime > 450) _tapCount = 0;
+  _tapCount++; _lastTapTime = now;
+  clearTimeout(_tapTimer);
+  _tapTimer = setTimeout(_multiTapAction, 380);
+}
+document.getElementById('textArea').addEventListener('touchend', e => {
+  if (_tapCount >= 1 && (Date.now() - _lastTapTime) < 450) e.preventDefault(); // מנע זום בכפל-הקשה
+  _lastTouchEnd = Date.now();
+  _registerTap();
 }, { passive: false });
+document.getElementById('textArea').addEventListener('click', () => {
+  if (Date.now() - _lastTouchEnd < 600) return; // התעלם מ-click מדומה אחרי מגע
+  _registerTap();
+});
 
 /* ── Playlist navigation ── */
 function navigatePlaylist() {
@@ -1932,7 +1946,11 @@ function _stripForTts(s){
   s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // {פ}{ס}[...]
   s = s.replace(/[֑-ֽֿ֯]/g,'');                                  // טעמים+מטג+רפה
   s = s.replace(/י[ְ-ּ]*ה[ְ-ּ]*ו[ְ-ּ]*ה/g,'אֲדֹנָי'); // שם הו״יה
-  s = s.replace(/יְיָ|יי׳/g,'אֲדֹנָי');
+  s = s.replace(/יְ?יָ(?![א-ת])/g,'אֲדֹנָי');            // שני יודים כולל מוקדם (לַייָ)
+  s = s.replace(/יי[׳']/g,'אֲדֹנָי');                     // יי׳
+  s = s.replace(/(^|[^א-ת])ה['׳](?![א-ת])/g,'$1אֲדֹנָי');  // ה' (שם השם) → אֲדֹנָי
+  s = s.replace(/לֹ(ש)/g,'לוֹ$1');                        // חולם חסר: שלֹש→שלוֹש (shlosha)
+  s = s.replace(/לָאו(?![א-ת])/g,'לָב');                  // לאו → "lav" (במקום la-oo)
   s = _kamatzKatan(s);
   s = s.replace(/[^א-תְ-ּׁׂ ]/g,' ');                     // רק אותיות+ניקוד+שין/שין-שמאלית
   return s.replace(/\s+/g,' ').trim();
@@ -2046,6 +2064,16 @@ function toggleTTS(){
   if (open) _updateRateLabel(); else _ttsStop();
 }
 // התחל מצב אודיו: 'read' רצף · 'repeat' אמור-אחריי · 'loop' בלולאה
+/* המשך אוטומטי למשנה הבאה בסיום הקראה (מצב "קרא ברצף") — אופציונלי בהגדרות */
+function _ttsAutoNextOn(){ try { return !!(S.get('tehillim_settings')||{}).ttsAutoNext; } catch(e){ return false; } }
+function _ttsScheduleAutoNext(){
+  showToast('▶ ממשיך לפרק הבא בעוד 3 שניות…', { dur: 2800 });
+  try { clearTimeout(window._ttsAutoTimer); } catch(e){}
+  window._ttsAutoTimer = setTimeout(function(){
+    window._ttsPendingAutoStart = true;
+    if (window._lastNavRandom) navigateRandom(); else navigate(1);
+  }, 3000);
+}
 function ttsStart(mode){
   if (!_ttsSupported() && !_isCloudVoice()){ _ttsNoVoice(); return; }
   _ttsStop();
@@ -2067,6 +2095,10 @@ function ttsStart(mode){
     const ri = _ttsUnits.findIndex(u => u.vIdx >= _ttsResume.vIdx);
     if (ri > 0) { _ttsIdx = ri; _resumed = true; }
   }
+  // הכרזת כותרת ("מסכת X פרק Y") בתחילת קריאה רציפה טרייה
+  if (mode === 'read' && !_resumed) {
+    _ttsUnits.unshift({ text: 'מסכת ' + ((Corpus.getTractate(curTractate)||{}).he || curTractate) + ' פרק ' + toGematria(chapNum), vIdx: -1, isTitle: true });
+  }
   document.getElementById('ttsBtn').classList.add('tts-on');
   document.querySelectorAll('.audio-opt').forEach(el=>el.classList.remove('playing'));
   const optBtn = document.getElementById('aopt_' + mode); if (optBtn) optBtn.classList.add('playing');
@@ -2080,7 +2112,7 @@ function _ttsSpeakNext(){
   if (!_ttsOn) return;
   if (_ttsIdx >= _ttsUnits.length) {
     // סיום טבעי של הפרק — אפס נקודת-המשך כדי שהפעם הבאה תתחיל מההתחלה
-    if (_ttsMode === 'loop') { _ttsIdx = 0; } else { _ttsResume = null; _ttsCurVIdx = null; _ttsStop(); return; }
+    if (_ttsMode === 'loop') { _ttsIdx = 0; } else { _ttsResume = null; _ttsCurVIdx = null; if (_ttsMode === 'read' && !isDone && typeof finishChapter === 'function') { try { finishChapter(); } catch(e){} } if (_ttsMode === 'read' && _ttsAutoNextOn()) { _ttsStop(); _ttsScheduleAutoNext(); return; } _ttsStop(); return; }
   }
   const unit = _ttsUnits[_ttsIdx];
   _ttsCurVIdx = unit.vIdx;

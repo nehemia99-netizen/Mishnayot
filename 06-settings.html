@@ -264,6 +264,13 @@ html.dark .google-btn{background:var(--surface);}
       </div>
       <div style="font-size:11px;color:var(--text-muted);line-height:1.4;">ערך נמוך = קול עמוק יותר. נסה קולות שונים ועומקים עד שתמצא את הכי טוב. (כל שינוי טוען מחדש מהענן.)</div>
     </div>
+    <div class="row" id="rowTtsAutoNext">
+      <div class="row-left">
+        <span class="row-icon">⏭️</span>
+        <div><div class="row-label">המשך אוטומטי בהקראה</div><div class="row-sub">בסיום ההקראה של פרק — המשך אוטומטית לפרק הבא (המתנה של 3 שניות)</div></div>
+      </div>
+      <div class="toggle" id="tTtsAutoNext" onclick="toggleTtsAutoNext()"><div class="toggle-knob"></div></div>
+    </div>
     <div class="row" id="rowScrollSpeed">
       <div class="row-left">
         <span class="row-icon">🐢</span>
@@ -484,7 +491,7 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.105 BETA · © 2026</div>
+  <div class="version-note">משנתי · גרסה 1.5.106 BETA · © 2026</div>
 </div>
 
 <script>
@@ -558,6 +565,7 @@ function loadSettings() {
     const el = document.getElementById('tHideCantillation');
     if (el) el.classList.add('on');
   }
+  { const el = document.getElementById('tTtsAutoNext'); if (el) el.classList.toggle('on', !!s.ttsAutoNext); }
   _loadingSettings = false; // הטעינה הסתיימה — saveSettings() מותר שוב
 }
 
@@ -910,6 +918,14 @@ function handleImport(e) {
 }
 
 /* ── Hide cantillation (טעמים) ── */
+function toggleTtsAutoNext() {
+  const s = S.get('tehillim_settings') || {};
+  s.ttsAutoNext = !s.ttsAutoNext;
+  S.set('tehillim_settings', s);
+  const el = document.getElementById('tTtsAutoNext');
+  if (el) el.classList.toggle('on', !!s.ttsAutoNext);
+}
+
 function toggleHideCantillation() {
   const s = S.get('tehillim_settings') || {};
   // toggle: "הצג טעמים" on = hideCantillation:false, off = hideCantillation:true
