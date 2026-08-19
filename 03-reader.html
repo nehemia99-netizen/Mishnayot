@@ -1954,7 +1954,20 @@ const _TTS_CITATION_RE = new RegExp('\\(\\s*(' + _TTS_CITATION_BOOKS.join('|') +
 function _stripForTts(s){
   s = (s||'').replace(/<[^>]+>/g,' ');
   s = s.replace(/ׇ/g,'ֹ');                                          // קמץ-קטן תנ"כי (U+05C7) → חולם                                       // HTML
-  s = s.replace(_TTS_CITATION_RE, function(m, book, rest){ rest = rest.trim(); return rest ? (book + ' פרק ' + rest) : book; });
+  const _TTS_PARTED_BOOKS = new Set(['שמואל','מלכים','דברי הימים']); // שמואל/מלכים/דברי-הימים א/ב = חלק-ספר, לא פרק
+  s = s.replace(_TTS_CITATION_RE, function(m, book, rest){
+    rest = rest.trim();
+    if (!rest) return book;
+    if (_TTS_PARTED_BOOKS.has(book)) {
+      const sp = rest.indexOf(' ');
+      const first = sp === -1 ? rest : rest.slice(0, sp);
+      const remainder = sp === -1 ? '' : rest.slice(sp + 1).trim();
+      if (first === 'א' || first === 'ב') {
+        return remainder ? (book + ' חלק ' + first + ' פרק ' + remainder) : (book + ' חלק ' + first);
+      }
+    }
+    return book + ' פרק ' + rest;
+  });
   s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // {פ}{ס}[...]
   s = s.replace(/[֑-ֽֿ֯]/g,'');                                  // טעמים+מטג+רפה
   s = s.replace(/י[ְ-ּ]*ה[ְ-ּ]*ו[ְ-ּ]*ה/g,'אֲדֹנָי'); // שם הו״יה
