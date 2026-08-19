@@ -1886,7 +1886,7 @@ async function _cloudTtsAudio(text){
   const voice=s.ttsCloudVoice || 'he-IL-Wavenet-D';
   const pitch=(s.ttsCloudPitch!=null)?s.ttsCloudPitch:-5;
   const rate=(s.ttsRate!=null)?s.ttsRate:1;
-  const k=voice+'|'+pitch+'|'+rate+'|'+text;
+  const k='v2|'+voice+'|'+pitch+'|'+rate+'|'+text; // v2: מבטל קאש ישן שנחתך ב-900 תווים (מלכודת: משניות ארוכות מ-900 תווים היו מוקלטות חתוכות)
   const cached=await _cloudCacheGet(k);
   if(cached && cached.size>200) return cached;
   const resp=await fetch('/api/tts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text:text, voice:voice, pitch:pitch, rate:rate }) });

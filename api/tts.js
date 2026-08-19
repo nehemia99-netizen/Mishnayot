@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; }
   }
   body = body || {};
-  const text = String(body.text || '').slice(0, 900);
+  const text = String(body.text || '').slice(0, 3000);
   if (!text.trim()) { res.status(400).json({ error: 'no text' }); return; }
   const voice = /^he-IL-[A-Za-z0-9-]+$/.test(body.voice || '') ? body.voice : 'he-IL-Wavenet-D'; // male
   const pitch = Math.max(-20, Math.min(20, Number(body.pitch != null ? body.pitch : -5)));   // שלילי = עמוק יותר (טבעי)
