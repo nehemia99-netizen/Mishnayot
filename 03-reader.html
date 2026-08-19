@@ -1936,9 +1936,13 @@ function _ttsSupported(){ return typeof speechSynthesis !== 'undefined' && typeo
    מבחינים בין השניים, לכן ממירים מילים נפוצות: מחליפים את הקמץ בחולם (05B8→05B9)
    — רק בטקסט הנשלח למנוע, לא בתצוגה. הרשימה ניתנת להרחבה לפי מילים שנשמעות שגוי. */
 function _kamatzKatan(s){
-  // כָּל / כָל — כשעומדת לעצמה או לפני מקף (לא בתוך מילה כמו "כָּלָה") → kol
-  return s.replace(/כּ?ָל(?![ְ-ׇּֿׁׂא-ת])/g,
-                   function(m){ return m.replace('ָ','ֹ'); });
+  // כָּל / כָל — כשעומדת לעצמה או לפני מקף (לא בתוך מילה כמו "כָּלָה") → kol
+  s = s.replace(/כּ?ָל(?![ְ-ׇא-ת])/g,
+                function(m){ return m.replace('ָ','ֹ'); });
+  // קָרְבּ... (קרבן/קרבנות וכד') — קמץ-קטן: "korban" לא "karban".
+  // מזוהה ע"י דגש-ישיר-על-ב' (בניגוד ל"קרבו/יקרבוך" שם הדגש שייך לשורוק על ה-ו' שאחריו — לא מתוקן).
+  s = s.replace(/\u05e7\u05b8\u05e8\u05b0\u05d1\u05bc/g, '\u05e7\u05b9\u05e8\u05b0\u05d1\u05bc');
+  return s;
 }
 /* מראי-מקום בסוגריים (ציטוטי תנ"ך, למשל "(בראשית כב)") — אותיות ללא ניקוד שהמנוע קורא כמילה שגויה.
    מסירים את הציטוט כולו (כמו {פ}{ס}); סוגריים עם תוכן אחר (הערה עריכתית, לא ציטוט) נשארים ונקראים כרגיל. */
@@ -2080,6 +2084,16 @@ function _ttsScheduleAutoNext(){
     if (window._lastNavRandom) navigateRandom(); else navigate(1);
   }, 3000);
 }
+const _TTS_TRACTATE_VOICE = {
+  'Sotah': '\u05e1\u05d5\u05b9\u05d8\u05b8\u05d4',
+  'Orlah': '\u05e2\u05b9\u05e8\u05b0\u05dc\u05b8\u05d4',
+  'Niddah': '\u05e0\u05b4\u05d3\u05bc\u05b8\u05d4',
+  'BavaKamma': '\u05d1\u05bc\u05b8\u05d1\u05bc\u05b8\u05d0\u0020\u05e7\u05b7\u05de\u05bc\u05b8\u05d0',
+  'BavaMetzia': '\u05d1\u05bc\u05b8\u05d1\u05bc\u05b8\u05d0\u0020\u05de\u05b0\u05e6\u05b4\u05d9\u05e2\u05b8\u05d0',
+  'BavaBatra': '\u05d1\u05bc\u05b8\u05d1\u05bc\u05b8\u05d0\u0020\u05d1\u05b7\u05ea\u05b0\u05e8\u05b8\u05d0',
+  'Middot': '\u05de\u05b4\u05d3\u05bc\u05d5\u05b9\u05ea',
+};
+
 function ttsStart(mode){
   if (!_ttsSupported() && !_isCloudVoice()){ _ttsNoVoice(); return; }
   _ttsStop();
@@ -2103,7 +2117,7 @@ function ttsStart(mode){
   }
   // הכרזת כותרת ("מסכת X פרק Y") בתחילת קריאה רציפה טרייה
   if (mode === 'read' && !_resumed) {
-    _ttsUnits.unshift({ text: 'מסכת ' + ((Corpus.getTractate(curTractate)||{}).he || curTractate) + ' פרק ' + toGematria(chapNum), vIdx: -1, isTitle: true });
+    _ttsUnits.unshift({ text: 'מסכת ' + (_TTS_TRACTATE_VOICE[curTractate] || (Corpus.getTractate(curTractate)||{}).he || curTractate) + ' פרק ' + toGematria(chapNum), vIdx: -1, isTitle: true });
   }
   document.getElementById('ttsBtn').classList.add('tts-on');
   document.querySelectorAll('.audio-opt').forEach(el=>el.classList.remove('playing'));
