@@ -491,7 +491,18 @@ html.dark .google-btn{background:var(--surface);}
     </div>
   </div>
 
-  <div class="version-note">משנתי · גרסה 1.5.113 BETA · © 2026</div>
+  <div onclick="openKofiPanel()" style="display:block;text-decoration:none;margin:4px 16px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,#FF9D6C,#E8622C);color:#fff;-webkit-tap-highlight-color:transparent;cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:24px;flex-shrink:0;">☕</span>
+      <div style="flex:1;">
+        <div style="font-size:14.5px;font-weight:800;">אוהבים את משנתי?</div>
+        <div style="font-size:11.5px;opacity:.92;margin-top:2px;line-height:1.45;">כוס קפה קטנה עוזרת להמשיך לפתח את האפליקציה בחינם ובלי פרסומות 🙏</div>
+      </div>
+      <span style="font-size:14px;opacity:.85;flex-shrink:0;">‹</span>
+    </div>
+  </div>
+
+  <div class="version-note">משנתי · גרסה 1.5.114 BETA · © 2026</div>
 </div>
 
 <script>
@@ -499,6 +510,26 @@ const S = {
   get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
+
+/* ── Ko-fi support panel ── */
+function openKofiPanel() {
+  const existing = document.getElementById('kofiModal');
+  if (existing) { existing.style.display = 'flex'; return; }
+  const m = document.createElement('div');
+  m.id = 'kofiModal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;';
+  m.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:14px 10px calc(14px + env(safe-area-inset-bottom,0px));max-width:430px;width:100%;max-height:88vh;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 10px;flex-shrink:0;">
+      <div style="font-size:16px;font-weight:800;color:var(--text);">☕ תמכו בנו</div>
+      <button onclick="document.getElementById('kofiModal').remove()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0;">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;border-radius:12px;">
+      <iframe src="https://ko-fi.com/tehilon/?hidefeed=true&widget=true&embed=true&preview=true" style="border:none;width:100%;min-height:680px;background:#f9f9f9;border-radius:12px;" title="Support on Ko-fi"></iframe>
+    </div>
+  </div>`;
+  m.onclick = function(e){ if(e.target===m) m.remove(); };
+  document.body.appendChild(m);
+}
 
 /* ── Load settings ── */
 function changeLang(lang) {
