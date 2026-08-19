@@ -1951,6 +1951,23 @@ function _kamatzKatan(s){
    מסירים את הציטוט כולו (כמו {פ}{ס}); סוגריים עם תוכן אחר (הערה עריכתית, לא ציטוט) נשארים ונקראים כרגיל. */
 const _TTS_CITATION_BOOKS = ['בראשית','שמות','ויקרא','במדבר','דברים','יהושע','שופטים','שמואל','מלכים','ישעיה','ירמיה','יחזקאל','הושע','יואל','עמוס','עובדיה','יונה','מיכה','נחום','חבקוק','צפניה','חגי','זכריה','מלאכי','תהלים','משלי','איוב','שיר השירים','רות','איכה','קהלת','אסתר','דניאל','עזרא','נחמיה','דברי הימים','שם'];
 const _TTS_CITATION_RE = new RegExp('\\(\\s*(' + _TTS_CITATION_BOOKS.join('|') + ')\\s*([^)]*)\\)', 'g');
+const _TTS_GEMATRIA_VALUES = {'א':1,'ב':2,'ג':3,'ד':4,'ה':5,'ו':6,'ז':7,'ח':8,'ט':9,'י':10,'כ':20,'ל':30,'מ':40,'נ':50,'ס':60,'ע':70,'פ':80,'צ':90,'ק':100,'ר':200,'ש':300,'ת':400};
+// ממיר צירוף אותיות-גימטריה גולמי (ללא גרש/גרשיים) חזרה דרך toGematria — מוסיף את הפיסוק הנכון שמונע מה-TTS לקרוא לדוגמה "לד" כמו מילה ("LED").
+// צירוף שכבר מכיל פיסוק (גרש/גרשיים/נקודתיים/פסיק) נשאר כמו שהוא — כבר מפוסק נכון במקור.
+function _ttsFixGematriaRef(ref){
+  if (!/^[א-ת]+$/.test(ref)) return ref;
+  var sum = 0;
+  for (var i2 = 0; i2 < ref.length; i2++) sum += (_TTS_GEMATRIA_VALUES[ref[i2]] || 0);
+  if (sum <= 0) return ref;
+  var h2 = ['','א','ב','ג','ד','ה','ו','ז','ח','ט'];
+  var t2 = ['','י','כ','ל','מ','נ','ס','ע','פ','צ'];
+  var m2 = ['','ק','ר','ש','ת'];
+  var parts = [], x = sum;
+  if (x >= 100) { parts.push(m2[Math.floor(x/100)]); x %= 100; }
+  if (x >= 10)  { parts.push(t2[Math.floor(x/10)]);  x %= 10;  }
+  if (x > 0 || parts.length === 0) parts.push(h2[x]);
+  return parts.join(' ');
+}
 function _stripForTts(s){
   s = (s||'').replace(/<[^>]+>/g,' ');
   s = s.replace(/ׇ/g,'ֹ');                                          // קמץ-קטן תנ"כי (U+05C7) → חולם                                       // HTML
@@ -1963,10 +1980,10 @@ function _stripForTts(s){
       const first = sp === -1 ? rest : rest.slice(0, sp);
       const remainder = sp === -1 ? '' : rest.slice(sp + 1).trim();
       if (first === 'א' || first === 'ב') {
-        return remainder ? (book + ' חלק ' + first + ' פרק ' + remainder) : (book + ' חלק ' + first);
+        return remainder ? (book + ' חלק ' + first + ' פרק ' + _ttsFixGematriaRef(remainder)) : (book + ' חלק ' + first);
       }
     }
-    return book + ' פרק ' + rest;
+    return book + ' פרק ' + _ttsFixGematriaRef(rest);
   });
   s = s.replace(/\{[^}]*\}|\[[^\]]*\]/g,' ');                                  // {פ}{ס}[...]
   s = s.replace(/[֑-ֽֿ֯]/g,'');                                  // טעמים+מטג+רפה
