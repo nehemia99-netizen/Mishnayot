@@ -566,14 +566,14 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.115 BETA</div>
+          <div class="app-version">גרסה 1.5.116 BETA</div>
         </div>
       </div>
     </div>
     <div class="header-left">
       <div style="display:flex;align-items:center;gap:7px;">
         <div class="hebrew-date" id="hebrewDate">טוען...</div>
-        <button class="hdr-search-btn" onclick="openKofiPanel()" title="תמכו בפיתוח ☕">☕</button>
+        <button class="hdr-search-btn" onclick="openKofiPanel()" title="תשר קטן ☕">☕</button>
         <button class="hdr-search-btn" onclick="openHomeSearch()" title="חיפוש משנה" data-i18n-title="home.search">🔍</button>
       </div>
     </div>
@@ -3046,7 +3046,7 @@ function openKofiPanel() {
   m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;';
   m.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:14px 10px calc(14px + env(safe-area-inset-bottom,0px));max-width:430px;width:100%;max-height:88vh;display:flex;flex-direction:column;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 10px;flex-shrink:0;">
-      <div style="font-size:16px;font-weight:800;color:var(--text);">☕ תמכו בנו</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);">☕ תשר קטן</div>
       <button onclick="document.getElementById('kofiModal').remove()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0;">✕</button>
     </div>
     <div style="flex:1;overflow-y:auto;border-radius:12px;">
@@ -3080,7 +3080,7 @@ function openAbout() {
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button onclick="document.getElementById('aboutModal').remove()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">${_aClose}</button>
         <button onclick="document.getElementById('aboutModal').remove();window.location.href='06-settings.html'" style="background:var(--primary);color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;" id="aboutSettingsBtn">${_aSettings}</button>
-        <button onclick="document.getElementById('aboutModal').remove();openKofiPanel()" style="background:linear-gradient(135deg,#FF9D6C,#E8622C);color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">☕ ${_aLang==='en'?'Support':'תמכו בנו'}</button>
+        <button onclick="document.getElementById('aboutModal').remove();openKofiPanel()" style="background:linear-gradient(135deg,#FF9D6C,#E8622C);color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">☕ ${_aLang==='en'?'Tip':'תשר'}</button>
       </div>
     </div>`;
     m.onclick = function(e){ if(e.target===m) m.remove(); };
