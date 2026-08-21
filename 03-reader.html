@@ -1910,7 +1910,15 @@ function _ttsAdvance(unit){
   if(_ttsMode==='repeat'){
     const pause=Math.max(1400, _stripForTts(unit.text).length*45);
     _ttsTimer=setTimeout(function(){ if(_ttsOn)_ttsSpeakNext(); }, pause);
-  } else { _ttsSpeakNext(); }
+  } else {
+    const next = _ttsUnits[_ttsIdx];
+    if (next && next.vIdx === unit.vIdx) {
+      // אותה משנה, משפט הבא — פאוזה קצרה וטבעית אחרי נקודת סיום משפט (בשונה ממעבר בין משניות, שם אין פאוזה מלאכותית)
+      _ttsTimer = setTimeout(function(){ if(_ttsOn) _ttsSpeakNext(); }, 380);
+    } else {
+      _ttsSpeakNext();
+    }
+  }
 }
 function _ttsCloudUnit(unit, verseEls){
   _ttsAnySpoke=true;
@@ -2152,11 +2160,10 @@ function ttsStart(mode){
   if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
   _ttsMode = mode;
   _ttsUnits = [];
-  if (mode === 'repeat') {
-    verses.forEach((v, vi) => _splitSentences(v).forEach(s => _ttsUnits.push({ text:s, vIdx:vi })));
-  } else {
-    verses.forEach((v, vi) => _ttsUnits.push({ text:v, vIdx:vi }));
-  }
+  // תמיד מפוצל למשפטים (לא רק ב-'repeat') — כדי לייצר פאוזה טבעית אחרי נקודת סיום משפט
+  // בתוך משנה ארוכה. הפער הגדול בין משנה למשנה נשמר: ב-_ttsAdvance אין פאוזה מלאכותית
+  // כשעוברים ל-vIdx חדש, רק כשנשארים באותה משנה.
+  verses.forEach((v, vi) => _splitSentences(v).forEach(s => _ttsUnits.push({ text:s, vIdx:vi })));
   _ttsOn = true; window.__ttsActive = true; _ttsIdx = 0; _ttsAnySpoke = false; _ttsCurVIdx = null; _ttsCloudFailed = false;
   // המשך מהמשנה שבה נעצר (אם יש נקודת-המשך לפרק הזה)
   let _resumed = false;
