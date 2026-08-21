@@ -2114,7 +2114,11 @@ function _ttsScheduleAutoNext(){
   try { clearTimeout(window._ttsAutoTimer); } catch(e){}
   window._ttsAutoTimer = setTimeout(function(){
     window._ttsPendingAutoStart = true;
-    if (window._lastNavRandom) navigateRandom(); else navigate(1);
+    // אותו דיספטצ' כמו markDone() — לא לסטות מהרצף/פלייליסט/חידא הנבחר
+    if (MODE === 'hida') navigateHida();
+    else if (MODE === 'playlist') navigatePlaylist();
+    else if (window._lastNavRandom) navigateRandom();
+    else navigate(1);
   }, 3000);
 }
 const _TTS_TRACTATE_VOICE = {
