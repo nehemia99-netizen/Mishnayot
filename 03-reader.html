@@ -1920,10 +1920,26 @@ function _ttsAdvance(unit){
     }
   }
 }
+// שליפה מוקדמת (prefetch) של האודיו למשפט הבא, כדי שלא יחכה לרשת/קאש כשמגיע תורו —
+// הפער המורגש בין משפטים נובע בעיקר מזמן-הבאת האודיו, לא מהפאוזה המכוונת עצמה.
+// self-healing: אם עברנו idx (דילוג/עצירה), הפרפצ' פשוט לא ייעשה בו שימוש ולא נבדק שוב.
+let _ttsPrefetchIdx = -1, _ttsPrefetchPromise = null;
+function _ttsPrefetchNext(afterIdx){
+  if (!_ttsOn || !_isCloudVoice() || _ttsCloudFailed) return;
+  const ni = afterIdx + 1;
+  if (ni >= _ttsUnits.length || _ttsPrefetchIdx === ni) return;
+  _ttsPrefetchIdx = ni;
+  _ttsPrefetchPromise = _cloudTtsAudio(_stripForTts(_ttsUnits[ni].text)).catch(function(){ return null; });
+}
 function _ttsCloudUnit(unit, verseEls){
   _ttsAnySpoke=true;
-  _cloudTtsAudio(_stripForTts(unit.text)).then(function(blob){
+  const myIdx = _ttsIdx;
+  const prefetched = (_ttsPrefetchIdx === myIdx) ? _ttsPrefetchPromise : null;
+  if (prefetched) { _ttsPrefetchIdx = -1; _ttsPrefetchPromise = null; }
+  const audioPromise = prefetched || _cloudTtsAudio(_stripForTts(unit.text));
+  audioPromise.then(function(blob){
     if(!_ttsOn) return;
+    if(!blob){ _cloudFail(unit, verseEls); return; } // כשל בפרפצ' — נופלים לקול המכשיר כרגיל
     _ttsHighlight(unit, verseEls);
     const url=URL.createObjectURL(blob);
     const a=_ensureAudioEl();
@@ -1931,6 +1947,7 @@ function _ttsCloudUnit(unit, verseEls){
     a.onerror=function(){ try{URL.revokeObjectURL(url);}catch(e){} _cloudFail(unit, verseEls); };
     a.src=url;
     const p=a.play(); if(p&&p.catch)p.catch(function(){ _cloudFail(unit, verseEls); });
+    _ttsPrefetchNext(myIdx); // בזמן שהמשפט הזה מתנגן — הבא כבר את הבא בתור
   }).catch(function(){ _cloudFail(unit, verseEls); });
 }
 function _cloudFail(unit, verseEls){
@@ -2060,6 +2077,7 @@ function _ttsStop(){
   _ttsOn = false;
   window.__ttsActive = false; // אפשר שוב שקשוק→פרק אקראי
   _releaseWakeLock();
+  _ttsPrefetchIdx = -1; _ttsPrefetchPromise = null; // בטל שליפה מוקדמת ממתינה
   if (_ttsTimer) { clearTimeout(_ttsTimer); _ttsTimer = null; }
   try { speechSynthesis.cancel(); } catch(e){}
   if (_ttsAudioEl) { try { _ttsAudioEl.pause(); } catch(e){} _ttsAudioEl.onended = null; _ttsAudioEl.onerror = null; }
