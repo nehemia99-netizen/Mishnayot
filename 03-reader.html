@@ -1914,7 +1914,7 @@ function _ttsAdvance(unit){
     const next = _ttsUnits[_ttsIdx];
     if (next && next.vIdx === unit.vIdx) {
       // אותה משנה, משפט הבא — פאוזה קצרה וטבעית אחרי נקודת סיום משפט (בשונה ממעבר בין משניות, שם אין פאוזה מלאכותית)
-      _ttsTimer = setTimeout(function(){ if(_ttsOn) _ttsSpeakNext(); }, 380);
+      _ttsTimer = setTimeout(function(){ if(_ttsOn) _ttsSpeakNext(); }, 247);
     } else {
       _ttsSpeakNext();
     }
