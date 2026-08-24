@@ -464,6 +464,12 @@ function toGematria(n) {
   if (r.length === 1) return r + '׳';
   return r.slice(0,-1) + '"' + r.slice(-1);
 }
+// מספר-פרק "בטוח" להקראה: אותיות toGematria (משמרות מקרים מיוחדים כמו ט"ו/ט"ז)
+// בלי גרש/גרשיים, עם רווח בין כל אות — מונע גם קריאה כמילה מזויפת (כמו "כה")
+// וגם התנגשות עם הכלל "ה' (שם השם)→אדוני" ב-_stripForTts (פרק ה' נקרא בטעות "פרק אדוני").
+function _ttsSpokenChapterNum(n){
+  return toGematria(n).replace(/[׳"]/g,'').split('').join(' ');
+}
 
 /* ── URL params / state ── */
 const params  = new URLSearchParams(location.search);
@@ -2192,7 +2198,7 @@ function ttsStart(mode){
   }
   // הכרזת כותרת ("מסכת X פרק Y") בתחילת קריאה רציפה טרייה
   if (mode === 'read' && !_resumed) {
-    _ttsUnits.unshift({ text: 'מסכת ' + (_TTS_TRACTATE_VOICE[curTractate] || (Corpus.getTractate(curTractate)||{}).he || curTractate) + ' פרק ' + toGematria(chapNum), vIdx: -1, isTitle: true });
+    _ttsUnits.unshift({ text: 'מסכת ' + (_TTS_TRACTATE_VOICE[curTractate] || (Corpus.getTractate(curTractate)||{}).he || curTractate) + ' פרק ' + _ttsSpokenChapterNum(chapNum), vIdx: -1, isTitle: true });
   }
   document.getElementById('ttsBtn').classList.add('tts-on');
   document.querySelectorAll('.audio-opt').forEach(el=>el.classList.remove('playing'));
