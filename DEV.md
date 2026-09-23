@@ -31,7 +31,7 @@
 | `notifications.js` · `fcm.js` · `firebase-messaging-sw.js` | תזכורות מקומיות + גידור שבת · Push (FCM) לקוח + SW רקע. |
 | `shake.js` · `errlog.js` | שייק→פרק אקראי (בכל הדפים) · לוגינג שגיאות → Firestore `errorLogs` (`create` בלבד). |
 | `sw.js` | Service Worker — Network-First לאפליקציה ול-Sefaria, Cache-First ל-CDN. מכיל `APP_SHELL` + **`MISHNAH_TEXT_FILES`** (63 קבצים, precache best-effort). |
-| `api/tts.js` | **פונקציית Vercel** — פרוקסי ל-Google Cloud TTS (קול גברי). מפתח ב-env `GOOGLE_TTS_KEY`. |
+| `api/tts.js` | **פונקציית Vercel** — פרוקסי ל-Google Cloud TTS (קול גברי). מפתח ב-env `GOOGLE_TTS_KEY`. **נעול (ספטמבר 2026):** רק `mishnayot-alpha.vercel.app`, כתובות-הפריסה של החשבון (`mishnayot…-nehemia-s-projects.vercel.app`) ו-localhost; בלי Origin → 403. אתר נוסף — `OWN_ORIGIN` או env `ALLOWED_ORIGIN`. |
 | `scripts/` | GitHub Actions: `send-daily-push.js`, `notify-new-members.js`, `survey-report.js`. סוד: `FIREBASE_SA`. |
 | `vercel.json` | `Cache-Control: no-cache` ל-`/sw.js` ולכל `*.html`. |
 | `STORE-LISTING.md` · `DATA-SAFETY.md` | חומרי Google Play מוכנים (he+en) · תשובות טופס Data Safety. |

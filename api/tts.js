@@ -4,9 +4,14 @@
    קלט: POST JSON { text, voice?, pitch?, rate? }
    פלט: audio/mpeg (MP3). */
 module.exports = async (req, res) => {
-  // הגבלת מקור בסיסית (להפחתת ניצול לרעה). מאפשר אותו דומיין / Vercel / localhost.
+  // הגבלת מקור: רק האתר של משנתי עצמו (ספטמבר 2026). עד עכשיו התקבל *כל* אתר ‎*.vercel.app‎ וגם בקשה בלי Origin
+  // בכלל — כל אתר זר יכול היה להשתמש במכסת Google TTS שלנו. עכשיו: mishnayot-alpha.vercel.app, כתובות-הפריסה של
+  // החשבון (לא "mishnayot-<כלשהו>.vercel.app", שכל אחד יכול לרשום), localhost לפיתוח, ו-ALLOWED_ORIGIN אם מוגדר.
+  // דפדפן תמיד שולח Origin ב-POST, גם מאותו אתר ומאפליקציית ה-TWA. (סקריפט יכול לזייף Origin — מפני זה מגינה מכסה
+  // יומית ב-Google Cloud.)
   const origin = req.headers.origin || '';
-  const okOrigin = !origin || /\.vercel\.app$/.test(origin) || /^https?:\/\/localhost(:\d+)?$/.test(origin) || origin === process.env.ALLOWED_ORIGIN;
+  const OWN_ORIGIN = /^https:\/\/mishnayot-alpha\.vercel\.app$|^https:\/\/mishnayot(-[a-z0-9]+)*-nehemia-s-projects\.vercel\.app$|^https?:\/\/localhost(:\d+)?$/;
+  const okOrigin = OWN_ORIGIN.test(origin) || (!!process.env.ALLOWED_ORIGIN && origin === process.env.ALLOWED_ORIGIN);
   if (origin) res.setHeader('Access-Control-Allow-Origin', okOrigin ? origin : 'null');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
