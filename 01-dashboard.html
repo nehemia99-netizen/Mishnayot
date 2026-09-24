@@ -566,7 +566,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.126 BETA</div>
+          <div class="app-version">גרסה 1.5.127 BETA</div>
         </div>
       </div>
     </div>
@@ -3041,20 +3041,42 @@ function goToLotteryChap() {
 function openKofiPanel() {
   const existing = document.getElementById('kofiModal');
   if (existing) { existing.style.display = 'flex'; return; }
+  // ספטמבר 2026 — עמוד Ko-fi אחד ("My Apps") משרת את כל האפליקציות, והחלון המוטמע שלו מציג בראשו את השם והתמונה של
+  // העמוד. במקומם: כותרת משלנו (האייקון של האפליקציה + שורת תודה, עברית/אנגלית לפי שפת האפליקציה). ה-iframe מוזז 165px
+  // למעלה (נמדד על החלון החי ברוחב 340 ו-410 — זהה: השם נגמר ב-157, בורר One-time/Monthly מתחיל ב-173) — רק בטעינה
+  // הראשונה שלו; כל טעינה נוספת בתוך החלון (שלב תשלום) מבטלת את החיתוך ומסתירה את הכותרת, כך ששום דבר מ-Ko-fi לא מוסתר.
+  const en = (typeof i18n !== 'undefined') && i18n.getCurrentLang && i18n.getCurrentLang() === 'en';
+  const title = en ? '☕ Tip Mishnati' : '☕ תשר למשנתי';
+  const thanks = en
+    ? 'Thank you for using Mishnati 🙏<span style="display:block;font-size:14px;font-weight:400;color:#555;direction:inherit;">We hope you\'re enjoying it.</span>'
+    : 'תודה שאתם משתמשים ב"משנתי" 🙏<span style="display:block;font-size:14px;font-weight:400;color:#555;direction:inherit;">מקווים שאתם נהנים.</span>';
   const m = document.createElement('div');
   m.id = 'kofiModal';
   m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;';
   m.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;padding:14px 10px calc(14px + env(safe-area-inset-bottom,0px));max-width:430px;width:100%;max-height:88vh;display:flex;flex-direction:column;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 10px;flex-shrink:0;">
-      <div style="font-size:16px;font-weight:800;color:var(--text);">☕ תשר קטן</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);">${title}</div>
       <button onclick="document.getElementById('kofiModal').remove()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0;">✕</button>
     </div>
-    <div style="flex:1;overflow-y:auto;border-radius:12px;">
-      <iframe src="https://ko-fi.com/tehilon/?hidefeed=true&widget=true&embed=true&preview=true" style="border:none;width:100%;min-height:340px;background:#f9f9f9;border-radius:12px;" title="Support on Ko-fi"></iframe>
+    <div style="flex:1;overflow-y:auto;border-radius:12px;background:#f9f9f9;">
+      <div id="kofiBrand" style="display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 5px;padding:20px 0 8px;background:#fff;border-radius:12px 12px 0 0;">
+        <img src="icons/icon-192.png" alt="" style="width:80px;height:80px;border-radius:50%;border:7px solid #e3e8eb;background:#fff;">
+        <div style="align-self:stretch;text-align:center;padding:0 16px;font-size:16px;font-weight:700;color:#1b1b1b;line-height:1.5;direction:${en ? 'ltr' : 'rtl'};">${thanks}</div>
+      </div>
+      <div id="kofiCrop" style="overflow:hidden;height:475px;">
+        <iframe id="kofiFrame" src="https://ko-fi.com/tehilon/?hidefeed=true&widget=true&embed=true&preview=true" style="border:none;width:100%;height:640px;margin-top:-165px;display:block;background:#f9f9f9;" title="Support Mishnati on Ko-fi"></iframe>
+      </div>
     </div>
   </div>`;
   m.onclick = function(e){ if(e.target===m) m.remove(); };
   document.body.appendChild(m);
+  let loads = 0;
+  m.querySelector('#kofiFrame').onload = function(){
+    if (++loads < 2) return; // first load = the tip form (cropped); a later one = Ko-fi's next step: show it whole
+    m.querySelector('#kofiCrop').style.height = 'auto';
+    this.style.height = '600px'; this.style.marginTop = '0';
+    m.querySelector('#kofiBrand').style.display = 'none';
+  };
 }
 
 function openAbout() {
