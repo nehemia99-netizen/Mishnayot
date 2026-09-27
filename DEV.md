@@ -140,6 +140,14 @@
 
 ## 5. פיצ'רים עיקריים
 
+### 📖 מבצע משניות משותף (`challenge.html`) — 1.5.129 · חדש
+פורט של "מבצע תהילים משותף" מתהילהון (אותו מודל: מסמך-פר-פרק, טרנזקציות, סבבים חוזרים, בלי קוד/קבוצה/הרשמה).
+- **מה מחלקים:** היוצר בוחר `scope` = `all` (525 פרקים) / `order` (סדר) / `tractate` (מסכת). ברירת מחדל מטרה: **לעילוי נשמה**.
+- **Firestore (`mishnayot-71073`):** `challenges/{id}` = מטא (purpose, dedication, title, scope, chapters[], total, round, completions, kind:'mishna'); `challenges/{id}/rounds/{round}/picks/{chapKey}` = `{uid,name,readAt}`. **מפתח פרק = `<tractateId>_<perek>`** (למשל `Berakhot_3`), לא מספר רץ — לא תלוי בסדר הקורפוס.
+- 🔴 **דורש פרסום ידני של `firestore.rules`** (אוסף `challenges`) בקונסולה. `firestore_rules_PASTE.txt` הוא עכשיו עותק מלא של `firestore.rules`.
+- 🔴 **מלכודת (נמצאה ב-1.5.129, קיימת גם בתהילהון עד 2.7.222):** החוק `picks.create` דורש `request.resource.data.uid == request.auth.uid`, לכן מזהה המשתמש בעמוד **חייב** להיות ה-uid של Firebase Auth. מזהה אקראי מקומי (`tehillim_uid` שלא סונכרן) גורם ל"permission denied" בכל לקיחה אצל מי שנכנס מהקישור בלי לעבור באפליקציה. הפתרון: `_authReady.then(u => { MY_ID = u.uid; S.set('tehillim_uid', u.uid) })`.
+- **בדיקה בלי לגעת בפרודקשן:** עותק זמני של הדף שמופנה לפרויקט `tehilhon` (החוקים שלו כבר מפורסמים), ואז מחיקת נתוני הבדיקה.
+
 ### מאז 1.5.70 (הכנה להשקה)
 - **אופליין מלא (1.5.76):** `mishnah-text/` — 63 קבצים פר-מסכת, טעינה על-פי דרישה + fallback ב-`fetchChapter`. ראה מלכודת #20.
 - **מונה חי צף "RayBan" בקורא (1.5.75)** + `min-height:0` + מרווח נייד דינמי (`bottomnav.js`).

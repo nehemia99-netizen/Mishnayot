@@ -46,6 +46,26 @@ service cloud.firestore {
       }
     }
 
+    // ── challenges/{id} — מבצע משניות משותף (מאגר פרקים, סבבים חוזרים, ללא קוד/קבוצה) ──
+    match /challenges/{id} {
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn();
+      // עדכון: היוצר יכול לערוך הכל; כל מחובר יכול *רק* לקדם סבב/מונה השלמות (סגירת סבב אטומית)
+      allow update: if isSignedIn() && (
+                      resource.data.createdBy == request.auth.uid
+                      || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['round','completions','lastCompletedAt'])
+                    );
+      allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+
+      // כל פרק בכל סבב = מסמך זעיר. מחובר תופס פרק פנוי (רק בשמו); משחרר רק את שלו.
+      match /rounds/{round}/picks/{chap} {
+        allow read:   if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid
+                      && request.resource.data.keys().hasOnly(['uid','name','readAt']);
+        allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      }
+    }
+
     // ── pushTokens/{uid} — token ל-Push; הבעלים כותב, Functions קוראות (Admin) ──
     match /pushTokens/{uid} {
       allow read, write: if isOwner(uid);

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3A7D44">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="משנתי">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>משנתי — מבצע משניות משותף</title>
+<style>
+:root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--border-row:rgba(0,0,0,.07);--primary:#3A7D44;--primary-light:#E9F2E9;--primary-dark:#2A5E33;--surface:#F5F5F3;--accent:#2F6EB5;--gold:#C07A00;}
+html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--border-row:rgba(255,255,255,.06);--primary:#54A463;--primary-light:#15291B;--primary-dark:#2A5E33;--surface:#272727;--accent:#5A98DB;--gold:#E0A020;}
+*{box-sizing:border-box;margin:0;padding:0;direction:rtl;}
+body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-content:center;}
+.app{max-width:430px;width:100%;background:var(--card);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border);position:sticky;top:0;background:var(--card);z-index:10;}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-btn{font-size:15px;color:var(--primary);border:1px solid var(--primary);background:var(--primary-light);border-radius:20px;padding:7px 16px;text-decoration:none;white-space:nowrap;font-weight:600;flex-shrink:0;margin-right:8px;}
+.view{display:none;}.view.active{display:block;padding-bottom:calc(80px + env(safe-area-inset-bottom,20px));}
+.loading-state{padding:70px 20px;text-align:center;color:var(--text-muted);}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Form (create) ── */
+.form-wrap{padding:20px 16px;}
+.form-title{font-size:19px;font-weight:800;color:var(--text);margin-bottom:5px;}
+.form-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px;line-height:1.55;}
+.form-label{font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;letter-spacing:.3px;}
+.form-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:15px;color:var(--text);font-family:inherit;outline:none;margin-bottom:16px;transition:border-color .2s;}
+.form-input:focus{border-color:var(--primary);}
+.form-input::placeholder{color:var(--text-muted);}
+.form-submit{width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:opacity .2s;}
+.form-submit:disabled{opacity:.45;cursor:default;}
+.purpose-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.purpose-opt{padding:12px 8px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.purpose-opt.selected{border-color:var(--primary);background:var(--primary-light);}
+.purpose-opt-icon{font-size:22px;margin-bottom:3px;}
+.purpose-opt-label{font-size:12.5px;font-weight:700;color:var(--text);}
+.scope-row{display:flex;gap:8px;margin-bottom:10px;}
+.scope-opt{flex:1;padding:10px 4px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;font-size:13px;font-weight:700;color:var(--text);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.scope-opt.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary);}
+.scope-opt small{display:block;font-size:10.5px;font-weight:500;color:var(--text-muted);margin-top:2px;}
+
+/* ── Pool header ── */
+.ded-header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:18px 18px 16px;color:#fff;}
+.ded-kicker{font-size:12px;opacity:.85;font-weight:600;}
+.ded-name{font-size:21px;font-weight:800;margin:2px 0 10px;line-height:1.25;}
+.complete-badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:6px 14px;font-size:13.5px;font-weight:800;margin-bottom:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.complete-badge:active{background:rgba(255,255,255,.32);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:130;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:800;color:var(--text);text-align:center;margin-bottom:14px;}
+.modal-close{width:100%;padding:12px;border-radius:12px;background:var(--surface);border:.5px solid var(--border);color:var(--text-sec);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:12px;}
+.progress-row{display:flex;justify-content:space-between;font-size:12px;opacity:.9;margin-bottom:5px;font-weight:600;}
+.progress-track{height:9px;background:rgba(255,255,255,.22);border-radius:6px;overflow:hidden;}
+.progress-fill{height:100%;background:#fff;border-radius:6px;width:0;transition:width .4s;}
+.ded-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.inv-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.inv-btn:active{background:rgba(255,255,255,.3);}
+
+/* ── Name strip ── */
+.name-strip{margin:14px 16px 4px;padding:12px 14px;background:var(--primary-light);border:1px solid var(--primary);border-radius:12px;}
+.name-strip-lbl{font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px;}
+.name-strip-row{display:flex;gap:8px;}
+.name-strip input{flex:1;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);font-size:15px;color:var(--text);font-family:inherit;outline:none;}
+.name-strip button{padding:9px 16px;border-radius:10px;background:var(--primary);color:#fff;border:none;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+
+/* ── Quick take ── */
+.quick-take{margin:14px 16px 2px;}
+.quick-btn{width:100%;padding:13px;border-radius:13px;background:var(--primary);color:#fff;font-size:15.5px;font-weight:800;border:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.quick-btn:active{opacity:.85;}
+.quick-sub{font-size:11.5px;color:var(--text-muted);text-align:center;margin-top:5px;}
+
+/* ── Legend ── */
+.legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:14px 16px 5px;font-size:11px;color:var(--text-muted);}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;}
+.hint{font-size:12px;color:var(--text-muted);text-align:center;padding:2px 24px 10px;line-height:1.5;}
+
+/* ── Tractates / grid ── */
+.order-title{margin:14px 16px 6px;font-size:14px;font-weight:800;color:var(--primary);padding-bottom:4px;border-bottom:1.5px solid var(--primary-light);}
+.decade{margin:0 16px 12px;}
+.decade-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:8px;}
+.decade-title{font-size:13px;font-weight:800;color:var(--text);}
+.decade-title small{font-weight:600;color:var(--text-muted);font-size:11px;margin-right:5px;}
+.decade-take{font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-light);border:1px solid var(--primary);border-radius:9px;padding:3px 10px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.decade-take:disabled{opacity:.35;cursor:default;}
+.chap-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;direction:ltr;}
+.chap-cell{position:relative;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;border:.5px solid transparent;user-select:none;transition:transform .08s;}
+.chap-cell:active{transform:scale(.9);}
+.chap-cell .who{font-size:7.5px;font-weight:600;line-height:1;margin-top:1px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1px;}
+.c-free{background:var(--surface);color:var(--text-sec);border-color:var(--border);}
+.c-mine{background:var(--primary);color:#fff;box-shadow:inset 0 0 0 2px #fff, 0 0 0 1px var(--primary);}
+.c-read{background:var(--accent);color:#fff;}
+
+/* ── Participants summary ── */
+.summary{margin:8px 16px 4px;}
+.summary-title{font-size:13px;font-weight:800;color:var(--text);margin:14px 0 8px;}
+.part-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:.5px solid var(--border);border-radius:11px;margin-bottom:6px;}
+.part-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.part-info{flex:1;min-width:0;}
+.part-name{font-size:13.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
+.part-chaps{font-size:11px;color:var(--text-muted);margin-top:1px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;}
+.part-count{font-size:14px;font-weight:800;color:var(--gold);text-align:left;flex-shrink:0;}
+.you-badge{font-size:9.5px;color:var(--primary);background:var(--primary-light);border-radius:7px;padding:1px 6px;font-weight:700;}
+.free-line{font-size:12px;color:var(--text-sec);padding:10px 14px;background:var(--primary-light);border-radius:11px;margin-top:6px;line-height:1.5;}
+.total-stat{font-size:12.5px;color:var(--text-sec);text-align:center;padding:12px 16px 2px;font-weight:600;}
+.total-stat b{color:var(--gold);font-size:15px;}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.95);color:#fff;padding:11px 20px;border-radius:22px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:120;max-width:88%;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="topbar-title" id="topbarTitle">📖 מבצע משניות משותף</span>
+    <a class="home-btn" href="01-dashboard.html">בית</a>
+  </div>
+
+  <!-- Loading -->
+  <div class="view active" id="viewLoading">
+    <div class="loading-state"><div class="spinner"></div>טוען…</div>
+  </div>
+
+  <!-- Create -->
+  <div class="view" id="viewCreate">
+    <div class="form-wrap">
+      <div class="form-title">📖 מבצע משניות משותף</div>
+      <div class="form-sub">חלקו את פרקי המשנה בין רבים — לעילוי נשמה, לרפואה או לכל ישועה. מנהג ישראל ללמוד משניות לעילוי נשמת הנפטרים, שכּן <b>"מִשְׁנָה" אותיות "נְשָׁמָה"</b>. שלחו קישור אחד לוואטסאפ, כל אחד לוקח פרקים, וכשמסיימים הכול מתחילים מחדש — <b>וסוגרים שוב ושוב.</b> בלי קוד, בלי הרשמה.</div>
+
+      <label class="form-label">לכבוד / למטרת</label>
+      <div class="purpose-grid" id="purposeGrid">
+        <div class="purpose-opt selected" data-p="neshama"><div class="purpose-opt-icon">🕯️</div><div class="purpose-opt-label">לעילוי נשמה</div></div>
+        <div class="purpose-opt" data-p="refua"><div class="purpose-opt-icon">💙</div><div class="purpose-opt-label">לרפואה</div></div>
+        <div class="purpose-opt" data-p="yeshua"><div class="purpose-opt-icon">🙏</div><div class="purpose-opt-label">לישועה/הצלחה</div></div>
+        <div class="purpose-opt" data-p="general"><div class="purpose-opt-icon">📖</div><div class="purpose-opt-label">כללי</div></div>
+      </div>
+
+      <label class="form-label" id="dedLabel">שם הנפטר/ת (ואם ידוע — בן/בת)</label>
+      <input class="form-input" id="dedInput" placeholder="לדוגמה: משה בן אברהם" maxlength="60">
+
+      <label class="form-label">מה מחלקים?</label>
+      <div class="scope-row" id="scopeRow">
+        <div class="scope-opt selected" data-s="all">כל המשנה<small>525 פרקים</small></div>
+        <div class="scope-opt" data-s="order">סדר<small>אחד מששת הסדרים</small></div>
+        <div class="scope-opt" data-s="tractate">מסכת<small>מסכת אחת</small></div>
+      </div>
+      <select class="form-input" id="scopeSel" style="display:none;"></select>
+
+      <label class="form-label">השם שלך (יוצר המבצע)</label>
+      <input class="form-input" id="creatorName" placeholder="השם שלך" maxlength="30">
+
+      <button class="form-submit" id="createBtn" onclick="createChallenge()">✨ צור מבצע וקבל קישור לשיתוף</button>
+    </div>
+  </div>
+
+  <!-- Pool -->
+  <div class="view" id="viewPool">
+    <div class="ded-header">
+      <div class="ded-kicker" id="poolKicker">מבצע משניות משותף</div>
+      <div class="ded-name" id="poolName">—</div>
+      <div class="complete-badge" id="completeBadge" onclick="openContrib()">🔵 סבב ראשון ▸</div>
+      <div class="progress-row"><span id="progLabel">סבב #1 · 0 נקראו</span><span id="progPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+      <div class="ded-actions">
+        <button class="inv-btn" onclick="shareChallenge()">🔗 שתף קישור</button>
+        <button class="inv-btn" onclick="copyLink()">📋 העתק</button>
+      </div>
+    </div>
+
+    <div class="name-strip" id="nameStrip" style="display:none;">
+      <div class="name-strip-lbl">מה השם שלך? (יופיע ליד הפרקים שתיקח)</div>
+      <div class="name-strip-row">
+        <input id="myNameInput" placeholder="השם שלך" maxlength="30">
+        <button onclick="saveMyName()">שמור</button>
+      </div>
+    </div>
+
+    <div class="quick-take">
+      <button class="quick-btn" onclick="takeNext(5)">🙋 תן לי 5 פרקים פנויים</button>
+      <div class="quick-sub">מקבל/ת אוטומטית 5 פרקים מהסבב הנוכחי · או בחר/י ידנית בלוח למטה</div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:var(--surface);border:.5px solid var(--border);"></i>פנוי</span>
+      <span><i style="background:var(--primary);"></i>שלי</span>
+      <span><i style="background:var(--accent);"></i>נקרא</span>
+    </div>
+    <div class="hint">פרק פנוי → לחיצה = "קראתי" · לחיצה על פרק שלך משחררת אותו</div>
+
+    <div id="decadesWrap"></div>
+
+    <div class="summary" id="summaryWrap"></div>
+    <div class="total-stat" id="totalStat"></div>
+  </div>
+
+  <!-- Contribution detail modal -->
+  <div class="modal-overlay" id="contribModal" onclick="if(event.target===this)closeContrib()">
+    <div class="modal-box">
+      <div class="modal-title">👥 מי קרא מה — כל הסבבים</div>
+      <div id="contribBody"></div>
+      <button class="modal-close" onclick="closeContrib()">סגור</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="corpus.js?v=2.2.0"></script>
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, runTransaction }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInAnonymously, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const FB_CFG = {
+  apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
+  authDomain:"mishnayot-71073.firebaseapp.com",
+  projectId:"mishnayot-71073",
+  storageBucket:"mishnayot-71073.firebasestorage.app",
+  messagingSenderId:"445059664136",
+  appId:"1:445059664136:web:fec8a4f338fd326d3b04bd"
+};
+const fbApp = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
+const db    = getFirestore(fbApp);
+const _auth = getAuth(fbApp);
+const _authReady = new Promise(resolve => {
+  onAuthStateChanged(_auth, async user => {
+    if (user) { resolve(user); return; }
+    try { const c = await signInAnonymously(_auth); resolve(c.user); }
+    catch(e) { console.warn('auth failed',e.code); resolve(null); }
+  });
+});
+
+// (the storage keys keep their original "tehillim_*" names, like the rest of the app)
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+if ((S.get('tehillim_settings')||{}).darkMode) document.documentElement.classList.add('dark');
+
+let MY_ID = (() => {
+  let uid = S.get('tehillim_uid');
+  if (!uid) { uid = 'u_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36); S.set('tehillim_uid',uid); }
+  return uid;
+})();
+
+// The security rules require pick.uid == the Firebase auth uid, so the id used for picks must BE the auth uid. A visitor who
+// opened the link without ever using the app has a random local id here, and every pick was rejected ("permission denied").
+_authReady.then(user => { if (user?.uid) { MY_ID = user.uid; S.set('tehillim_uid', user.uid); } });
+
+let _toastT;
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(()=>el.classList.remove('show'),2600); }
+function showView(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+/* ── Name helpers ── */
+function myName(){ const s=S.get('tehillim_settings')||{}; return (s.username||s.groupName||'').toString().trim(); }
+function setMyName(n){ const s=S.get('tehillim_settings')||{}; s.username=n; S.set('tehillim_settings',s); }
+function initials(n){ n=(n||'').trim(); if(!n)return '•'; const p=n.split(/\s+/); return (p[0][0]||'')+(p.length>1?p[p.length-1][0]:''); }
+function avatarColor(id){ const c=['#3A7D44','#2F6EB5','#7B2FF7','#C07A00','#C0392B','#0E8A8A','#B0308A']; let h=0; for(const ch of (id||'')) h=(h*31+ch.charCodeAt(0))>>>0; return c[h%c.length]; }
+function esc(s){ return (s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+/* ── Mishnah structure (from corpus.js): a chapter is addressed by "<tractateId>_<perek>", e.g. "Berakhot_3".
+   The key does not depend on the order of the corpus, so a campaign keeps working if the corpus is regenerated. ── */
+const TR = window.Corpus.tractates, ORDERS = window.Corpus.orders;
+const ALL_KEYS = []; const INFO = {};            // INFO[key] = {t: tractateId, n: perek, ti: tractate index}
+TR.forEach((t,ti)=>{ t.perakim.forEach((_,i)=>{ const k=t.id+'_'+(i+1); ALL_KEYS.push(k); INFO[k]={t:t.id,n:i+1,ti:ti}; }); });
+const ORDER_OF = {}; ORDERS.forEach(o=>o.tractates.forEach(id=>{ ORDER_OF[id]=o; }));
+const TR_BY_ID = window.Corpus.byId;
+
+function poolFor(scope){
+  if(scope.type==='order'){ const o=ORDERS.find(x=>x.id===scope.id); const set=new Set(o?o.tractates:[]); return ALL_KEYS.filter(k=>set.has(INFO[k].t)); }
+  if(scope.type==='tractate') return ALL_KEYS.filter(k=>INFO[k].t===scope.id);
+  return ALL_KEYS.slice();
+}
+function scopeLabel(scope){       // for "… הושלמה N פעמים" and the share text
+  if(scope&&scope.type==='order'){ const o=ORDERS.find(x=>x.id===scope.id); return {name:'סדר '+(o?o.he:''), done:'הושלם', fut:'נשלים'}; }
+  if(scope&&scope.type==='tractate'){ const t=TR_BY_ID[scope.id]; return {name:'מסכת '+(t?t.he:''), done:'הושלמה', fut:'נשלים'}; }
+  return {name:'כל המשנה', done:'הושלמה', fut:'נשלים'};
+}
+
+/* ── Purpose config ── */
+const PURPOSE = {
+  neshama: { icon:'🕯️', kicker:'לעילוי נשמת', dedLabel:'שם הנפטר/ת (ואם ידוע — בן/בת)', dedPh:'לדוגמה: משה בן אברהם', title:n=>'לעילוי נשמת '+n },
+  refua:   { icon:'💙', kicker:'לרפואת', dedLabel:'שם החולה (ואם ידוע — בן/בת האם)', dedPh:'לדוגמה: ישראל בן שרה', title:n=>'לרפואת '+n },
+  yeshua:  { icon:'🙏', kicker:'לישועת', dedLabel:'שם (ואם ידוע — בן/בת האם)', dedPh:'לדוגמה: רבקה בת לאה', title:n=>'לישועת '+n },
+  general: { icon:'📖', kicker:'מבצע משניות', dedLabel:'כותרת המבצע', dedPh:'לדוגמה: לזכות עם ישראל', title:n=>n }
+};
+let _purpose='neshama', _scopeType='all';
+
+/* ── Create view ── */
+function fillScopeSelect(){
+  const sel=document.getElementById('scopeSel');
+  if(_scopeType==='order'){
+    sel.innerHTML=ORDERS.map(o=>{ const ch=o.tractates.reduce((s,id)=>s+TR_BY_ID[id].perakim.length,0); return `<option value="${o.id}">סדר ${esc(o.he)} — ${o.tractates.length} מסכתות, ${ch} פרקים</option>`; }).join('');
+    sel.style.display='';
+  }else if(_scopeType==='tractate'){
+    sel.innerHTML=ORDERS.map(o=>`<optgroup label="סדר ${esc(o.he)}">`+o.tractates.map(id=>{ const t=TR_BY_ID[id]; return `<option value="${t.id}">${esc(t.he)} — ${t.perakim.length} פרקים</option>`; }).join('')+'</optgroup>').join('');
+    sel.style.display='';
+  }else{ sel.style.display='none'; }
+}
+function renderCreate(){
+  document.getElementById('purposeGrid').addEventListener('click',e=>{
+    const opt=e.target.closest('.purpose-opt'); if(!opt)return;
+    _purpose=opt.dataset.p;
+    document.querySelectorAll('.purpose-opt').forEach(o=>o.classList.toggle('selected',o===opt));
+    const cfg=PURPOSE[_purpose];
+    document.getElementById('dedLabel').textContent=cfg.dedLabel;
+    document.getElementById('dedInput').placeholder=cfg.dedPh;
+  });
+  document.getElementById('scopeRow').addEventListener('click',e=>{
+    const opt=e.target.closest('.scope-opt'); if(!opt)return;
+    _scopeType=opt.dataset.s;
+    document.querySelectorAll('.scope-opt').forEach(o=>o.classList.toggle('selected',o===opt));
+    fillScopeSelect();
+  });
+  const cn=document.getElementById('creatorName'); if(myName())cn.value=myName();
+  showView('viewCreate');
+}
+window.createChallenge=async function(){
+  const btn=document.getElementById('createBtn');
+  const ded=document.getElementById('dedInput').value.trim();
+  const creator=document.getElementById('creatorName').value.trim();
+  if(!ded){ toast('⚠️ מלא/י את שם/כותרת המבצע'); return; }
+  if(!creator){ toast('⚠️ מלא/י את שמך'); return; }
+  setMyName(creator);
+  btn.disabled=true; btn.textContent='יוצר…';
+  try{
+    const user=await _authReady; if(user?.uid)MY_ID=user.uid;
+    const scope = _scopeType==='all' ? {type:'all'} : {type:_scopeType, id:document.getElementById('scopeSel').value};
+    const chapters=poolFor(scope);
+    if(!chapters.length){ toast('⚠️ לא נמצאו פרקים'); btn.disabled=false; btn.textContent='✨ צור מבצע וקבל קישור לשיתוף'; return; }
+    const id=(Date.now().toString(36)+Math.random().toString(36).slice(2,8)).replace(/[^a-z0-9]/g,'');
+    const title=PURPOSE[_purpose].title(ded);
+    await setDoc(doc(db,'challenges',id),{
+      createdBy:MY_ID, createdByName:creator, createdAt:Date.now(), kind:'mishna',
+      purpose:_purpose, dedication:ded, title:title, scope:scope, chapters:chapters, total:chapters.length,
+      round:1, completions:0
+    });
+    location.replace('challenge.html?c='+id);
+  }catch(e){ console.error(e); toast('⚠️ שגיאה ביצירה: '+(e.code||e.message)); btn.disabled=false; btn.textContent='✨ צור מבצע וקבל קישור לשיתוף'; }
+};
+
+/* ── Pool view ── */
+let _cid=null, _meta=null, _round=0, _picks={}, _metaUnsub=null, _picksUnsub=null, _advancing=false, _prevCompletions=null;
+
+async function openPool(id){
+  _cid=id;
+  try{
+    await _authReady;
+    const first=await getDoc(doc(db,'challenges',id));
+    if(!first.exists()){ toast('⚠️ המבצע לא נמצא'); setTimeout(()=>location.replace('challenge.html'),1500); return; }
+  }catch(e){ console.error(e); toast('⚠️ שגיאה בטעינה'); return; }
+
+  if(!myName()) document.getElementById('nameStrip').style.display='';
+  showView('viewPool');
+
+  // live meta subscription (round + completions)
+  _metaUnsub=onSnapshot(doc(db,'challenges',id),snap=>{
+    if(!snap.exists())return;
+    _meta=snap.data();
+    renderHeader();
+    // celebrate a newly-finished round
+    if(_prevCompletions!==null && _meta.completions>_prevCompletions){ const l=scopeLabel(_meta.scope); toast('🎉 '+l.name+' '+l.done+'! (פעם '+_meta.completions+')'); }
+    _prevCompletions=_meta.completions;
+    // (re)subscribe to the current round's picks
+    if(_meta.round!==_round){ _round=_meta.round; subscribeRound(id,_round); }
+  },err=>{ console.warn('meta snap',err); });
+}
+
+function subscribeRound(id,round){
+  if(_picksUnsub)_picksUnsub();
+  _picks={};
+  _picksUnsub=onSnapshot(collection(db,'challenges',id,'rounds',String(round),'picks'),snap=>{
+    _picks={}; snap.forEach(d=>{ _picks[d.id]=d.data(); });
+    renderPool();
+  },err=>{ console.warn('picks snap',err); toast('⚠️ בעיית סנכרון'); });
+}
+
+function renderHeader(){
+  const cfg=PURPOSE[_meta.purpose]||PURPOSE.general;
+  const l=scopeLabel(_meta.scope);
+  document.getElementById('topbarTitle').textContent=cfg.icon+' '+(_meta.title||'מבצע משניות');
+  document.getElementById('poolKicker').textContent=cfg.icon+' '+cfg.kicker+' · '+l.name;
+  document.getElementById('poolName').textContent=_meta.dedication||_meta.title||'';
+  const c=_meta.completions||0;
+  document.getElementById('completeBadge').textContent = c>0 ? ('✅ '+l.name+' '+l.done+' '+c+' '+(c===1?'פעם':'פעמים')+' ▸') : ('🔵 סבב ראשון — יחד '+l.fut+' '+l.name+'! ▸');
+}
+
+function trHeader(tid, keys){
+  const t=TR_BY_ID[tid];
+  const done=keys.filter(k=>_picks[k]).length;
+  const freeIn=keys.some(k=>!_picks[k]);
+  const allFree=keys.every(k=>!_picks[k]);
+  return `<div class="decade-head">
+      <span class="decade-title">${esc(t?t.he:tid)}<small>${done}/${keys.length}</small></span>
+      <button class="decade-take" onclick="takeTractate('${tid}')" ${freeIn?'':'disabled'}>${allFree?'קח מסכת':'קח את הפנויים'}</button>
+    </div>`;
+}
+
+function renderPool(){
+  if(!_meta)return;
+  const chapters=_meta.chapters||[];
+  const total=chapters.length;
+  let read=0;
+  chapters.forEach(k=>{ if(_picks[k])read++; });
+
+  const pct=total?Math.round(read/total*100):0;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progLabel').textContent='סבב #'+(_meta.round||1)+' · '+read+' / '+total+' נקראו';
+
+  // group by tractate (in corpus order); when the whole Mishnah is shared, also show the order (seder) headings
+  const groups=[]; const idx={};
+  chapters.forEach(k=>{ const t=(INFO[k]||{}).t; if(!t)return; if(!(t in idx)){ idx[t]=groups.length; groups.push({t:t,keys:[]}); } groups[idx[t]].keys.push(k); });
+  groups.sort((a,b)=>(TR.indexOf(TR_BY_ID[a.t])) - (TR.indexOf(TR_BY_ID[b.t])));
+  groups.forEach(g=>g.keys.sort((a,b)=>INFO[a].n-INFO[b].n));
+  const showOrders=groups.length>12;
+  let lastOrder=null, html='';
+  groups.forEach(g=>{
+    if(showOrders){ const o=ORDER_OF[g.t]; if(o&&o!==lastOrder){ html+=`<div class="order-title">סדר ${esc(o.he)}</div>`; lastOrder=o; } }
+    html+=`<div class="decade">${trHeader(g.t,g.keys)}<div class="chap-grid">${g.keys.map(cellHtml).join('')}</div></div>`;
+  });
+  document.getElementById('decadesWrap').innerHTML=html;
+
+  renderSummary(chapters, total);
+
+  // auto-advance round when complete
+  if(read>=total && total>0) tryAdvanceRound(_meta.round);
+}
+
+function cellHtml(k){
+  const p=_picks[k];
+  let cls='c-free', who='';
+  if(p){ const mine=p.uid===MY_ID; cls=mine?'c-mine':'c-read'; who=mine?'שלי':(p.name||'').split(/\s+/)[0]; }
+  return `<div class="chap-cell ${cls}" onclick="tapChapter('${k}')"><span>${INFO[k].n}</span>${who?`<span class="who">${esc(who)}</span>`:''}</div>`;
+}
+
+function fmtChaps(keys){          // "ברכות 1–3, 5 · פאה 2"
+  const by={};
+  keys.forEach(k=>{ const i=INFO[k]; if(!i)return; (by[i.t]=by[i.t]||[]).push(i.n); });
+  return Object.keys(by).sort((a,b)=>TR.indexOf(TR_BY_ID[a])-TR.indexOf(TR_BY_ID[b])).map(t=>{
+    const a=by[t].sort((x,y)=>x-y); const out=[]; let s=a[0], p=a[0];
+    for(let i=1;i<=a.length;i++){ if(a[i]===p+1){ p=a[i]; continue; } out.push(s===p?''+s:s+'–'+p); s=a[i]; p=a[i]; }
+    return TR_BY_ID[t].he+' '+out.join(', ');
+  }).join(' · ');
+}
+
+function renderSummary(chapters,total){
+  const byUser={};
+  chapters.forEach(k=>{ const p=_picks[k]; if(!p)return; (byUser[p.uid]=byUser[p.uid]||{name:p.name||'—',uid:p.uid,chaps:[]}); byUser[p.uid].chaps.push(k); });
+  const users=Object.values(byUser).sort((a,b)=>b.chaps.length-a.chaps.length);
+  const free=chapters.filter(k=>!_picks[k]);
+  let html='<div class="summary-title">👥 מי לקח מה בסבב הזה ('+users.length+' משתתפים)</div>';
+  if(!users.length){ html+='<div class="part-chaps" style="padding:4px 2px;">עדיין לא נלקחו פרקים בסבב — קח/י ראשון!</div>'; }
+  html+=users.map(u=>{
+    const mine=u.uid===MY_ID;
+    return `<div class="part-row">
+      <div class="part-avatar" style="background:${avatarColor(u.uid)}">${esc(initials(u.name))}</div>
+      <div class="part-info">
+        <div class="part-name">${esc(u.name)}${mine?'<span class="you-badge">אני</span>':''}</div>
+        <div class="part-chaps">${esc(fmtChaps(u.chaps))}</div>
+      </div>
+      <div class="part-count">${u.chaps.length}</div>
+    </div>`;
+  }).join('');
+  if(free.length){
+    const list = free.length<=30 ? fmtChaps(free) : (free.length+' פרקים ב-'+new Set(free.map(k=>INFO[k].t)).size+' מסכתות');
+    html+=`<div class="free-line">🟩 <b>נותרו פנויים לסגירת הסבב (${free.length}):</b> ${esc(list)}</div>`;
+  }
+  document.getElementById('summaryWrap').innerHTML=html;
+
+  const totalRead=(_meta.completions||0)*total + (total-free.length);
+  document.getElementById('totalStat').innerHTML='📿 סה״כ נקראו במבצע: <b>'+totalRead+'</b> פרקים';
+}
+
+/* ── Round completion (atomic, guarded) ── */
+async function tryAdvanceRound(currentRound){
+  if(_advancing)return; _advancing=true;
+  try{
+    await runTransaction(db,async tx=>{
+      const mref=doc(db,'challenges',_cid);
+      const m=await tx.get(mref); const d=m.data();
+      if(!d || d.round!==currentRound) return; // already advanced by someone else
+      tx.update(mref,{ round:currentRound+1, completions:(d.completions||0)+1, lastCompletedAt:Date.now() });
+    });
+  }catch(e){ console.warn('advance',e); }
+  finally{ setTimeout(()=>{_advancing=false;},400); }
+}
+
+/* ── Actions ── */
+window.saveMyName=function(){
+  const v=document.getElementById('myNameInput').value.trim();
+  if(!v){ toast('⚠️ הזן/י שם'); return; }
+  setMyName(v); document.getElementById('nameStrip').style.display='none'; toast('✅ נשמר'); renderPool();
+};
+function ensureName(){ if(myName())return true; document.getElementById('nameStrip').style.display=''; document.getElementById('myNameInput').focus(); toast('הזן/י שם קודם'); return false; }
+
+function pickRef(k){ return doc(db,'challenges',_cid,'rounds',String(_round),'picks',k); }
+async function takeOne(k){
+  const ref=pickRef(k);
+  await runTransaction(db,async tx=>{
+    const d=await tx.get(ref);
+    if(d.exists()) throw {code:'taken'};
+    tx.set(ref,{ uid:MY_ID, name:myName(), readAt:Date.now() });
+  });
+}
+window.tapChapter=async function(k){
+  const p=_picks[k];
+  if(p && p.uid!==MY_ID){ toast('נקרא ע"י '+(p.name||'משתתף אחר')); return; }
+  if(!p){ if(!ensureName())return;
+    try{ await takeOne(k); }catch(e){ if(e.code==='taken')toast('⚠️ מישהו הקדים אותך'); else{console.error(e);toast('⚠️ שגיאה');} }
+    return;
+  }
+  try{ await deleteDoc(pickRef(k)); const i=INFO[k]; toast('פרק '+i.n+' ב'+TR_BY_ID[i.t].he+' שוחרר'); }catch(e){ console.error(e); toast('⚠️ שגיאה'); }
+};
+window.takeTractate=async function(tid){
+  if(!ensureName())return;
+  const free=(_meta.chapters||[]).filter(k=>INFO[k]&&INFO[k].t===tid && !_picks[k]).sort((a,b)=>INFO[a].n-INFO[b].n);
+  await grab(free, free.length);
+};
+window.takeNext=async function(count){
+  if(!ensureName())return;
+  const free=(_meta.chapters||[]).filter(k=>!_picks[k]);
+  if(!free.length){ toast('אין פרקים פנויים כרגע — הסבב כמעט נסגר!'); return; }
+  await grab(free, count);
+};
+// take up to `count` chapters from the free list; if someone else grabbed one meanwhile, move on to the next free one
+async function grab(list,count){
+  if(!list||!list.length){ toast('אין פרקים פנויים'); return; }
+  let ok=0;
+  for(const k of list){ if(ok>=count)break; try{ await takeOne(k); ok++; }catch(e){} }
+  toast(ok?('✅ לקחת '+ok+' פרקים — שהלימוד יעלה לזכות '+(_meta.purpose==='neshama'?'הנשמה 🕯️':'המבצע 🙏')):'⚠️ נלקחו בינתיים, נסה/י שוב');
+}
+
+/* ── Share ── */
+const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function linkFor(){
+  const base=location.protocol==='https:' ? (location.origin+location.pathname.replace(/challenge\.html.*$/,'')+'challenge.html') : 'https://mishnayot-alpha.vercel.app/challenge.html';
+  return base+'?c='+_cid;
+}
+function shareText(){
+  const cfg=PURPOSE[_meta.purpose]||PURPOSE.general;
+  const l=scopeLabel(_meta.scope);
+  return `📖 מבצע משניות משותף ${cfg.kicker} ${_meta.dedication||''}\n\nכל אחד לוקח כמה פרקי משנה ואנחנו משלימים יחד — ${l.name} — שוב ושוב 🙏\n\n👇 היכנסו, קחו פרקים וסמנו כשלמדתם:\n${linkFor()}`;
+}
+window.shareChallenge=function(){
+  const text=shareText();
+  if(IS_MOBILE&&navigator.share){ navigator.share({title:'מבצע משניות',text}).catch(()=>{}); }
+  else{ navigator.clipboard.writeText(text).catch(()=>{}); window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); toast('✅ נפתח WhatsApp'); }
+};
+window.copyLink=function(){ navigator.clipboard.writeText(linkFor()).then(()=>toast('✅ הקישור הועתק')).catch(()=>toast(linkFor())); };
+
+/* ── Contribution detail (across all rounds) ── */
+window.openContrib=async function(){
+  if(!_meta)return;
+  document.getElementById('contribModal').classList.add('open');
+  const body=document.getElementById('contribBody');
+  body.innerHTML='<div style="text-align:center;padding:26px;"><div class="spinner"></div></div>';
+  try{
+    const agg={}; const maxR=_meta.round||1;
+    for(let r=1;r<=maxR;r++){
+      const snap=await getDocs(collection(db,'challenges',_cid,'rounds',String(r),'picks'));
+      snap.forEach(d=>{ const p=d.data(); if(!p||!p.uid)return; (agg[p.uid]=agg[p.uid]||{name:p.name||'—',uid:p.uid,count:0}); agg[p.uid].count++; });
+    }
+    const users=Object.values(agg).sort((a,b)=>b.count-a.count);
+    const grand=users.reduce((s,u)=>s+u.count,0);
+    const l=scopeLabel(_meta.scope);
+    let html='<div style="text-align:center;font-size:13px;color:var(--text-sec);margin-bottom:14px;line-height:1.6;">סה״כ <b style="color:var(--gold);font-size:17px;">'+grand+'</b> פרקים נלמדו<br>('+(_meta.completions||0)+' השלמות מלאות של '+esc(l.name)+' + הסבב הנוכחי)</div>';
+    if(!users.length){ html+='<div style="text-align:center;color:var(--text-muted);padding:20px;">עדיין אין לימוד</div>'; }
+    const medal=['🥇','🥈','🥉'];
+    html+=users.map((u,i)=>`<div class="part-row">
+      <div class="part-avatar" style="background:${avatarColor(u.uid)}">${esc(initials(u.name))}</div>
+      <div class="part-info"><div class="part-name">${i<3?medal[i]+' ':''}${esc(u.name)}${u.uid===MY_ID?'<span class="you-badge">אני</span>':''}</div></div>
+      <div class="part-count">${u.count}</div>
+    </div>`).join('');
+    body.innerHTML=html;
+  }catch(e){ console.error(e); body.innerHTML='<div style="text-align:center;color:#C0392B;padding:20px;">שגיאה בטעינת הפירוט</div>'; }
+};
+window.closeContrib=function(){ document.getElementById('contribModal').classList.remove('open'); };
+
+/* ── Init ── */
+(function init(){
+  const id=new URLSearchParams(location.search).get('c');
+  if(id) openPool(id);
+  else renderCreate();
+})();
+</script>
+<script src="bottomnav.js?v=1.5.82"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

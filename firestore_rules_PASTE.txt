@@ -1,28 +1,90 @@
 rules_version = '2';
+// ═══════════════════════════════════════════════════════════
+//  משניון — Firestore Security Rules
+//  עודכן: יוני 2026 (חיזוק: groups לבעלים בלבד, whitelist שדות)
+// ═══════════════════════════════════════════════════════════
 service cloud.firestore {
   match /databases/{database}/documents {
+
     function isSignedIn() { return request.auth != null; }
     function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
 
+    // ── users/{uid} — רק הבעלים ──
     match /users/{uid} {
       allow read, write: if isOwner(uid);
-    }
-    match /leaderboard/{uid} {
-      allow read: if isSignedIn();
-      allow write: if isOwner(uid);
-    }
-    match /chapReads/{chapId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn();
-    }
-    match /groups/{code} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn();
-      match /members/{uid} {
-        allow read: if isSignedIn();
-        allow write: if isOwner(uid);
+      // תת-אוספים פרטיים של המשתמש (למשל groups שמורים)
+      match /{document=**} {
+        allow read, write: if isOwner(uid);
       }
     }
+
+    // ── leaderboard/{uid} — קריאה לכל מחובר, כתיבה לבעלים בלבד + רק שדות מותרים ──
+    match /leaderboard/{uid} {
+      allow read:  if isSignedIn();
+      allow write: if isOwner(uid)
+                   && request.resource.data.keys().hasOnly(['displayName','score','medals','streak','monthly','memorized','chaps','todayChaps','lastDate','updatedAt']);
+    }
+
+    // ── chapReads/{chapId} — מונה קריאות גלובלי; רק שדה count ──
+    match /chapReads/{chapId} {
+      allow read:  if isSignedIn();
+      allow write: if isSignedIn()
+                   && request.resource.data.keys().hasOnly(['count']);
+    }
+
+    // ── groups/{code} — יצירה לכל מחובר; עדכון/מחיקה ליוצר בלבד ──
+    match /groups/{code} {
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+
+      // חבר כותב את הרשומה שלו; יוצר הקבוצה (אדמין) יכול להסיר/לכתוב כל חבר
+      match /members/{uid} {
+        allow read:  if isSignedIn();
+        allow write: if isOwner(uid)
+                     || (isSignedIn() && get(/databases/$(database)/documents/groups/$(code)).data.createdBy == request.auth.uid);
+      }
+    }
+
+    // ── challenges/{id} — מבצע משניות משותף (מאגר פרקים, סבבים חוזרים, ללא קוד/קבוצה) ──
+    match /challenges/{id} {
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn();
+      // עדכון: היוצר יכול לערוך הכל; כל מחובר יכול *רק* לקדם סבב/מונה השלמות (סגירת סבב אטומית)
+      allow update: if isSignedIn() && (
+                      resource.data.createdBy == request.auth.uid
+                      || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['round','completions','lastCompletedAt'])
+                    );
+      allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+
+      // כל פרק בכל סבב = מסמך זעיר. מחובר תופס פרק פנוי (רק בשמו); משחרר רק את שלו.
+      match /rounds/{round}/picks/{chap} {
+        allow read:   if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid
+                      && request.resource.data.keys().hasOnly(['uid','name','readAt']);
+        allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // ── pushTokens/{uid} — token ל-Push; הבעלים כותב, Functions קוראות (Admin) ──
+    match /pushTokens/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── errorLogs — לוג שגיאות; כל מחובר יכול ליצור, אך אסור לקרוא/לשנות/למחוק מהלקוח
+    //    (קוראים את הלוגים רק בקונסולת Firebase כאדמין). שדות מוגבלים בגודל/סוג. ──
+    match /errorLogs/{doc} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if false;
+    }
+
+    // ── surveys — סקר משתמשים; כל מחובר יכול ליצור, קריאה רק בקונסולה (אדמין) ──
+    match /surveys/{doc} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if false;
+    }
+
+    // ── ברירת מחדל: חסום הכל ──
     match /{document=**} {
       allow read, write: if false;
     }
