@@ -170,7 +170,7 @@
       bottombar.classList.add('has-bnav');
       var _clearBnav = function () {
         var h = (nav && nav.getBoundingClientRect().height) || 62;
-        bottombar.style.setProperty('padding-bottom', Math.ceil(h + 16) + 'px', 'important');
+        bottombar.style.setProperty('padding-bottom', Math.ceil(h + 6) + 'px', 'important');
       };
       requestAnimationFrame(_clearBnav);
       setTimeout(_clearBnav, 300);

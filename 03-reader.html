@@ -66,10 +66,10 @@ html.dark #memBtn{color:#9B6FE0;}
 .retry-btn{margin-top:12px;display:inline-block;padding:8px 22px;background:var(--primary-light);color:var(--primary);border:.5px solid var(--primary);border-radius:20px;cursor:pointer;font-size:13px;}
 
 /* Bottom bar */
-.bottombar{border-top:.5px solid var(--border);padding:7px 16px calc(9px + env(safe-area-inset-bottom, 0px));background:var(--card);flex-shrink:0;}
+.bottombar{border-top:.5px solid var(--border);padding:5px 16px calc(9px + env(safe-area-inset-bottom, 0px));background:var(--card);flex-shrink:0;}
 .idle-warning{font-size:11px;color:#C07A00;display:none;text-align:center;margin-bottom:8px;padding:5px;background:rgba(192,122,0,.08);border-radius:8px;}
 /* Scroll progress */
-.read-progress-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:7px;overflow:hidden;}
+.read-progress-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:6px;overflow:hidden;}
 .read-progress-bar{height:100%;width:0%;background:var(--primary);border-radius:2px;transition:width .15s;}
 .read-progress-bar.full{background:var(--green);}
 .done-btn{width:100%;padding:8px 14px;border-radius:13px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,opacity .2s;display:flex;flex-direction:column;align-items:center;gap:1px;}
@@ -78,6 +78,9 @@ html.dark #memBtn{color:#9B6FE0;}
 .done-btn.locked{background:transparent;color:var(--text-muted);border:none;cursor:default;pointer-events:none;}
 @keyframes doneBtnBlink{0%,100%{background:var(--primary);color:#fff;}50%{background:#fff;color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary);}}
 .done-btn.blink{animation:doneBtnBlink .8s ease-in-out 6;}
+/* כשיש סרגל ניווט תחתון המונה הצף (liveCounter) יושב על הכפתור ומחליף את שורת הטיימר/ניקוד שבתוכו — השורה הזו לא תופסת מקום (היא הייתה מוסתרת אבל שמרה גובה) */
+.bottombar.has-bnav .done-btn-meta{display:none;}
+.bottombar.has-bnav .done-btn{min-height:38px;justify-content:center;}
 .done-btn-meta{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;width:100%;opacity:.92;}
 .done-btn-meta .meta-timer{color:#1a1a1a;}
 .done-btn-meta .meta-score{color:#c8960c;}
@@ -377,7 +380,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
     lc.style.display = 'flex';
     if(toast){ toast.style.bottom='10px'; toast.style.zIndex='501'; }
     var meta=document.querySelector('.done-btn-meta'); // הסתר את הכפול שבבר
-    if(meta) meta.style.visibility='hidden';
+    if(meta) meta.style.display='none';
   }
   window._placeLiveCounter = place;
   function sync(){
@@ -685,6 +688,13 @@ function commTextForVerse(commData, idx) {
 
 /* ── Load & render chapter ── */
 async function loadChapter(tractateId, perek) {
+  // עוברים לפרק אחר בזמן הקראה (כפתור "הבא" למטה, חיצים, בורר, אקראי...): עוצרים מיד את ההקראה של הפרק
+  // הקודם — אחרת היא ממשיכה לדבר על פרק שכבר לא על המסך — ואם זו הקראה רציפה, ממשיכים באותו מצב בפרק החדש.
+  if (_ttsOn && _ttsUnitsId != null && _ttsUnitsId !== Corpus.chapId(tractateId, perek)) {
+    const _m = _ttsMode;
+    _ttsStop();
+    if (_m === 'read' || _m === 'loop' || _m === 'repeat') { window._ttsPendingAutoStart = true; window._ttsPendingMode = _m; }
+  }
   isDone = false;
   try { clearTimeout(window._doneBlinkT); clearTimeout(window._doneBlinkT2); clearTimeout(window._ttsAutoTimer); var _bp=document.getElementById('doneBtn'); if(_bp) _bp.classList.remove('blink'); } catch(e){}
   curTractate = tractateId;
@@ -760,7 +770,7 @@ async function loadChapter(tractateId, perek) {
     if (shinunActive && shinunLevel > 1) renderShinunVerses(data.he, shinunLevel);
     else renderVerses(data.he, commData);
     // המשך-אוטומטי בהקראה: אחרי טעינת הפרק הבא — התחל להקריא
-    if (window._ttsPendingAutoStart) { window._ttsPendingAutoStart = false; setTimeout(function(){ try{ ttsStart('read'); }catch(e){} }, 500); }
+    if (window._ttsPendingAutoStart) { const _pm = window._ttsPendingMode || 'read'; window._ttsPendingAutoStart = false; window._ttsPendingMode = null; setTimeout(function(){ try{ ttsStart(_pm); }catch(e){} }, 500); }
     // קפיצה למשנה ספציפית אם התבקשה דרך ה-URL (?mishnah=N) — פעם אחת בלבד
     if (_pendingMishnah) { const _m = _pendingMishnah; _pendingMishnah = 0; setTimeout(function(){ scrollToMishnah(_m, true); }, 250); }
     if (_pendingReview) { _pendingReview = false; setTimeout(function(){ if (!shinunActive) toggleShinunMode(); setShinunLevel(4); }, 300); }
@@ -1859,6 +1869,8 @@ function recordMasteryScore(id, pct, perfectFirstPass){
 
 /* ── הקראה קולית (Text-to-Speech) ── */
 let _ttsOn = false, _ttsIdx = 0, _ttsMode = 'read', _ttsUnits = [], _ttsTimer = null, _ttsAnySpoke = false;
+let _ttsGen = 0;          // מונה הפעלות: כל עצירה/קפיצה מגדילה אותו, וקריאות-חוזרות ישנות (ענן שהגיע באיחור, onend של משפט שבוטל) מתעלמות מעצמן
+let _ttsUnitsId = null;   // לאיזה פרק (curId) שייכת _ttsUnits — לא curId() הנוכחי, שכבר השתנה כשעוברים פרק
 let _ttsCurVIdx = null;            // המשנה (vIdx) שמתנגנת כרגע — לצורך "המשך מהנקודה"
 let _ttsResume = null;             // {chapId, vIdx} — נקודת המשך אחרי עצירה
 let _wakeLock = null;              // Screen Wake Lock — מונע כיבוי מסך בזמן הקראה
@@ -1939,12 +1951,13 @@ function _ttsPrefetchNext(afterIdx){
 }
 function _ttsCloudUnit(unit, verseEls){
   _ttsAnySpoke=true;
+  const gen=_ttsGen;
   const myIdx = _ttsIdx;
   const prefetched = (_ttsPrefetchIdx === myIdx) ? _ttsPrefetchPromise : null;
   if (prefetched) { _ttsPrefetchIdx = -1; _ttsPrefetchPromise = null; }
   const audioPromise = prefetched || _cloudTtsAudio(_stripForTts(unit.text));
   audioPromise.then(function(blob){
-    if(!_ttsOn) return;
+    if(!_ttsOn || gen!==_ttsGen) return;
     if(!blob){ _cloudFail(unit, verseEls); return; } // כשל בפרפצ' — נופלים לקול המכשיר כרגיל
     _ttsHighlight(unit, verseEls);
     const url=URL.createObjectURL(blob);
@@ -1952,9 +1965,9 @@ function _ttsCloudUnit(unit, verseEls){
     a.onended=function(){ try{URL.revokeObjectURL(url);}catch(e){} _ttsAdvance(unit); };
     a.onerror=function(){ try{URL.revokeObjectURL(url);}catch(e){} _cloudFail(unit, verseEls); };
     a.src=url;
-    const p=a.play(); if(p&&p.catch)p.catch(function(){ _cloudFail(unit, verseEls); });
+    const p=a.play(); if(p&&p.catch)p.catch(function(){ if(gen===_ttsGen) _cloudFail(unit, verseEls); });
     _ttsPrefetchNext(myIdx); // בזמן שהמשפט הזה מתנגן — הבא כבר את הבא בתור
-  }).catch(function(){ _cloudFail(unit, verseEls); });
+  }).catch(function(){ if(gen===_ttsGen) _cloudFail(unit, verseEls); });
 }
 function _cloudFail(unit, verseEls){
   if(!_ttsCloudFailed){ _ttsCloudFailed=true; showToast(_rLang()==='en'?'☁️ Cloud voice unavailable — using device voice':'☁️ הקול האיכותי לא זמין כעת — עובר לקול המכשיר'); }
@@ -2078,9 +2091,10 @@ function _ttsNoVoice(){ showToast(_rLang()==='en' ? '🔇 No Hebrew voice availa
 function _ttsStop(){
   // שמור נקודת-המשך (המשנה שהתנגנה) אם נעצר באמצע
   if (_ttsOn && _ttsCurVIdx != null) {
-    _ttsResume = { chapId: curId(), vIdx: _ttsCurVIdx };
+    _ttsResume = { chapId: (_ttsUnitsId != null ? _ttsUnitsId : curId()), vIdx: _ttsCurVIdx };
   }
   _ttsOn = false;
+  _ttsGen++;
   window.__ttsActive = false; // אפשר שוב שקשוק→פרק אקראי
   _releaseWakeLock();
   _ttsPrefetchIdx = -1; _ttsPrefetchPromise = null; // בטל שליפה מוקדמת ממתינה
@@ -2113,6 +2127,7 @@ function _ttsJumpTo(idx){
   try { speechSynthesis.cancel(); } catch(e){}
   if (_ttsAudioEl){ _ttsAudioEl.onended = null; _ttsAudioEl.onerror = null; try{ _ttsAudioEl.pause(); }catch(e){} }
   document.querySelectorAll('.verse.tts-speaking').forEach(el=>el.classList.remove('tts-speaking'));
+  _ttsGen++;
   _ttsIdx = Math.max(0, idx);
   _ttsSpeakNext();
 }
@@ -2184,7 +2199,7 @@ function ttsStart(mode){
   const verses = (cached && cached.he) ? cached.he : (_shinunVerses.length ? _shinunVerses : null);
   if (!verses || !verses.length){ showToast('אין טקסט להקראה'); return; }
   _ttsMode = mode;
-  _ttsUnits = [];
+  _ttsUnits = []; _ttsUnitsId = curId();
   // תמיד מפוצל למשפטים (לא רק ב-'repeat') — כדי לייצר פאוזה טבעית אחרי נקודת סיום משפט
   // בתוך משנה ארוכה. הפער הגדול בין משנה למשנה נשמר: ב-_ttsAdvance אין פאוזה מלאכותית
   // כשעוברים ל-vIdx חדש, רק כשנשארים באותה משנה.
@@ -2229,12 +2244,15 @@ function _ttsSpeakSS(unit, verseEls){
   u.lang = 'he-IL'; u.rate = 0.9;
   _applyTtsVoice(u);
   let _started = false, _uT0 = 0;
+  const gen = _ttsGen;
   u.onstart = function(){
+    if (gen !== _ttsGen) return;
     _started = true; _ttsAnySpoke = true;
     _uT0 = (window.performance && performance.now) ? performance.now() : Date.now();
     _ttsHighlight(unit, verseEls);
   };
   u.onend = function(){
+    if (gen !== _ttsGen) return; // המשפט בוטל (עצירה/מעבר פרק/קפיצה) — לא להתקדם בשם הרצף הישן
     if (!_started && !_ttsAnySpoke && _ttsIdx === 0){ _ttsStop(); _ttsNoVoice(); return; }
     // הקראה שהסתיימה מיידית = אין קול עברי בפועל; עצור והזהר במקום לגלול את כל הפרק בשקט
     const _dur = _uT0 ? (((window.performance && performance.now) ? performance.now() : Date.now()) - _uT0) : 999;
@@ -2242,6 +2260,7 @@ function _ttsSpeakSS(unit, verseEls){
     _ttsAdvance(unit);
   };
   u.onerror = function(){
+    if (gen !== _ttsGen) return;
     if (!_ttsAnySpoke){ _ttsStop(); _ttsNoVoice(); return; }
     _ttsIdx++; _ttsSpeakNext();
   };
@@ -3045,7 +3064,7 @@ if (_grp && _grp.code) {
   };
 }
 </script>
-<script src="bottomnav.js?v=1.5.82"></script>
+<script src="bottomnav.js?v=1.5.131"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   try { if (typeof i18n !== 'undefined' && i18n.applyTranslations) i18n.applyTranslations(); } catch(e) {}
