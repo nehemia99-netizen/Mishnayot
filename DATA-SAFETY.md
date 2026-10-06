@@ -1,48 +1,49 @@
 # משנתי — טופס "בטיחות נתונים" (Google Play Data Safety)
 
-תשובות מוכנות לסעיף **Data safety** בקונסולת Google Play. בנוי לפי איך שהאפליקציה באמת עובדת
-(Firebase: אימות אנונימי + Firestore; ללא פרסומות וללא מעקב).
+תשובות מוכנות לסעיף **Data safety** בקונסולת Google Play. נבנה לפי מה שהקוד עושה בפועל (אומת מול הקוד באוקטובר 2026, גרסה 1.5.132) ותואם ל-`terms.html`.
+**כלל:** כל שינוי באיסוף נתונים בקוד צריך להתעדכן גם כאן, גם ב-`terms.html` וגם בקונסולה. סתירה ביניהם היא סיבה לדחייה.
 
 ---
 
 ## שאלות פתיחה
-- **Does your app collect or share any of the required user data types?** → **Yes** (מעט; ראה למטה).
-- **Is all of the user data collected by your app encrypted in transit?** → **Yes** (כל התעבורה דרך HTTPS/Firebase).
-- **Do you provide a way for users to request that their data is deleted?** → **Yes**
-  (המשתמש יכול לכבות "הצטרפות ללוח המובילים" ולהסיר את שמו, ולנקות את הנתונים המקומיים במכשיר;
-  לפנייה למחיקה מלאה — דוא"ל tehilon2026@gmail.com).
+- **Does your app collect or share any of the required user data types?** → **Yes**
+- **Is all of the user data collected by your app encrypted in transit?** → **Yes** (HTTPS / Firebase)
+- **Which of the following methods of account creation does your app support?** → **OAuth (Sign in with Google)**. התחברות אופציונלית; יש גם מזהה אנונימי אוטומטי.
+- **Delete account URL** → **https://mishnayot-alpha.vercel.app/terms.html#delete**
+- **Do you provide a way for users to request that some or all of their data is deleted, without requiring them to delete their account?** → **Yes** (כיבוי לוח המובילים, עזיבת קבוצה, שחרור פרק, כיבוי תזכורות)
 
 ## האם הנתונים "Shared" (משותפים עם צד שלישי)?
-→ **No.** הנתונים מעובדים רק ע"י Firebase/Google כספק תשתית (service provider), לא "משותפים" לפי הגדרת Google,
-ולא נמכרים/מועברים לצדדים שלישיים. **ללא מעקב פרסומי, ללא רשתות מודעות.**
-
-> הערה: ההקראה הקולית (TTS) משתמשת ב-Google Cloud TTS כספק תשתית — נשלח אליו **טקסט המשנה בלבד** (לא נתוני משתמש),
-> לצורך הפקת האודיו. אין בכך איסוף או שיתוף של נתונים אישיים.
+→ **No.** Firebase/Google ו-Vercel הם ספקי שירות (service providers) שמעבדים בשמנו, וזה לא נחשב "sharing" לפי הגדרת Google. הטקסט שנשלח ל-Google TTS הוא טקסט המשנה בלבד ואינו נתון משתמש. אין פרסומות, אין רשתות מודעות, ואין מכירת נתונים.
+> נתונים שמשתמשים **אחרים** רואים (לוח מובילים, קבוצות, מבצע) הם חלק מפונקציונליות האפליקציה, ולפי Google זה לא "sharing" עם צד שלישי.
 
 ---
 
 ## סוגי הנתונים שנאספים (Collected)
 
-| קטגוריה ב-Play | פריט | נאסף? | חובה/אופציונלי | מטרה | משותף? |
-|---|---|---|---|---|---|
-| **Personal info** | Name (שם תצוגה) | כן | **אופציונלי** — רק אם המשתמש בוחר להופיע בלוח המובילים | App functionality (לוח מובילים/קבוצות) | לא |
-| **App activity** | App interactions (התקדמות לימוד: ניקוד/רצף/פרקים/שינון) | כן | אופציונלי (סנכרון קהילתי) | App functionality, Analytics | לא |
-| **App info & performance** | Crash logs / Diagnostics (לוג שגיאות) | כן | אופציונלי | App functionality (תיקון תקלות) | לא |
-| **Device or other IDs** | Push token (FCM) | כן | אופציונלי | App functionality (תזכורות/התראות) | לא |
+| קטגוריה ב-Play | פריט | חובה/אופציונלי | מטרה | איפה בקוד |
+|---|---|---|---|---|
+| **Personal info** | **Name** | אופציונלי | App functionality, Account management | כינוי/שם בלוח המובילים, בקבוצות ובמבצע; שם מ-Google בהתחברות |
+| **Personal info** | **Email address** | אופציונלי (רק בהתחברות Google) | Account management | Firebase Auth + `tehillim_google_user` |
+| **Personal info** | **User IDs** | חובה (מזהה אנונימי אוטומטי) | App functionality | Firebase Anonymous Auth uid |
+| **Photos and videos** | — | **לא**. תמונת הפרופיל מ-Google נשמרת כקישור בלבד ולא נאספת כקובץ. | | |
+| **App activity** | **App interactions** | אופציונלי* | App functionality, Analytics | זכויות/רצף/פרקים בלוח המובילים, מונה לימוד אנונימי, Vercel Web Analytics |
+| **App activity** | **Other user-generated content** | אופציונלי | App functionality | הקדשות במבצע (בדרך כלל שם נפטר, לעילוי נשמה), שמות קבוצות, גיבוי ענן (מועדפים, הערות, שמות לרפואה), תשובות סקר |
+| **App info and performance** | **Crash logs** + **Diagnostics** | חובה (אוטומטי) | App functionality (תיקון תקלות) | `errorLogs` (הודעה, עמוד, user-agent, גרסה) |
+| **Device or other IDs** | **Device or other IDs** | אופציונלי (רק עם תזכורות) | App functionality | FCM token ב-`pushTokens` |
 
-> **לא נאסף:** מיקום, אנשי קשר, תמונות/מדיה, אימייל/טלפון, מידע פיננסי, היסטוריית גלישה, מזהי פרסום.
-> רוב נתוני המשתמש (לימוד, הגדרות, מועדפים, הקלטות קוליות) נשמרים **מקומית במכשיר בלבד** ואינם נאספים על-ידינו.
+\* לוח המובילים פעיל כברירת מחדל, אבל אפשר לכבות אותו. לכן "Users can choose whether this data is collected" = **Yes**.
+
+> **לא נאסף:** מיקום, אנשי קשר, תמונות/קבצים, הקלטות קול (נשמרות **במכשיר בלבד**, IndexedDB), מספר טלפון, מידע פיננסי (Ko-fi מטפל בתשלום בעצמו, בחלון שלו), היסטוריית גלישה, מזהי פרסום.
 
 ---
 
-## ניסוח קצר ל"For each data type" (לכל פריט, אם נשאל)
-- **Collected** (לא רק shared).
-- **Processed ephemerally?** No (נשמר כל עוד המשתמש פעיל/בחר להופיע).
-- **Required or optional?** Optional — המשתמש בוחר אם להצטרף ללוח/קבוצות/תזכורות.
-- **Purposes:** App functionality (ובמקרה של פעילות — גם Analytics בסיסי, ללא פרסום).
+## לכל פריט (אם נשאל)
+- **Collected** (לא shared).
+- **Processed ephemerally?** → No.
+- **Required or optional?** → לפי הטבלה.
+- **Purposes** → App functionality. בנוסף Analytics ל-App interactions ו-Account management ל-Name/Email.
 
 ## הערות
-- האימות הוא **אנונימי** (Firebase Anonymous Auth) — אין הרשמה עם אימייל/סיסמה, אין זהות אישית מחייבת.
-- "שם התצוגה" הוא כינוי שהמשתמש מזין בעצמו (ברירת מחדל: "משתמש אנונימי").
-- ההקלטות הקוליות (שינון) נשמרות **במכשיר בלבד** ואינן נשלחות לשרת.
+- בקשת מחיקה במייל: tehilon2026@gmail.com, טיפול תוך 30 יום (ההתחייבות כתובה ב-`terms.html#delete`).
+- `errorLogs` ו-`surveys` כוללים שדה `expireAt` (שנה מהיצירה). **צריך להפעיל מדיניות TTL בקונסולת Firestore** (Firestore ← TTL ← collection `errorLogs` ושדה `expireAt`, וכנ"ל ל-`surveys`), כדי שההבטחה למחיקה תוך 12 חודשים תתקיים.
 - כתובת מדיניות הפרטיות לקונסולה: **https://mishnayot-alpha.vercel.app/terms.html**

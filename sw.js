@@ -6,7 +6,7 @@
    • CDN (Chart.js וכו') → Cache-First
 ═══════════════════════════════════════════════════ */
 
-const CACHE_VER  = 'mishnayon-v1.5.131';
+const CACHE_VER  = 'mishnayon-v1.5.132';
 const SEFARIA    = 'www.sefaria.org';
 
 const APP_SHELL  = [
@@ -32,6 +32,23 @@ const APP_SHELL  = [
   './i18n.js',
   './gamification.js',
   './notifications.js',
+  './netstatus.js',
+  './tablet.css',
+  './shake.js',
+  './onboarding.js',
+  './auth.js',
+  './fcm.js',
+  './about-tehilim.html',
+  './index.html',
+  './favicon.ico',
+  './4.jpg',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
+
+/* CDN — נשמרים בנפרד: כשל באחד מהם (חסום בסינון/רשת) לא מבטל את שמירת האפליקציה כולה
+   (cache.addAll הוא הכל-או-כלום — עד 1.5.132 CDN חסום השאיר את המטמון ריק, כולל טקסט המשנה). */
+const CDN_SHELL = [
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
@@ -67,7 +84,10 @@ const MISHNAH_TEXT_FILES = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VER)
-      .then(cache => cache.addAll(APP_SHELL)
+      .then(cache => Promise.all([
+          cache.addAll(APP_SHELL),
+          ...CDN_SHELL.map(u => cache.add(u).catch(() => {}))
+        ])
         // טקסט המשנה best-effort — כישלון בקובץ בודד לא ישבור את ההתקנה
         .then(() => Promise.allSettled(MISHNAH_TEXT_FILES.map(u => cache.add(u)))))
       .then(() => self.skipWaiting())
@@ -147,7 +167,11 @@ function networkFirst(request) {
       }
       return response;
     })
-    .catch(() => caches.match(request).then(r => r || Response.error()));
+    .catch(() => caches.match(request)
+      // אופליין: הדפים נקראים עם פרמטרים (03-reader.html?chap=…) והסקריפטים עם ?v=… —
+      // אם הכתובת המדויקת לא נשמרה, נופלים לאותו קובץ בלי הפרמטרים (מה-APP_SHELL).
+      .then(r => r || caches.match(request, { ignoreSearch: true }))
+      .then(r => r || Response.error()));
 }
 
 function cacheFirst(request) {

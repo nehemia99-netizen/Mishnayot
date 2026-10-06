@@ -235,6 +235,8 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+<script src="netstatus.js?v=1.5.132" defer></script>
+<link rel="stylesheet" href="tablet.css?v=1.5.132">
 </head>
 <body>
 <div class="app" id="app">
@@ -417,7 +419,7 @@ html.dark .toast.big{background:var(--primary);color:#fff;}
 })();
 </script>
 
-<script src="utils.js?v=2.2.0"></script>
+<script src="utils.js?v=1.5.132"></script>
 <script src="corpus.js?v=1.0.1"></script>
 <script src="gamification.js?v=1.5.96"></script>
 <script>
@@ -2951,7 +2953,8 @@ async function _syncLeaderboard() {
     const gUser = _S2.get('tehillim_google_user');
     let displayName = null;
     if (sett.leaderboard !== false) {
-      displayName = sett.username || (gUser && gUser.displayName) || 'משתמש אנונימי';
+      // 1.5.132: בלי כינוי — ראשי תיבות של שם ה-Google ("נ.כ."), לא השם המלא; אנונימי → "לומד משניות 4821"
+      displayName = (window.TH && TH.lbDisplayName) ? TH.lbDisplayName() : (sett.username || 'משתמש אנונימי');
     }
     // מדדים נוספים ללוחות מובילים (מדליות / רצף / חודש / בקיאות)
     let medals = 0, streak = 0, monthly = 0, memorized = 0;
@@ -3045,7 +3048,7 @@ if (_grp && _grp.code) {
       const trendDelta = ((sc.daily||{})[today]||0) - ((sc.daily||{})[yesterday]||0);
 
       const stats = {
-        displayName: sett.username || 'אנונימי',
+        displayName: sett.username || ((window.TH && TH.lbDisplayName) ? TH.lbDisplayName() : 'אנונימי'),
         todayDate:   today,
         todayChaps:  todayDone.size,
         todayMins:   Math.round(todayMins),

@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-<script src="utils.js?v=2.2.0"></script>
+<script src="utils.js?v=1.5.132"></script>
 <script src="corpus.js?v=1.0.1"></script>
 <script src="gamification.js?v=1.5.75"></script>
 <script src="notifications.js?v=2.2.33"></script>
@@ -295,6 +295,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 .app-version{font-size:11px;color:var(--text-muted);}
 .header-left{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 .hebrew-date{font-size:15px;color:var(--text);font-weight:500;}
+/* מסכים צרים (iPhone SE / 320px): שלא תגלוש הכותרת הצידה */
+@media (max-width:360px){.header{padding:10px 10px 8px;gap:6px;}.app-logo img{width:46px!important;height:46px!important;}.app-title{font-size:19px!important;}.hebrew-date{font-size:13px;}.header-left>div{gap:5px!important;}.hdr-search-btn{width:32px;height:32px;font-size:16px;}}
 .settings-btn{font-size:12px;color:var(--primary);background:var(--primary-light);border-radius:20px;padding:4px 10px;cursor:pointer;border:none;font-family:inherit;}
 .hdr-search-btn{width:36px;height:36px;border-radius:50%;background:var(--primary-light);border:.5px solid var(--primary-border);color:var(--primary);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
 .hdr-search-btn:active{background:var(--primary);color:#fff;}
@@ -513,6 +515,8 @@ html.dark .lottery-trigger{opacity:.85;}
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+<script src="netstatus.js?v=1.5.132" defer></script>
+<link rel="stylesheet" href="tablet.css?v=1.5.132">
 </head>
 <body>
 <script>
@@ -566,7 +570,7 @@ html.dark .lottery-trigger{opacity:.85;}
         <img src="4.jpg" alt="משנתי" onclick="openAbout()" style="width:62px;height:62px;border-radius:14px;object-fit:cover;flex-shrink:0;cursor:pointer;"/>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="app-title" style="font-size:22px;font-weight:700;">משנתי</div>
-          <div class="app-version">גרסה 1.5.131 BETA</div>
+          <div class="app-version">גרסה 1.5.132 BETA</div>
         </div>
       </div>
     </div>
@@ -1937,7 +1941,9 @@ function buildChart(tab){
   const ctx=document.getElementById('mainChart').getContext('2d');
   if(chartInst)chartInst.destroy();
   const dark=document.documentElement.classList.contains('dark'),c=chartColors(currentMetric,dark);
-  chartInst=new Chart(ctx,{type:'line',data:{labels:d.labels,datasets:[{data:d.data,borderColor:c.line,backgroundColor:c.fill,borderWidth:2.5,pointRadius:2,pointBackgroundColor:c.line,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{rtl:true,callbacks:{label:c2=>c2.raw+' '+c.unit}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:dark?'#777':'#999'}},y:{display:false,beginAtZero:true}}}});
+  // Chart.js מגיע מ-CDN; אם לא נטען (אופליין לפני שנשמר, או חסום בסינון) — מדלגים על הגרף
+  // ולא זורקים שגיאה, אחרת שאר אתחול הדף לא רץ (1.5.132).
+  chartInst=(typeof Chart==='undefined')?null:new Chart(ctx,{type:'line',data:{labels:d.labels,datasets:[{data:d.data,borderColor:c.line,backgroundColor:c.fill,borderWidth:2.5,pointRadius:2,pointBackgroundColor:c.line,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{rtl:true,callbacks:{label:c2=>c2.raw+' '+c.unit}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:dark?'#777':'#999'}},y:{display:false,beginAtZero:true}}}});
   document.getElementById('totalMins').textContent=d.val;
   document.getElementById('totalMins').style.color=currentMetric==='score'?(dark?'#F5C842':'#C07A00'):'var(--text)';
   document.getElementById('graphLabel').textContent=d.label;
@@ -2698,6 +2704,9 @@ if ('serviceWorker' in navigator) {
     location.reload();
   });
   window.addEventListener('load', function() {
+    // בקשת אחסון קבוע: נתוני משתמש אנונימי נמצאים רק ב-localStorage, ובלי זה הדפדפן
+    // (במיוחד ספארי באייפון כשהאתר לא מותקן) רשאי למחוק אותם אחרי תקופה בלי ביקור.
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function(){}); } catch (e) {}
     navigator.serviceWorker.register('./sw.js').then(function(reg) {
       reg.update();
       // אם כבר יש SW בהמתנה — בקש ממנו להשתלט מיד
@@ -3123,7 +3132,7 @@ function openAbout() {
 </script>
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 const _app = getApps().find(a=>a.name==='dash-comm') || initializeApp({
   apiKey:"AIzaSyB413Gtcwy5DcQHK4yXb1egMhUEwjJ0jhA",
@@ -3143,6 +3152,24 @@ let _authReady = new Promise(res => {
     else signInAnonymously(_auth).catch(()=>res(null));
   } catch(e) { res(null); }
 });
+// יומן השגיאות (errlog.js) עלה ל-errorLogs רק מ-auth.js, שנטען רק בעמוד ההגדרות — כלומר שגיאות של מי
+// שלא פותח הגדרות לא הגיעו אף פעם. מעלים גם מכאן (אותם שדות וחיתוכים כמו flushErrorLogs ב-auth.js).
+_authReady.then(async u => {
+  if (!u) return;
+  let arr; try { arr = JSON.parse(localStorage.getItem('tehillim_errlog') || '[]'); } catch(e) { return; }
+  if (!Array.isArray(arr) || !arr.length) return;
+  for (const r0 of arr) {
+    const r = r0 || {};
+    try {
+      await addDoc(collection(_db, 'errorLogs'), {
+        kind: String(r.kind||'').slice(0,20), msg: String(r.msg||'').slice(0,500), stack: String(r.stack||'').slice(0,1500),
+        url: String(r.url||'').slice(0,200), ua: String(r.ua||'').slice(0,200), ver: String(r.ver||'').slice(0,40),
+        n: (r.n||1), clientTs: r.ts||Date.now(), uid: u.uid, ts: serverTimestamp(), expireAt: new Date(Date.now() + 365*864e5)
+      });
+    } catch(e) { return; }   // נחסם / אופליין — נשאר במאגר לפעם הבאה
+  }
+  try { localStorage.removeItem('tehillim_errlog'); } catch(e) {}
+}).catch(()=>{});
 const HEB=['','א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ז׳','ח׳','ט׳','י׳','י״א','י״ב','י״ג','י״ד','ט״ו','ט״ז','י״ז','י״ח','י״ט','כ׳','כ״א','כ״ב','כ״ג','כ״ד','כ״ה','כ״ו','כ״ז','כ״ח','כ״ט','ל׳','ל״א','ל״ב','ל״ג','ל״ד','ל״ה','ל״ו','ל״ז','ל״ח','ל״ט','מ׳','מ״א','מ״ב','מ״ג','מ״ד','מ״ה','מ״ו','מ״ז','מ״ח','מ״ט','נ׳','נ״א','נ״ב','נ״ג','נ״ד','נ״ה','נ״ו','נ״ז','נ״ח','נ״ט','ס׳','ס״א','ס״ב','ס״ג','ס״ד','ס״ה','ס״ו','ס״ז','ס״ח','ס״ט','ע׳','ע״א','ע״ב','ע״ג','ע״ד','ע״ה','ע״ו','ע״ז','ע״ח','ע״ט','פ׳','פ״א','פ״ב','פ״ג','פ״ד','פ״ה','פ״ו','פ״ז','פ״ח','פ״ט','צ׳','צ״א','צ״ב','צ״ג','צ״ד','צ״ה','צ״ו','צ״ז','צ״ח','צ״ט','ק׳','ק״א','ק״ב','ק״ג','ק״ד','ק״ה','ק״ו','ק״ז','ק״ח','ק״ט','ק״י','קי״א','קי״ב','קי״ג','קי״ד','קט״ו','קט״ז','קי״ז','קי״ח','קי״ט','ק״כ','קכ״א','קכ״ב','קכ״ג','קכ״ד','קכ״ה','קכ״ו','קכ״ז','קכ״ח','קכ״ט','ק״ל','קל״א','קל״ב','קל״ג','קל״ד','קל״ה','קל״ו','קל״ז','קל״ח','קל״ט','ק״מ','קמ״א','קמ״ב','קמ״ג','קמ״ד','קמ״ה','קמ״ו','קמ״ז','קמ״ח','קמ״ט','ק״נ'];
 
 function _dashChapLabel(id){
@@ -3189,7 +3216,7 @@ window.loadDashCommunity = async function loadDashCommunity(){
       const u=ls.docs.map(d=>d.data()).filter(d=>d.displayName);
       const cl=[['#EEEDFE','#3C3489'],['#FFF3E0','#7A4A00'],['#F3E5F5','#6A1B9A']];
       lbEl.innerHTML=u.length
-        ?u.map((p,i)=>'<div class="user-row"><div class="avatar" style="background:'+(cl[i]?cl[i][0]:'#eee')+';color:'+(cl[i]?cl[i][1]:'#333')+';">'+(p.displayName||'?').split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div class="user-name">'+p.displayName+'</div><div class="user-score">⭐ '+(p.score||0).toLocaleString()+' זכויות</div></div>').join('')
+        ?u.map((p,i)=>'<div class="user-row"><div class="avatar" style="background:'+(cl[i]?cl[i][0]:'#eee')+';color:'+(cl[i]?cl[i][1]:'#333')+';">'+TH.esc((p.displayName||'?').split(' ').map(w=>w[0]).join('').slice(0,2))+'</div><div class="user-name">'+TH.esc(p.displayName)+'</div><div class="user-score">⭐ '+(p.score||0).toLocaleString()+' זכויות</div></div>').join('')
         :'<div style="padding:8px;color:var(--text-muted);font-size:12px;">אין עדיין משתמשים</div>';
     }
   }catch(e){ console.warn('leaderboard load error',e); const lbEl=document.getElementById('dashLeaderboard'); if(lbEl)lbEl.innerHTML='<div style="padding:8px;color:var(--text-muted);font-size:12px;text-align:center">אין נתונים כרגע</div>'; }

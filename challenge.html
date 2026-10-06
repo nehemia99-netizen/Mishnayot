@@ -114,6 +114,9 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.95);color:#fff;padding:11px 20px;border-radius:22px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:120;max-width:88%;text-align:center;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
+<script src="errlog.js?v=1.5.75"></script>
+<script src="netstatus.js?v=1.5.132" defer></script>
+<link rel="stylesheet" href="tablet.css?v=1.5.132">
 </head>
 <body>
 <div class="app">
@@ -211,6 +214,15 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 <div class="toast" id="toast"></div>
 
 <script src="corpus.js?v=2.2.0"></script>
+<script>
+/* אם Firebase לא נטען (אין אינטרנט / חסום בסינון) המודול לא רץ בכלל והעמוד נשאר על "טוען…" לנצח — אחרי 15 שניות מסבירים. */
+setTimeout(function(){
+  var v=document.getElementById('viewLoading');
+  if(v && v.classList.contains('active')){
+    v.querySelector('.loading-state').innerHTML='⚠️ לא ניתן להתחבר כרגע.<br>בדקו את החיבור לאינטרנט ונסו שוב.<br><br><button onclick="location.reload()" style="padding:9px 22px;border-radius:20px;border:1px solid var(--primary,#185FA5);background:none;color:var(--primary,#185FA5);font-weight:700;font-size:14px;cursor:pointer;">🔄 נסו שוב</button>';
+  }
+},15000);
+</script>
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, runTransaction }

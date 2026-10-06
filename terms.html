@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>משנתי — תנאי שימוש ופרטיות</title>
+<title>משנתי — תנאי שימוש ומדיניות פרטיות</title>
 <style>
 :root{--bg:#EEEDE8;--card:#fff;--text:#1A1A1A;--text-sec:#6B6B6B;--text-muted:#9E9E9E;--border:rgba(0,0,0,.12);--primary:#3A7D44;--primary-light:#E9F2E9;}
 html.dark{--bg:#111;--card:#1E1E1E;--text:#F0EFE9;--text-sec:#ABABAB;--text-muted:#666;--border:rgba(255,255,255,.09);--primary:#6FBF7A;--primary-light:#15291B;}
@@ -41,12 +41,33 @@ html.dark .disclaimer-box{background:#1E1800;border-color:#7A6000;}
 .disclaimer-box p{font-size:13px;color:#7A5800;line-height:1.6;margin:0;}
 html.dark .disclaimer-box p{color:#C8A820;}
 
+.summary-box{background:var(--primary-light);border-radius:12px;padding:12px 14px;margin-bottom:22px;}
+.summary-box p{font-size:13.5px;color:var(--text);line-height:1.65;margin:0;}
+.summary-box a,.section a{color:var(--primary);}
+.section{scroll-margin-top:70px;}
+.section ul{padding-inline-start:20px;margin:0 0 8px;}
+.section li{font-size:14px;color:var(--text-sec);line-height:1.7;margin-bottom:4px;}
+.data-table td,.data-table th{font-size:12.5px;}
+.data-table td:first-child{width:52%;}
+@media (max-width:520px){
+  .data-table,.data-table tbody,.data-table tr,.data-table td{display:block;width:100%!important;}
+  .data-table .th-row{display:none;}
+  .data-table tr{border:.5px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+  .data-table td{border:none;padding:4px 10px;}
+  .data-table td:first-child{padding-top:9px;}
+  .data-table td:last-child{padding-bottom:9px;}
+  .data-table td[data-label]::before{content:attr(data-label) " ";font-weight:700;color:var(--primary);}
+  .data-table tr:nth-child(even) td{background:none;}
+}
 .footer-note{text-align:center;font-size:12px;color:var(--text-muted);margin-top:28px;line-height:1.7;}
 .footer-note a{color:var(--primary);text-decoration:none;}
 </style>
 <script>
 try{ if(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').darkMode) document.documentElement.classList.add('dark'); }catch(e){}
 </script>
+<script src="errlog.js?v=1.5.75"></script>
+<script src="netstatus.js?v=1.5.132" defer></script>
+<link rel="stylesheet" href="tablet.css?v=1.5.132">
 </head>
 <body>
 <div class="app">
@@ -61,78 +82,120 @@ try{ if(JSON.parse(localStorage.getItem('tehillim_settings')||'{}').darkMode) do
     <div class="hero">
       <span class="hero-emoji">📜</span>
       <div class="hero-title">תנאי שימוש ומדיניות פרטיות</div>
-      <div class="hero-sub">משנתי · עודכן: יוני 2026</div>
+      <div class="hero-sub">משנתי · עודכן: אוקטובר 2026 · <a href="#en" style="color:var(--primary);text-decoration:none;">English</a></div>
+    </div>
+
+    <div class="summary-box">
+      <p><b>בקצרה:</b> רוב הנתונים שלך נשמרים רק במכשיר. בענן נשמר רק מה שצריך בשביל לוח המובילים, קבוצות, מבצעי משניות, תזכורות וגיבוי (אם התחברת עם Google). אין פרסומות, אין מעקב, ואנחנו לא מוכרים ולא מעבירים מידע לאף אחד. אפשר למחוק הכל בכל רגע: <a href="#delete">איך מוחקים</a>.</p>
     </div>
 
     <!-- 1. כללי -->
-    <div class="section">
+    <div class="section" id="general">
       <div class="section-title">1. כללי</div>
-      <p>משנתי היא אפליקציית אינטרנט חינמית (PWA) ללימוד משניות, מעקב לימוד, ותפילה אישית וקבוצתית. השימוש באפליקציה מהווה הסכמה לתנאים המפורטים להלן.</p>
-      <p>האפליקציה אינה גובה תשלום, אינה מחייבת הרשמה, ואינה אוספת פרטים מזהים כגון שם מלא, דוא"ל, או מספר טלפון.</p>
+      <p>משנתי היא אפליקציה חינמית (אתר שאפשר להתקין, PWA, וגם אפליקציה ב-Google Play) ללימוד משניות, מעקב לימוד, ולימוד אישי וקבוצתי. האפליקציה פותחה ומופעלת על ידי מפתח פרטי ("המפתח", "אנחנו"). לפניות: <a href="mailto:tehilon2026@gmail.com">tehilon2026@gmail.com</a>.</p>
+      <p>השימוש באפליקציה מהווה הסכמה לתנאים ולמדיניות שלהלן. אין חובה להירשם; ההתחברות עם Google היא אופציונלית.</p>
     </div>
 
-    <!-- 2. נתונים ופרטיות -->
-    <div class="section">
-      <div class="section-title">2. איסוף נתונים ופרטיות</div>
-      <p>האפליקציה שומרת שני סוגי נתונים:</p>
+    <!-- 2. נשמר במכשיר -->
+    <div class="section" id="local">
+      <div class="section-title">2. מה נשמר רק במכשיר שלך</div>
+      <p>היסטוריית לימוד, זכויות ומדליות, הגדרות, מועדפים, משניות שמורות והערות, שינון, ושמות שהזנת לרפואה או לעילוי נשמה. כל אלה נשמרים באחסון של הדפדפן (localStorage / IndexedDB) ולא נשלחים אלינו, <b>אלא אם התחברת עם Google</b> (סעיף 3ג).</p>
+      <p><b>הקלטות קול</b> (במצב שינון) נשמרות במכשיר בלבד ולעולם לא נשלחות. מחיקת נתוני הדפדפן או הסרת האפליקציה מוחקת את כל הנתונים המקומיים לצמיתות.</p>
+    </div>
 
+    <!-- 3. נשמר בענן -->
+    <div class="section" id="cloud">
+      <div class="section-title">3. מה נשמר בענן, ומתי</div>
+      <p>הנתונים בענן נשמרים ב-Firebase (שירות של Google) ומועברים בהצפנה (HTTPS).</p>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th>נתון</th>
-            <th>איפה נשמר</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>היסטוריית לימוד, נקודות, הגדרות, מועדפים</td>
-            <td><span class="badge badge-local">מקומי בלבד</span> המכשיר שלך</td>
-          </tr>
-          <tr>
-            <td>שם תצוגה + פרקים שנלמדו</td>
-            <td><span class="badge badge-cloud">ענן</span> רק בעת הצטרפות לקבוצה</td>
-          </tr>
-          <tr>
-            <td>ניקוד ולוח מובילים</td>
-            <td><span class="badge badge-cloud">ענן</span> רק בעת שימוש בקהילה</td>
-          </tr>
-          <tr>
-            <td>כתובת IP, מיקום, מזהה מכשיר</td>
-            <td><span class="badge badge-none">לא נאסף</span></td>
-          </tr>
-        </tbody>
+        <tr class="th-row"><th>נתון</th><th>מתי</th><th>מי רואה</th></tr>
+        <tr><td><b>א. מזהה אנונימי</b>: מספר אקראי שנוצר אוטומטית (Firebase Anonymous Auth). לא כולל שם, טלפון או אימייל.</td><td data-label="מתי:">בפתיחה הראשונה</td><td data-label="מי רואה:">אף אחד</td></tr>
+        <tr><td><b>ב. לוח המובילים</b>: כינוי, זכויות, מדליות, רצף ימים, מספר פרקים. בכניסה הראשונה לעמוד הקהילה נשאל איך להציג אותך. אם לא בחרת כינוי: למחובר עם Google מוצגים <b>ראשי התיבות בלבד</b> של השם בחשבון (למשל "נ.כ."), ולאחרים כינוי כללי כמו "לומד משניות 4821". השם המלא שלך לא מוצג אלא אם כתבת אותו בעצמך.</td><td data-label="מתי:">מופעל כברירת מחדל; אפשר לכבות בהגדרות ← "הצג בלוח המובילים"</td><td data-label="מי רואה:">כל משתמשי האפליקציה</td></tr>
+        <tr><td><b>ג. התחברות עם Google (אופציונלי)</b>: שם, כתובת אימייל ותמונת פרופיל מחשבון Google, וגיבוי של הנתונים המקומיים (סעיף 2, למעט הקלטות) כדי לשחזר אותם במכשיר אחר. נשמר גם סוג הדפדפן/מכשיר של הסנכרון האחרון.</td><td data-label="מתי:">רק אם התחברת</td><td data-label="מי רואה:">רק אתה</td></tr>
+        <tr><td><b>ד. קבוצות</b>: שם הקבוצה, שם התצוגה שלך ונתוני הלימוד שלך בקבוצה.</td><td data-label="מתי:">כשאתה יוצר קבוצה או מצטרף</td><td data-label="מי רואה:">חברי הקבוצה</td></tr>
+        <tr><td><b>ה. מבצע משניות משותף</b>: מטרת המבצע והקדשה (למשל שם החולה או הנפטר), השם שהזנת, והפרקים שלקחת.</td><td data-label="מתי:">כשאתה יוצר מבצע או לוקח פרק</td><td data-label="מי רואה:">כל מי שיש לו את הקישור</td></tr>
+        <tr><td><b>ו. מונה לימוד כללי</b>: כמה פעמים נלמד כל פרק, בלי שום שיוך למשתמש.</td><td data-label="מתי:">בסיום פרק</td><td data-label="מי רואה:">כולם (סטטיסטיקה)</td></tr>
+        <tr><td><b>ז. תזכורות (Push)</b>: מזהה התראות של המכשיר (FCM token), שעת התזכורת, שפה, השתקה בשבת, וסוג הדפדפן/מכשיר.</td><td data-label="מתי:">רק אם הפעלת תזכורות</td><td data-label="מי רואה:">אף אחד (משמש רק לשליחה)</td></tr>
+        <tr><td><b>ח. יומן תקלות</b>: הודעת השגיאה, העמוד, סוג הדפדפן, גרסת האפליקציה והמזהה האנונימי.</td><td data-label="מתי:">אוטומטית כשמתרחשת תקלה</td><td data-label="מי רואה:">רק המפתח (לתיקון תקלות)</td></tr>
+        <tr><td><b>ט. סקר משתמשים</b>: התשובות שמילאת.</td><td data-label="מתי:">רק אם מילאת את הסקר</td><td data-label="מי רואה:">רק המפתח</td></tr>
       </table>
-
-      <p style="margin-top:12px;">הנתונים המקומיים שמורים ב-localStorage של הדפדפן. מחיקת נתוני הדפדפן תמחק אותם לצמיתות.</p>
-      <p>הנתונים שנשמרים בענן מאוחסנים ב-<strong>Firebase Firestore</strong> של Google. הכניסה לשירות מתבצעת באמצעות אימות אנונימי בלבד — ללא חשבון Google, ללא אימייל וללא סיסמה. לתנאי השירות של Google: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+      <p style="margin-top:10px;">שים לב: שמות שאתה מזין בקבוצות ובמבצעים (כולל שמות לרפואה ולעילוי נשמה) <b>גלויים לאחרים</b>. אל תזין מידע שאינך רוצה שאחרים יראו.</p>
     </div>
 
-    <!-- 3. תוכן -->
-    <div class="section">
-      <div class="section-title">3. מקורות תוכן</div>
-      <p>טקסט המשנה מסופק על ידי <strong>Sefaria</strong> (<a href="https://www.sefaria.org" target="_blank" rel="noopener">sefaria.org</a>) — פלטפורמה ציבורית לטקסטים יהודיים. הטקסטים הם נחלת הכלל.</p>
-      <p>גופנים נטענים מ-Google Fonts. לא מועברים נתונים אישיים לשירות זה.</p>
+    <!-- 4. שירותים חיצוניים -->
+    <div class="section" id="services">
+      <div class="section-title">4. שירותים חיצוניים</div>
+      <p>כמו כל אתר, הפנייה לשירותים האלה חושפת בפניהם את כתובת ה-IP וסוג הדפדפן שלך, לפי מדיניות הפרטיות שלהם:</p>
+      <ul>
+        <li><b>Google Firebase</b> (אימות, מסד נתונים, התראות): לפי <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">מדיניות הפרטיות של Google</a>.</li>
+        <li><b>Google Cloud Text-to-Speech</b> (הקראה בקול): נשלח רק טקסט המשנה, דרך השרת שלנו, בלי שום פרט מזהה.</li>
+        <li><b>Sefaria</b> (טקסט המשנה, פירוש ברטנורא ולימוד יומי) ו-<b>Hebcal</b> (המרת תאריכים).</li>
+        <li><b>Vercel</b> (אחסון האתר) ו-<b>Vercel Web Analytics</b>: ספירת כניסות לעמודים, אנונימית ובלי עוגיות (cookies).</li>
+        <li><b>Google Fonts</b> ו-<b>cdnjs</b> (גופנים וספריות קוד).</li>
+        <li><b>Ko-fi</b>: רק אם בחרת לפתוח את חלון התשר. התשלום מתבצע אצל Ko-fi ולא עובר דרכנו.</li>
+        <li><b>WhatsApp</b>: רק כשאתה בוחר לשתף.</li>
+      </ul>
     </div>
 
-    <!-- 4. שימוש מותר -->
-    <div class="section">
-      <div class="section-title">4. שימוש מותר</div>
-      <p>האפליקציה מיועדת לשימוש אישי, משפחתי, ולימודי. אסור להשתמש בה לכל מטרה מסחרית ללא אישור מפורש מהמפתח.</p>
-      <p>המשתמש אחראי לתוכן שהוא מפרסם בתוך קבוצות (שם תצוגה). אסור לפרסם תוכן פוגעני, מסית, או בלתי הולם.</p>
+    <!-- 5. מה לא נאסף -->
+    <div class="section" id="not-collected">
+      <div class="section-title">5. מה לא נאסף</div>
+      <p>מיקום, אנשי קשר, תמונות וקבצים, מספר טלפון, מידע פיננסי, היסטוריית גלישה ומזהי פרסום. אין פרסומות ואין מעקב בין אפליקציות או אתרים. אנחנו <b>לא מוכרים</b> מידע ולא מעבירים אותו לצד שלישי, למעט ספקי התשתית שבסעיף 4 ולמעט חובה על פי דין.</p>
+      <p><b>הרשאות:</b> מיקרופון (רק להקלטה במצב שינון, נשמר במכשיר), התראות (רק לתזכורות), חיישן תנועה (שקשוק לפרק אקראי, מעובד במכשיר בלבד). כל ההרשאות אופציונליות ואפשר לבטל אותן בהגדרות המכשיר.</p>
     </div>
 
-    <!-- 5. כתב ויתור -->
-    <div class="section">
-      <div class="section-title">5. כתב ויתור ואחריות</div>
+    <!-- 6. מחיקה -->
+    <div class="section" id="delete">
+      <div class="section-title">6. מחיקת נתונים וחשבון</div>
+      <p><b>מתוך האפליקציה (מיידי):</b> הגדרות ← "איפוס כל הנתונים". הפעולה מוחקת את כל הנתונים במכשיר, את הגיבוי בענן, את הרשומה בלוח המובילים ואת מזהה התזכורות, ומנתקת את חשבון Google מהאפליקציה.</p>
+      <p><b>מחיקה חלקית:</b> כיבוי "הצג בלוח המובילים" מסיר את השם שלך מהלוח; "עזוב קבוצה" מסיר אותך מקבוצה; לחיצה על פרק שלקחת במבצע משחררת אותו; כיבוי התזכורות מוחק את מזהה ההתראות.</p>
+      <p><b>בלי גישה לאפליקציה (למשל אחרי שהסרת אותה):</b> שלח אימייל ל-<a href="mailto:tehilon2026@gmail.com?subject=%D7%91%D7%A7%D7%A9%D7%AA%20%D7%9E%D7%97%D7%99%D7%A7%D7%AA%20%D7%A0%D7%AA%D7%95%D7%A0%D7%99%D7%9D%20%E2%80%94%20%D7%9E%D7%A9%D7%A0%D7%AA%D7%99">tehilon2026@gmail.com</a> עם הנושא "בקשת מחיקת נתונים — משנתי". ציין את כתובת האימייל של חשבון Google שהתחברת איתו, או את הכינוי שלך בלוח המובילים / שם הקבוצה. נמחק את כל הנתונים המשויכים אליך תוך 30 יום ונאשר במייל.</p>
+      <p><b>מה נשאר אחרי מחיקה:</b> מונה הלימוד הכללי (ללא שיוך), ורשומות יומן תקלות וסקרים שאינן כוללות פרט מזהה מלבד המזהה האנונימי; אלה נמחקים אוטומטית לכל המאוחר 12 חודשים מיצירתם. גיבויים טכניים של Google נמחקים במחזור הרגיל שלהם.</p>
+    </div>
+
+    <!-- 7. שמירה וילדים -->
+    <div class="section" id="retention">
+      <div class="section-title">7. משך שמירה וקטינים</div>
+      <p>נתונים בענן נשמרים כל עוד אתה משתמש באפליקציה או עד שתמחק אותם. האפליקציה אינה מיועדת לילדים מתחת לגיל 13, ואיננו אוספים ביודעין מידע מילדים; אם נודע לך על מקרה כזה, פנה אלינו ונמחק.</p>
+    </div>
+
+    <!-- 8. מקורות תוכן -->
+    <div class="section" id="content">
+      <div class="section-title">8. מקורות תוכן</div>
+      <p>טקסט המשנה, פירוש ברטנורא ולימוד יומי מסופקים על ידי Sefaria (sefaria.org); ברכת המזון מוויקיטקסט. הטקסטים הם נחלת הכלל או ברישיון פתוח של המקור.</p>
+    </div>
+
+    <!-- 9. שימוש מותר -->
+    <div class="section" id="use">
+      <div class="section-title">9. שימוש מותר</div>
+      <p>האפליקציה מיועדת לשימוש אישי, משפחתי ולימודי. אסור להשתמש בה לכל מטרה מסחרית ללא אישור מפורש מהמפתח.</p>
+      <p>המשתמש אחראי לתוכן שהוא מפרסם (כינוי, שם קבוצה, הקדשה במבצע). אסור לפרסם תוכן פוגעני, מסית או בלתי הולם, או פרטים של אדם אחר בלי הסכמתו. המפתח רשאי להסיר תוכן כזה.</p>
+    </div>
+
+    <!-- 10. אחריות -->
+    <div class="section" id="liability">
+      <div class="section-title">10. כתב ויתור ואחריות</div>
       <div class="disclaimer-box">
-        <p>האפליקציה מסופקת <strong>"כפי שהיא" (AS IS)</strong> ללא כל אחריות מפורשת או משתמעת. המפתח אינו אחראי לכל נזק ישיר, עקיף, או תוצאתי הנובע משימוש באפליקציה, לרבות אובדן נתונים, הפסקת שירות, או תקלות טכניות. השימוש הוא על אחריות המשתמש בלבד.</p>
+        <p>האפליקציה מסופקת "כפי שהיא" (AS IS) ללא כל אחריות מפורשת או משתמעת. המפתח אינו אחראי לכל נזק ישיר, עקיף או תוצאתי הנובע משימוש באפליקציה, לרבות אובדן נתונים, הפסקת שירות או תקלות טכניות. השימוש הוא על אחריות המשתמש בלבד.</p>
       </div>
     </div>
 
-    <!-- 6. שינויים -->
-    <div class="section">
-      <div class="section-title">6. עדכונים לתנאים</div>
-      <p>המפתח רשאי לעדכן תנאים אלה בכל עת. המשך השימוש לאחר פרסום שינויים מהווה הסכמה לתנאים המעודכנים.</p>
+    <!-- 11. שינויים -->
+    <div class="section" id="changes">
+      <div class="section-title">11. עדכונים למדיניות</div>
+      <p>נעדכן את המסמך הזה כשמשתנה משהו באופן שבו האפליקציה מטפלת במידע, ונציין את תאריך העדכון בראש העמוד. על שינוי מהותי נודיע גם בתוך האפליקציה. המשך השימוש לאחר העדכון מהווה הסכמה למדיניות המעודכנת.</p>
+    </div>
+
+    <!-- English -->
+    <div class="section" id="en" dir="ltr" style="text-align:left;">
+      <div class="section-title">Privacy Policy (English summary)</div>
+      <p><b>Mishnati</b> is a free Mishnah learning app operated by an individual developer. Contact: <a href="mailto:tehilon2026@gmail.com">tehilon2026@gmail.com</a>. Last updated: October 2026.</p>
+      <p><b>Stored on your device only:</b> learning history, points, settings, favorites, saved mishnayot, notes, names entered for prayers, and voice recordings (recordings never leave the device).</p>
+      <p><b>Stored in the cloud (Google Firebase), encrypted in transit:</b> (a) a random anonymous ID; (b) leaderboard entry: the nickname you choose (if none: only the initials of your Google name, e.g. "N.K.", or a generic "Mishnah learner 4821"), points, medals, streak and chapter counts, visible to all users, on by default and can be turned off in Settings; (c) only if you sign in with Google: your name, email, profile photo, and a backup of your on-device data; (d) groups: display name and reading stats, visible to group members; (e) shared Mishnah campaigns: purpose, dedication name, your name and the chapters you took, visible to anyone with the link; (f) anonymous per-chapter learning counts; (g) only if reminders are on: push token, reminder time, language and device type; (h) error logs (error message, page, browser, app version, anonymous ID); (i) survey answers, only if you submit the survey.</p>
+      <p><b>Third parties:</b> Google Firebase, Google Cloud Text-to-Speech (Mishnah text only), Sefaria, Hebcal, Vercel hosting and cookieless Vercel Web Analytics, Google Fonts, cdnjs, and Ko-fi (only if you open the tip panel). We do not sell or share personal data, show ads, or track you across apps.</p>
+      <p><b>Not collected:</b> location, contacts, photos/files, phone number, financial info, browsing history, advertising IDs.</p>
+      <p><b>Data and account deletion:</b> in the app, go to Settings → "Reset all data" (איפוס כל הנתונים). This deletes all local data, your cloud backup, your leaderboard entry and push token, and signs you out. Without the app, email <a href="mailto:tehilon2026@gmail.com?subject=Data%20deletion%20request%20-%20Mishnati">tehilon2026@gmail.com</a> with the subject "Data deletion request – Mishnati" and include your Google account email or leaderboard nickname/group name. We delete all associated data within 30 days. Aggregate learning counts and non-identifying error/survey records are deleted within 12 months.</p>
+      <p><b>Children:</b> the app is not directed at children under 13.</p>
     </div>
 
     <div class="footer-note">

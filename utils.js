@@ -142,6 +142,44 @@
     return y + '-' + m + '-' + day;
   };
 
+  /* ── esc: טקסט ממשתמשים אחרים (שמות בלוח/קבוצה) לפני innerHTML ──
+     1.5.132: שמות מ-Firestore הוכנסו ל-innerHTML כמו שהם — "שם" עם תגית HTML היה רץ אצל כל מי שפותח את הקהילה. */
+  TH.esc = function (v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+
+  /* ── שם בלוח המובילים (1.5.132) ─────────────────────────────
+     1. כינוי שהמשתמש בחר (settings.username) — תמיד גובר.
+     2. מחובר Google בלי כינוי → ראשי תיבות בלבד: "נחמיה כהן" → "נ.כ." (לא חושפים שם מלא בלי בחירה).
+     3. אחרת → "לומד משניות 4821" (מספר קבוע לכל משתמש, נגזר מהמזהה שלו). */
+  TH.nameInitials = function (full) {
+    var w = String(full || '').trim().split(/\s+/).filter(Boolean);
+    if (!w.length) return '';
+    if (w.length === 1) return w[0].charAt(0) + '.';
+    return w[0].charAt(0) + '.' + w[w.length - 1].charAt(0) + '.';
+  };
+  TH.anonReaderName = function (uid) {
+    var s = String(uid || ''), h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    var en = false;
+    try { en = (JSON.parse(localStorage.getItem('tehillim_settings') || '{}').lang === 'en'); } catch (e) {}
+    return (en ? 'Mishnah learner ' : 'לומד משניות ') + (1000 + (s ? h % 9000 : Math.floor(Math.random() * 9000)));
+  };
+  /* שם ברירת המחדל (בלי הכינוי) — להצעה בחלון "איך להציג אותך?" ובהגדרות */
+  TH.lbDefaultName = function () {
+    var g = TH.S.get('tehillim_google_user');
+    var ini = g && g.name ? TH.nameInitials(g.name) : '';
+    if (!ini && g && g.displayName) ini = TH.nameInitials(g.displayName);
+    return ini || TH.anonReaderName(TH.S.get('tehillim_uid'));
+  };
+  TH.lbDisplayName = function () {
+    var s = TH.S.get('tehillim_settings') || {};
+    var u = String(s.username || '').trim();
+    return u || TH.lbDefaultName();
+  };
+
   /* קיצור גלובלי — נגיש מכל קובץ אחרי טעינת utils.js */
   window.localDateStr = TH.localDateStr;
 

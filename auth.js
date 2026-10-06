@@ -5,7 +5,7 @@
  */
 
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, addDoc }
+import { getFirestore, doc, setDoc, getDoc, deleteDoc, serverTimestamp, collection, addDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
   getAuth,
@@ -226,6 +226,24 @@ export async function signOutUser() {
 /* ════════════════════════════════════════════
    ERROR LOGS — העלאת מאגר השגיאות (errlog.js) ל-Firestore
 ════════════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   DELETE CLOUD DATA + HARD SIGN-OUT — ל"איפוס כל הנתונים" (1.5.132, הובא מתהילהון 2.7.208/209/213).
+   בלי זה: אצל מחובר Google, initAuth() שרץ בכל טעינה מוריד את users/<uid> בחזרה מהענן והאיפוס "לא קורה";
+   leaderboard/<uid> הוא מסמך נפרד שנשאר בלוח; ו-session ה-Firebase (IndexedDB) שורד את ניקוי ה-localStorage.
+════════════════════════════════════════════ */
+export async function deleteCloudData(uid) {
+  if (!uid) return;
+  try {
+    await Promise.all([
+      deleteDoc(doc(db, 'users', uid)).catch(()=>{}),
+      deleteDoc(doc(db, 'leaderboard', uid)).catch(()=>{}) // ייתכן שהמסמך לא קיים — לא שגיאה
+    ]);
+  } catch(e) { console.warn('Cloud delete failed:', e.code); }
+}
+export async function hardSignOut() {
+  try { await signOut(auth); } catch(e) {}
+}
+
 export async function flushErrorLogs(uid) {
   let arr;
   try {
@@ -248,7 +266,8 @@ export async function flushErrorLogs(uid) {
         n:        (r.n || 1),
         clientTs: r.ts || Date.now(),
         uid:      owner,
-        ts:       serverTimestamp()
+        ts:       serverTimestamp(),
+        expireAt: new Date(Date.now() + 365 * 864e5)   // מחיקה אוטומטית (TTL) — terms.html#delete
       });
     } catch (e) {
       return; // נחסם (rules לא פרוסים / אופליין) — השאר במאגר לניסיון הבא
@@ -276,7 +295,8 @@ export async function submitSurvey(answers) {
     problems:     String(answers.problems || '').slice(0, 1000),
     comments:     String(answers.comments || '').slice(0, 1000),
     ver, uid,
-    ts: serverTimestamp()
+    ts: serverTimestamp(),
+    expireAt: new Date(Date.now() + 365 * 864e5)   // מחיקה אוטומטית (TTL) — terms.html#delete
   });
 }
 

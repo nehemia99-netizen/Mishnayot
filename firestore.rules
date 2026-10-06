@@ -21,8 +21,11 @@ service cloud.firestore {
     // ── leaderboard/{uid} — קריאה לכל מחובר, כתיבה לבעלים בלבד + רק שדות מותרים ──
     match /leaderboard/{uid} {
       allow read:  if isSignedIn();
-      allow write: if isOwner(uid)
+      allow create, update: if isOwner(uid)
                    && request.resource.data.keys().hasOnly(['displayName','score','medals','streak','monthly','memorized','chaps','todayChaps','lastDate','updatedAt']);
+      // מחיקה בנפרד: ב-delete אין request.resource, ולכן תנאי ה-hasOnly שלמעלה נכשל ו"איפוס כל הנתונים"
+      // לא הצליח למחוק את הרשומה בלוח המובילים (נבלע ב-catch). אוקטובר 2026.
+      allow delete: if isOwner(uid);
     }
 
     // ── chapReads/{chapId} — מונה קריאות גלובלי; רק שדה count ──
