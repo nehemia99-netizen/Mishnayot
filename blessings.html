@@ -38,6 +38,8 @@ body{font-family:system-ui,sans-serif;background:var(--bg);display:flex;justify-
 .blessing-item.open .blessing-arrow{transform:rotate(90deg);}
 .blessing-body{display:none;padding:0 16px 16px;font-size:15px;color:var(--text);line-height:1.9;font-family:'David Libre','David','Times New Roman',serif;}
 .blessing-item.open .blessing-body{display:block;}
+.mayan-extra{color:#C0392B;font-weight:700;}
+html.dark .mayan-extra{color:#FF7B6B;}
 .group-header{padding:11px 16px 9px;font-size:12px;font-weight:800;color:var(--text-muted);letter-spacing:.4px;background:var(--surface);border-bottom:.5px solid var(--border);}
 
 /* ── ברכת המזון (מתג נוסח) ── */
@@ -526,6 +528,72 @@ function applyBlessingFont() {
 }
 
 /* ── ברכה מעין שלוש ── */
+/* ── מעין שלוש: מתי תוספות שבת/ראש חודש רלוונטיות ──
+   היום ההלכתי מתחיל בשקיעה: ערב ראש חודש (או ערב שבת) אחרי השקיעה כבר רלוונטי, וביום עצמו — עד השקיעה.
+   השקיעה מחושבת מהמיקום: ישראל לפי אזור-זמן; בחו"ל — מיקום מדויק אם כבר ניתנה הרשאת מיקום לאתר (בלי לבקש),
+   ואחרת קירוב לפי היסט אזור-הזמן. כשלא ניתן לחשב — 18:00. */
+function _mayanLocation() {
+  try {
+    const g = JSON.parse(localStorage.getItem('tehillim_geo') || 'null');
+    if (g && typeof g.lat === 'number' && typeof g.lon === 'number') return g;
+  } catch (e) {}
+  let tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  if (/^(Asia\/(Jerusalem|Hebron|Gaza|Tel_Aviv)|Israel)$/.test(tz)) return { lat: 31.7683, lon: 35.2137 };
+  return { lat: 40, lon: -new Date().getTimezoneOffset() / 4 }; // 15° לכל שעה; רוחב 40° כקירוב כללי
+}
+// ניסיון שקט לעדכן מיקום מדויק — רק אם ההרשאה כבר ניתנה (לא מקפיץ בקשה)
+(function () {
+  try {
+    if (!navigator.permissions || !navigator.geolocation) return;
+    navigator.permissions.query({ name: 'geolocation' }).then(function (p) {
+      if (p.state !== 'granted') return;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        try { localStorage.setItem('tehillim_geo', JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude, ts: Date.now() })); } catch (e) {}
+      }, function () {}, { maximumAge: 7 * 864e5, timeout: 8000 });
+    }).catch(function () {});
+  } catch (e) {}
+})();
+// שקיעה (Date) ביום האזרחי של d, לפי האלגוריתם של ה-Almanac (דיוק של כדקה-שתיים). null אם אין שקיעה (קוטב).
+function _mayanSunset(d, loc) {
+  const R = Math.PI / 180, sin = x => Math.sin(x * R), cos = x => Math.cos(x * R);
+  const mod = (a, n) => ((a % n) + n) % n;
+  const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+  const N = Math.floor(275 * m / 9) - Math.floor((m + 9) / 12) * (1 + Math.floor((y - 4 * Math.floor(y / 4) + 2) / 3)) + day - 30;
+  const lngH = loc.lon / 15, t = N + (18 - lngH) / 24;
+  const M = 0.9856 * t - 3.289;
+  const L = mod(M + 1.916 * sin(M) + 0.020 * sin(2 * M) + 282.634, 360);
+  let RA = mod(Math.atan(0.91764 * Math.tan(L * R)) / R, 360);
+  RA += Math.floor(L / 90) * 90 - Math.floor(RA / 90) * 90;
+  RA /= 15;
+  const sinDec = 0.39782 * sin(L), cosDec = Math.cos(Math.asin(sinDec));
+  const cosH = (cos(90.833) - sinDec * sin(loc.lat)) / (cosDec * cos(loc.lat));
+  if (cosH > 1 || cosH < -1) return null;
+  const H = Math.acos(cosH) / R / 15;
+  const UT = mod(H + RA - 0.06571 * t - 6.622 - lngH, 24);
+  let ms = Date.UTC(y, m - 1, day) + UT * 36e5;
+  const noon = new Date(y, m - 1, day, 12, 0, 0).getTime();
+  while (ms < noon) ms += 864e5;           // השקיעה היא תמיד אחרי הצהריים המקומיים
+  while (ms >= noon + 864e5) ms -= 864e5;
+  return new Date(ms);
+}
+// המצב ההלכתי "עכשיו": האם היום (לפי שקיעה) שבת / ראש חודש
+function _mayanDayInfo(nowArg) {
+  const now = nowArg || new Date();
+  let after;
+  try { const ss = _mayanSunset(now, _mayanLocation()); after = ss ? now.getTime() >= ss.getTime() : now.getHours() >= 18; }
+  catch (e) { after = now.getHours() >= 18; }
+  const eff = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (after ? 1 : 0), 12, 0, 0);
+  let rc = false;
+  try {
+    const hd = parseInt(new Intl.DateTimeFormat('en-u-ca-hebrew-nu-latn', { day: 'numeric' }).format(eff), 10);
+    if (hd === 30) rc = true;
+    else if (hd === 1) rc = new Intl.DateTimeFormat('he-u-ca-hebrew', { month: 'long' }).format(eff).indexOf('תשרי') === -1; // א׳ תשרי = ראש השנה
+  } catch (e) {}
+  return { shabbat: eff.getDay() === 6, roshChodesh: rc };
+}
+function _mayanIsShabbatDay() { return _mayanDayInfo().shabbat; }
+function _mayanIsRoshChodeshDay() { return _mayanDayInfo().roshChodesh; }
 let mayanActive = new Set([1]);
 function toggleMayan(n) {
   if (mayanActive.has(n)) { if (mayanActive.size > 1) mayanActive.delete(n); }
@@ -540,6 +608,12 @@ function applyMayan() {
   const out = document.getElementById('mTextOut');
   if (out) { out.innerHTML = buildMayanText(); try { applyBlessingFont(); } catch(e){} }
 }
+function _mayanExtraBracket() {
+  const bits = [];
+  if (_mayanIsShabbatDay()) bits.push('[בשבת: וּרְצֵה וְהַחֲלִיצֵנוּ בְּיוֹם הַשַּׁבָּת הַזֶּה.]');
+  if (_mayanIsRoshChodeshDay()) bits.push('[בראש חודש: וְזָכְרֵנוּ לְטוֹבָה בְּיוֹם רֹאשׁ הַחֹדֶשׁ הַזֶּה.]');
+  return bits.length ? ('<span class="mayan-extra">' + bits.join(' ') + '</span> ') : '';
+}
 function buildMayanText() {
   const parts = [], close1 = [], openings = [];
   if (mayanActive.has(1)) { parts.push('עַל הַמִּחְיָה וְעַל הַכַּלְכָּלָה'); close1.push('הַמִּחְיָה'); }
@@ -550,7 +624,7 @@ function buildMayanText() {
     ', וְעַל תְּנוּבַת הַשָּׂדֶה, וְעַל אֶרֶץ חֶמְדָּה טוֹבָה וּרְחָבָה שֶׁרָצִיתָ וְהִנְחַלְתָּ לַאֲבוֹתֵינוּ לֶאֱכוֹל מִפִּרְיָהּ וְלִשְׂבּוֹעַ מִטּוּבָהּ. ' +
     'רַחֵם נָא יְהֹוָה אֱלֹהֵינוּ עַל יִשְׂרָאֵל עַמֶּךָ, וְעַל יְרוּשָׁלַיִם עִירֶךָ, וְעַל צִיּוֹן מִשְׁכַּן כְּבוֹדֶךָ, וְעַל מִזְבְּחֶךָ וְעַל הֵיכָלֶךָ. ' +
     'וּבְנֵה יְרוּשָׁלַיִם עִיר הַקֹּדֶשׁ בִּמְהֵרָה בְיָמֵינוּ, וְהַעֲלֵנוּ לְתוֹכָהּ וְשַׂמְּחֵנוּ בְּבִנְיָנָהּ, וְנֹאכַל מִפִּרְיָהּ וְנִשְׂבַּע מִטּוּבָהּ, וּנְבָרֶכְךָ עָלֶיהָ בִּקְדֻשָּׁה וּבְטָהֳרָה. ' +
-    '<span style="color:var(--text-muted)">[בשבת: וּרְצֵה וְהַחֲלִיצֵנוּ בְּיוֹם הַשַּׁבָּת הַזֶּה.] [בראש חודש: וְזָכְרֵנוּ לְטוֹבָה בְּיוֹם רֹאשׁ הַחֹדֶשׁ הַזֶּה.]</span> ' +
+    _mayanExtraBracket() +
     'כִּי אַתָּה יְהֹוָה טוֹב וּמֵטִיב לַכֹּל, וְנוֹדֶה לְּךָ עַל הָאָרֶץ וְעַל ' + cl +
     '. בָּרוּךְ אַתָּה יְהֹוָה, עַל הָאָרֶץ וְעַל ' + cl + '.';
 }
