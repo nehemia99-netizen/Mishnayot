@@ -394,6 +394,12 @@ const S = TH ? TH.S : {
 /* ── כלי: טוגל אקורדיון ── */
 const ALL_BLESSINGS = ['bMazon','bShemaMita','bNefashot','b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13','b14','bAsher'];
 
+/* אחרי פתיחת ברכה (השאר נסגרות והרשימה מתקצרת) מיישרים את הכותרת שלה לראש הרשימה; אחרת היא נשארת במקום שרירותי וצריך לגלול אליה */
+function _blessAlignTop(el) {
+  const list = el.closest('.blessing-list'); if (!list) return;
+  list.scrollTop += el.getBoundingClientRect().top - list.getBoundingClientRect().top;
+}
+
 function toggleBlessing(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -404,6 +410,7 @@ function toggleBlessing(id) {
   });
   if (!wasOpen) {
     el.classList.add('open');
+    _blessAlignTop(el);
     if (id === 'b7') { if (!mayanActive || !mayanActive.size) { mayanActive = new Set([1]); } applyMayan(); }
     if (id === 'bMazon') applyMazonRC();
     if (id === 'b10') initAvot();
