@@ -1589,7 +1589,12 @@ function navigateHida() {
 }
 
 /* ── Mark done ── */
+/* עוצר את הבהוב כפתור הסיום (בלחיצה עליו) ומבטל את התזמון שעוד לא הופעל */
+function _stopDoneBlink() {
+  try { clearTimeout(window._doneBlinkT); clearTimeout(window._doneBlinkT2); var b = document.getElementById('doneBtn'); if (b) b.classList.remove('blink'); } catch (e) {}
+}
 function markDone() {
+  _stopDoneBlink();
   if (isDone) {
     // מצב חידא — עבור לקטע הבא
     if (MODE === 'hida') { navigateHida(); return; }
